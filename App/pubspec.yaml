@@ -54,11 +54,11 @@ dev_dependencies:
 flutter:
 
   # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
+  # included with your application, so that you can use the  icons in
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets
+    - assets/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -76,24 +76,24 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-   fonts:
-     - family: Yuiyeon
-       fonts:
-         - asset: fonts/yuiyeon.ttf
+  fonts:
+    - family: Yuiyeon
+      fonts:
+        - asset: fonts/yuiyeon.ttf
     - family: NotoSans
-        fonts:
-          - asset: fonts/NotoSansKR-Black.otf
-            weight: 900
-          - asset: fonts/NotoSansKR-Bold.otf
-            weight: 700
-          - asset: fonts/NotoSansKR-Medium.otf
-            weight: 500
-          - asset: fonts/NotoSansKR-Regular.otf
-            weight: 400
-          - asset: fonts/NotoSansKR-Light.otf
-            weight: 300
-          - asset: fonts/NotoSansKR-Thin.otf
-            weight: 100
-  #
+      fonts:
+        - asset: fonts/NotoSansKR-Black.otf
+          weight: 900
+        - asset: fonts/NotoSansKR-Bold.otf
+          weight: 700
+        - asset: fonts/NotoSansKR-Medium.otf
+          weight: 500
+        - asset: fonts/NotoSansKR-Regular.otf
+          weight: 400
+        - asset: fonts/NotoSansKR-Light.otf
+          weight: 300
+        - asset: fonts/NotoSansKR-Thin.otf
+          weight: 100
+    #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
