@@ -79,7 +79,11 @@ flutter:
   fonts:
     - family: Yuiyeon
       fonts:
+<<<<<<< Updated upstream
         - asset: fonts/yuiyeon.ttf
+=======
+         - asset: fonts/yuiyeon.ttf
+>>>>>>> Stashed changes
     - family: NotoSans
       fonts:
         - asset: fonts/NotoSansKR-Black.otf
@@ -94,6 +98,10 @@ flutter:
           weight: 300
         - asset: fonts/NotoSansKR-Thin.otf
           weight: 100
+<<<<<<< Updated upstream
     #
+=======
+  #
+>>>>>>> Stashed changes
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
