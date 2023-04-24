@@ -16,27 +16,30 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset : false,
-      appBar: AppBar(title: Text('BottomNavigationBar')),
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        clipBehavior: Clip.antiAlias,
-        child: Container(
-          height: kBottomNavigationBarHeight,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(
-                  color: Colors.grey,
-                  width: 0.5,
-                ),
-              ),
-            ),
-            child: BottomNavigationBar(
+    return
+
+      // appBar: AppBar(title: Text('BottomNavigationBar')),
+      // body: _pages[_currentIndex],
+      // BottomNavigationBar(
+      //   shape: CircularNotchedRectangle(),
+      //   notchMargin: 8.0,
+      //   clipBehavior: Clip.antiAlias,
+      //   child: Container(
+      //     height: kBottomNavigationBarHeight,
+      //     child: Container(
+      //       decoration: BoxDecoration(
+      //         color: Colors.white,
+      //         border: Border(
+      //           top: BorderSide(
+      //             color: Colors.grey,
+      //             width: 0.5,
+      //           ),
+      //         ),
+      //       ),
+      //       child:
+            BottomNavigationBar(
+                iconSize: 8,// ADD THIS
+                selectedFontSize: 4,// ADD THIS
                 currentIndex: _currentIndex,
                 backgroundColor: Colors.blue,
                 selectedItemColor: Colors.white,
@@ -51,23 +54,22 @@ class _HomePageState extends State<HomePage> {
                   BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
                   BottomNavigationBarItem(
                       icon: Image.asset('assets/b3d37220175f46299a2639f1bf15ded2.png'), label: 'Game'),
-                ]),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation:
-      FloatingActionButtonLocation.miniCenterDocked,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FloatingActionButton(
-          backgroundColor: _currentIndex == 1 ? Colors.blue : Colors.blueGrey,
-          child: Icon(Icons.home),
-          onPressed: () => setState(() {
-            _currentIndex = 1;
-          }),
-        ),
-      ),
-    );
+                ]);
+        //   ),
+        // )
+    //   floatingActionButtonLocation:
+    //   FloatingActionButtonLocation.miniCenterDocked,
+    //   floatingActionButton: Padding(
+    //     padding: const EdgeInsets.all(8.0),
+    //     child: FloatingActionButton(
+    //       backgroundColor: _currentIndex == 1 ? Colors.blue : Colors.blueGrey,
+    //       child: Icon(Icons.home),
+    //       onPressed: () => setState(() {
+    //         _currentIndex = 1;
+    //       }),
+    //     ),
+    //   ),
+    // );
   }
 }
 class HomeScreen extends StatelessWidget {
