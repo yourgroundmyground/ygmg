@@ -11,13 +11,14 @@ class Login extends StatelessWidget {
         body: Container(
           decoration: BoxDecoration(
 
+
           ),
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
               children:[
-                Image.asset('assets/images/MainLogo.png'),
+                Image.asset('images/mainlogo.png'),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     ),
