@@ -8,7 +8,7 @@ class Navbar extends StatefulWidget {
   _NavbarState createState() => _NavbarState();
 }
 class _NavbarState extends State<Navbar> {
-  int _currentIndex = 1;
+  int _currentIndex = 2;
   List<Widget> _pages = [];
   @override
   void initState() {
