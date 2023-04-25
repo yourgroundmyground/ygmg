@@ -14,7 +14,7 @@ class _NavbarState extends State<Navbar> {
   void initState() {
     _pages.add(RunningStart());
     _pages.add(Mypage());
-    // _pages.add(GameStart());
+    // _pages.add(GameStart()); //게임스타트페이지
     super.initState();
   }
   @override
