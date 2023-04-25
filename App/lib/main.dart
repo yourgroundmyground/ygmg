@@ -24,8 +24,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: AppBar(title: Text('메인')),
-      body: Text('내용'),
-      bottomNavigationBar: HomePage(),
+      body: Text(''),
+      bottomNavigationBar: Navbar(),
     );
   }
 }
