@@ -64,8 +64,6 @@ class Mypage extends StatelessWidget {
                 ),
                 child: Image.asset('assets/testProfile.png'),      // *프로필 사진 넣어주기
               ),
-
-
             ],
           ),
         ),
