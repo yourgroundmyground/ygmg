@@ -13,9 +13,8 @@ class DailyGame extends StatelessWidget {
       body: SafeArea(
         top: true,
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+        child:
+          Column(
             children: [
               Column(
                 children: [
@@ -55,7 +54,7 @@ class DailyGame extends StatelessWidget {
                       )),
                       Positioned(
                         top: 5,
-                        left: 150,                 // *가운데 position 어떻게해요..?
+                        left: (MediaQuery.of(context).size.width - 155) / 2,
                         child: Container(
                           width: 155,
                           height: 29,
@@ -66,7 +65,7 @@ class DailyGame extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('MY GROUND',
+                              Text('오늘 차지한 땅',
                                 style: TextStyle(
                                   color: Colors.white,
                                 ),
@@ -88,7 +87,6 @@ class DailyGame extends StatelessWidget {
             ],
           ),
         ),
-      )
     );
   }
 }
@@ -103,7 +101,7 @@ class DailyMap extends StatelessWidget {
     return Container(
       child: Container(
         width: double.infinity,
-        height: 600,
+        height: 500,
       ),
     );
   }
@@ -151,7 +149,7 @@ class DailyGameResult extends StatelessWidget {
             ),
             child: Image.asset('assets/testProfile.png'),      // *프로필 사진 넣어주기
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 10),
           Text('58:25', style: TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.w900
