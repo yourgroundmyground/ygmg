@@ -11,7 +11,7 @@ class Login extends StatelessWidget {
         decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: AssetImage('images/mainbg.png'),
+          image: AssetImage('assets/images/mainbg.png'),
         ),
         ),
         child: Scaffold(
@@ -20,8 +20,8 @@ class Login extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('images/mainlogo.png'),
-              ElevatedButton(onPressed: (){}, child: Text('카카오로그인')),
+              Image.asset('assets/images/mainlogo.png'),
+              ElevatedButton(onPressed: (){}, child: Text('카카오 로그인')),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
