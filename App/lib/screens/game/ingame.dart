@@ -5,48 +5,52 @@ class InGame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: Column(
-                    children: [
-                      Text('시간모달'),
-                      Text('차지면적')
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  child: Column(
-                    children: [
-                      Text('실시간 순위')
-                    ],
-                  ),
-                )
-              ],
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
+
+    return Stack(
+      children: [
+        Container(
+          color: Colors.deepPurple,
+        ),
+        Positioned(
+            left: mediaWidth*0.01,
+            top: mediaHeight*0.03,
+            child: Container(
+              //왼쪽 위 모달
+              width: 200,
+              color: Colors.amber,
+              child: Column(
+                children: [
+                  Text('시간모달', style: TextStyle(fontSize: 20,color: Colors.black),),
+                  Text('차지면적', style: TextStyle(fontSize: 20,color: Colors.black),)
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                FloatingActionButton(
-                  backgroundColor: Colors.pink,
-                  child: Icon(Icons.stop),
-                  onPressed: (){},
-                ),
-              ],
+        ),
+        Positioned(
+            right: mediaWidth*0.01,
+            top: mediaHeight*0.03,
+            child: Container(
+              //오른쪽 위 모달
+              width: 200,
+              color: Colors.green,
+              child: Column(
+                children: [
+                  Text('실시간 순위', style: TextStyle(fontSize: 16, color: Colors.black)),
+                  Text('현재 내 순위', style: TextStyle(fontSize: 16, color: Colors.black))
+                ],
+              ),
             )
-          ],
-        )
-      ),
+        ),
+        Positioned(
+            bottom: mediaHeight*0.01,
+            right: mediaWidth*0.45,
+            child: FloatingActionButton(
+                backgroundColor: Colors.deepOrangeAccent,
+                onPressed: (){}, child: Icon(Icons.stop))
+        ),
+      ],
     );
   }
 }
