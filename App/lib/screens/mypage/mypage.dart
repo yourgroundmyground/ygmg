@@ -16,7 +16,7 @@ class Mypage extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             image : DecorationImage(
-              image : AssetImage('assets/mypage-bg.png'),
+              image : AssetImage('images/mypage-bg.png'),
               fit : BoxFit.fitWidth,
               alignment: Alignment.topLeft,
               repeat: ImageRepeat.noRepeat
@@ -62,7 +62,7 @@ class Mypage extends StatelessWidget {
                       )
                     ]
                 ),
-                child: Image.asset('assets/testProfile.png'),      // *프로필 사진 넣어주기
+                child: Image.asset('images/testProfile.png'),      // *프로필 사진 넣어주기
               ),
             ],
           ),
