@@ -30,10 +30,10 @@ class _NavbarState extends State<Navbar> {
           height: kBottomNavigationBarHeight,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.white.withOpacity(0),
               border: Border(
                 top: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.grey.withOpacity(0),
                   width: 0.5,
                 ),
               ),
@@ -43,7 +43,7 @@ class _NavbarState extends State<Navbar> {
                 selectedFontSize: 4,
                 currentIndex: _currentIndex,
                 backgroundColor: Colors.blue,
-                selectedItemColor: Colors.white,
+                selectedItemColor: Colors.white.withOpacity(0),
                 onTap: (index) {
                   setState(() {
                     _currentIndex = index;
@@ -51,11 +51,11 @@ class _NavbarState extends State<Navbar> {
                 },
                 items: [
                   BottomNavigationBarItem(
-                      icon: Image.asset('assets/RunningShoe.png'), label: 'Running'),
+                      icon: Image.asset('assets/images/RunningShoe.png'), label: 'Running'),
                   BottomNavigationBarItem(
-                      icon: Image.asset('assets/testProfile.png', width: 40,), label: ''),
+                      icon: Image.asset('assets/images/testProfile.png', width: 40,), label: ''),
                   BottomNavigationBarItem(
-                      icon: Image.asset('assets/b3d37220175f46299a2639f1bf15ded2.png'), label: 'Game')
+                      icon: Image.asset('assets/images/b3d37220175f46299a2639f1bf15ded2.png'), label: 'Game')
                 ]),
           ),
         ),
@@ -65,8 +65,22 @@ class _NavbarState extends State<Navbar> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton(
-          backgroundColor: _currentIndex == 1 ? Colors.blue : Colors.blueGrey,
-          child: Image.asset('assets/testProfile.png', width: 40,),
+          child : Container(
+            width:  100,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+              Color(0xFFFBCA92),
+              Color(0xFFEF7EC2)
+              ]
+            ),
+          ),
+          child: Image.asset('assets/images/testProfile.png', width: 40,),
+          ),
           onPressed: () => setState(() {
             _currentIndex = 1;
           }),
