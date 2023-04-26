@@ -1,8 +1,30 @@
 import 'package:app/const/colors.dart';
+import 'package:app/widgets/modal.dart';
 import 'package:flutter/material.dart';
 
-class WeeklyGame extends StatelessWidget {
+class WeeklyGame extends StatefulWidget {
   const WeeklyGame({Key? key}) : super(key: key);
+
+  @override
+  State<WeeklyGame> createState() => _WeeklyGameState();
+}
+
+class _WeeklyGameState extends State<WeeklyGame> {
+  @override
+  void initState() {
+    super.initState();
+    // 2초 후에 showModal 함수 호출
+    Future.delayed(Duration(seconds: 2), showModal);
+  }
+
+  void showModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomModal();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
