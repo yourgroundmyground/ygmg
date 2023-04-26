@@ -1,7 +1,9 @@
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main(){
+void main() async {
+  await dotenv.load(fileName: 'lib/.env');
   runApp(MyApp());
 }
 
@@ -20,6 +22,7 @@ class Home extends StatefulWidget{
 }
 
 class _HomeState extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
