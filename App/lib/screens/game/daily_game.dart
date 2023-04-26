@@ -1,8 +1,26 @@
 import 'package:app/const/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class DailyGame extends StatelessWidget {
+class DailyGame extends StatefulWidget {
   const DailyGame({Key? key}) : super(key: key);
+
+  @override
+  State<DailyGame> createState() => _DailyGameState();
+}
+
+class _DailyGameState extends State<DailyGame> {
+  bool showSvg = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        showSvg = true;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,79 +36,88 @@ class DailyGame extends StatelessWidget {
         top: true,
         bottom: false,
         child:
-          Column(
+          Stack(
             children: [
               Column(
                 children: [
-                  // const SizedBox(height: 51,),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.1, 0, mediaHeight*0.02),
-                    child: Text('결과', style: TextStyle(
-                      fontSize: mediaWidth*0.07,
-                      fontWeight: FontWeight.w700
-                    ),),
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.03, mediaWidth*0.1, mediaHeight*0.02),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('현재 랭킹 :', style: TextStyle(
-                          fontSize: mediaWidth*0.05,
-                          fontWeight: FontWeight.w600
-                        ),),
-                        Text('$nowRanking 위', style: TextStyle(
-                          fontSize: mediaWidth*0.05,
-                          fontWeight: FontWeight.w600,
-                          color: YGMG_RED
-                        ),),
-                      ],
-                    ),
-                  ),
-                  Stack(
+                  Column(
                     children: [
-                      DailyMap(),
-                      Positioned(child: Container(
+                      // const SizedBox(height: 51,),
+                      Container(
                         width: double.infinity,
-                        height: mediaHeight*0.35,
-                        color: Colors.blue,         // *나중에 지도 맵 넣기
-                      )),
-                      Positioned(
-                        top: mediaHeight*0.01,
-                        left: (MediaQuery.of(context).size.width - mediaWidth*0.3) / 2,
-                        child: Container(
-                          width: mediaWidth*0.3,
-                          height: mediaHeight*0.035,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(mediaWidth*0.1),
-                            color: Color.fromRGBO(0, 0, 0, 0.4),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('오늘 차지한 땅',
-                                style: TextStyle(
-                                  fontSize: mediaWidth*0.028,
-                                  color: Colors.white,
+                        padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.1, 0, mediaHeight*0.02),
+                        child: Text('결과', style: TextStyle(
+                            fontSize: mediaWidth*0.07,
+                            fontWeight: FontWeight.w700
+                        ),),
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.03, mediaWidth*0.1, mediaHeight*0.02),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('현재 랭킹 :', style: TextStyle(
+                                fontSize: mediaWidth*0.05,
+                                fontWeight: FontWeight.w600
+                            ),),
+                            Text('$nowRanking 위', style: TextStyle(
+                                fontSize: mediaWidth*0.05,
+                                fontWeight: FontWeight.w600,
+                                color: YGMG_RED
+                            ),),
+                          ],
+                        ),
+                      ),
+                      Stack(
+                        children: [
+                          DailyMap(),
+                          Positioned(child: Container(
+                            width: double.infinity,
+                            height: mediaHeight*0.35,
+                            color: Colors.blue,         // *나중에 지도 맵 넣기
+                          )),
+                          Positioned(
+                              top: mediaHeight*0.01,
+                              left: (MediaQuery.of(context).size.width - mediaWidth*0.3) / 2,
+                              child: Container(
+                                width: mediaWidth*0.3,
+                                height: mediaHeight*0.035,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(mediaWidth*0.1),
+                                  color: Color.fromRGBO(0, 0, 0, 0.4),
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                      )),
-                      Positioned(
-                        top: mediaHeight*0.3,
-                        left: mediaWidth*0.1,
-                        right: mediaWidth*0.1,
-                        child:DailyGameResult()
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('오늘 차지한 땅',
+                                      style: TextStyle(
+                                        fontSize: mediaWidth*0.028,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              )),
+                          Positioned(
+                              top: mediaHeight*0.3,
+                              left: mediaWidth*0.1,
+                              right: mediaWidth*0.1,
+                              child:DailyGameResult()
+                          )
+                        ],
                       )
                     ],
-                  )
+                  ),
                 ],
               ),
+              Positioned(
+                left: mediaWidth*0.6,
+                child: showSvg ? SvgPicture.asset('assets/images/donemark.svg') : Container()
+              )
             ],
           ),
+
         ),
     );
   }
