@@ -9,10 +9,6 @@ class Navbar extends StatefulWidget {
   _NavbarState createState() => _NavbarState();
 }
 class _NavbarState extends State<Navbar> {
-  // env 파일의 key 사용법
-  void _key() {
-    print(dotenv.env['GOOGLE_MAP_KEY']);
-  }
   int _currentIndex = 2;
   List<Widget> _pages = [];
   @override
@@ -88,7 +84,6 @@ class _NavbarState extends State<Navbar> {
           ),
           onPressed: () => setState(() {
             _currentIndex = 1;
-            _key();
           }),
         ),
       ),
