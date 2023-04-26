@@ -35,7 +35,7 @@ class RunningStart extends StatelessWidget {
                 child: Text('달리기', style: TextStyle(
                     fontSize: mediaWidth*0.07,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black
+                    color: Colors.white
                 ),),
               ),
               Stack(
@@ -89,8 +89,8 @@ class RunningStart extends StatelessWidget {
               ),
               // 목표 입력창
               Container(
-                width: mediaWidth*0.75,
-                height: mediaWidth*0.15,
+                width: mediaWidth*0.8,
+                height: mediaWidth*0.17,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(mediaWidth*0.08),
@@ -110,12 +110,12 @@ class RunningStart extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text('오늘 목표', style: TextStyle(
-                          fontSize: mediaWidth*0.04,
+                          fontSize: mediaWidth*0.05,
                           fontWeight: FontWeight.w600
                       ),),
                       Text('${todayGoal.toStringAsFixed(1)} KM',
                         style: TextStyle(
-                            fontSize: mediaWidth*0.045,
+                            fontSize: mediaWidth*0.055,
                             fontWeight: FontWeight.w600
                         ),)        // *목표미설정시 0.0, 설정 후 변경되도록하기
                     ],
