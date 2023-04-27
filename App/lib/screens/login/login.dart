@@ -22,7 +22,9 @@ class Login extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset('assets/images/mainlogo.png'),
+              Container(
+                  margin: EdgeInsets.only(top: mediaHeight*0.05),
+                  child: Image.asset('assets/images/mainlogo.png')),
               Container(
                 margin: EdgeInsets.only(top: mediaHeight*0.02),
                 child: GestureDetector(
