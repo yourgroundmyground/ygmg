@@ -1,6 +1,7 @@
 import 'package:app/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/bottomnavbar.dart';
+import 'package:app/utils/map.dart';
 
 class Mypage extends StatelessWidget {
   const Mypage({Key? key}) : super(key: key);
@@ -125,8 +126,8 @@ class Mypage extends StatelessWidget {
             ],
           ),
         ),
-      )
-      // bottomNavigationBar: HomePage(),
+      ),
+      bottomNavigationBar:  MapSample(),
     );
   }
 }

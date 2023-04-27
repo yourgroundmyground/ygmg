@@ -47,3 +47,7 @@ app.*.map.json
 .env*
 *.env
 .env
+.properties
+*.properties
+.properties*
+local.properties
