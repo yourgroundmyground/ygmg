@@ -10,3 +10,4 @@ const YGMG_DARKGREEN = Color(0xFF1BA49A);
 const YGMG_PURPLE = Color(0xFFBF37A1);
 
 const TEXT_GREY = Color(0xFFB1B1B1);
+const CLOCK_BLACK = Color(0xFF4B4B4B);
