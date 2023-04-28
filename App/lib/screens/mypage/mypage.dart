@@ -2,31 +2,59 @@ import 'package:app/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:app/utils/map.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:location/location.dart';
 
-class ChartData{
-  ChartData(this.x, this.y1, this.y2, this.y3, this.y4);
-  final String x;
-  final String y1;
-  final String y2;
-  final String y3;
-  final String y4;
-}
-class Mypage extends StatelessWidget {
+
+class Mypage extends StatefulWidget {
   const Mypage({Key? key}) : super(key: key);
   @override
+  _MypageState createState() => _MypageState();
+}
+class _MypageState extends State<Mypage> {
+  Location location = new Location();
+
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
+  LocationData? _locationData;
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+  void getLocation() async {
+    final location = Location();
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationData = await location.getLocation();
+    setState(() {});
+    print('내놔');
+    print(_locationData?.latitude);
+  }
+
+@override
   Widget build(BuildContext context) {
-    final List<ChartData> chartData = [
-      ChartData('China', 12, 10, 14, 20),
-      ChartData('USA', 14, 11, 18, 23),
-      ChartData('UK', 16, 10, 15, 20),
-      ChartData('Brazil', 18, 16, 18, 24)
-    ];
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
     // 닉네임
     var nickname = '달려달려';
     // 결과
+
 
     return  Scaffold(
       // appBar: AppBar(title: Text('마이페이지')),
@@ -150,35 +178,8 @@ class Mypage extends StatelessWidget {
                         ),
                       ),
                       Container(
-                          child: SfCartesianChart(
-                              primaryXAxis: CategoryAxis(),
-                              series: <ChartSeries>[
-                                StackedColumnSeries<ChartData, String>(
-                                    groupName: 'Group A',
-                                    dataSource: chartData,
-                                    xValueMapper: (ChartData data, _) => data.x,
-                                    yValueMapper: (ChartData data, _) => data.y1
-                                ),
-                                StackedColumnSeries<ChartData, String>(
-                                    groupName: 'Group B',
-                                    dataSource: chartData,
-                                    xValueMapper: (ChartData data, _) => data.x,
-                                    yValueMapper: (ChartData data, _) => data.y2
-                                ),
-                                StackedColumnSeries<ChartData, String>(
-                                    groupName: 'Group A',
-                                    dataSource: chartData,
-                                    xValueMapper: (ChartData data, _) => data.x,
-                                    yValueMapper: (ChartData data, _) => data.y3
-                                ),
-                                StackedColumnSeries<ChartData, String>(
-                                    groupName: 'Group B',
-                                    dataSource: chartData,
-                                    xValueMapper: (ChartData data, _) => data.x,
-                                    yValueMapper: (ChartData data, _) => data.y4
-                                )
-                              ]
-                          )
+
+                        child: Text('위도: ${_locationData?.latitude ?? '위치 정보 없음'}, 경도: ${_locationData?.longitude ?? '위치 정보 없음'}')
                       )
                     ],
                   ),
