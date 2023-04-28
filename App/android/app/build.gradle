@@ -3,16 +3,6 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
-//Properties properties = new Properties()
-//properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-//def localProperties = new Properties()
-//def localPropertiesFile = rootProject.file('local.properties')
-//if (localPropertiesFile.exists()) {
-//    localPropertiesFile.withReader('UTF-8') { reader ->
-//        localProperties.load(reader)
-//    }
-//}
 
 def localProperties = new Properties()
 localProperties.load(new FileInputStream(rootProject.file("local.properties")))
@@ -63,7 +53,6 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders = ["google_api_key": google_api_key]
-//        buildConfigField "String", "google_api_key", localProperties['google_api_key']
     }
 
     buildTypes {

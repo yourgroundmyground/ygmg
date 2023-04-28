@@ -3,10 +3,10 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <application
         android:label="app"
-        android:name="${applicationName}"
+        android:name="android.app.Application"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="${googleMapApiKey}"/>
+            android:value="${google_api_key}"/>
 
         <activity
             android:name=".MainActivity"
