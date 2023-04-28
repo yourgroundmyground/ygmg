@@ -218,7 +218,7 @@ class _MypageState extends State<Mypage> {
           ),
         ),
       ),
-      // bottomNavigationBar:  MapSample(),
+      bottomNavigationBar:  MapSample(),
     );
 
   }
