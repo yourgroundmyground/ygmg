@@ -87,7 +87,7 @@ class MapSampleState extends State<MapSample> {
         CameraPosition(
           bearing: 0,
           target: target,
-          zoom: 80.0,
+          zoom: 20.0,
         ),
       ));
     }
