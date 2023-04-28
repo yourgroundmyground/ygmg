@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void fetchData() async {
-  final response  = await http.get('url들어갈 자리');
+  final response  = await http.get(Uri.parse('https://example.com/data'));
 
   if (response.statusCode == 200) {
     print('Response body: ${response.body}');
   } else {
-    print('Request failed with status: ${response.statusCode}.');
+    print('오류 Request failed with status: ${response.statusCode}.');
   }
 }
 
