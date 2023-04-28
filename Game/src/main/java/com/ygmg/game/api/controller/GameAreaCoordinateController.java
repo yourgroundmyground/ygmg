@@ -27,16 +27,16 @@ public class GameAreaCoordinateController {
         return ResponseEntity.status(200).body("면적 좌표가 생성되었습니다.");
     }
 
-    @GetMapping("/{areaId}")
-    public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable int areaId) throws Exception {
-        List<CoordinateRes> coordinates = coordinateService.getCoordinateByAreaId(areaId);
-        return ResponseEntity.status(200).body(coordinates);
-    }
-
     @GetMapping("/{areaCoordinateId}")
     public ResponseEntity<AreaCoordinate> getCoordinate(@PathVariable int areaCoordinateId) throws Exception {
         AreaCoordinate coordinate = coordinateService.getCoordinateByCoordinateId(areaCoordinateId);
         return ResponseEntity.status(200).body(coordinate);
+    }
+
+    @GetMapping("/area/{areaId}")
+    public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable int areaId) throws Exception {
+        List<CoordinateRes> coordinates = coordinateService.getCoordinateByAreaId(areaId);
+        return ResponseEntity.status(200).body(coordinates);
     }
 
 }
