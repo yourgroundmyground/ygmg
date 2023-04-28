@@ -85,7 +85,7 @@ public class OAuthService {
             conn.setRequestProperty("Authorization", "Bearer " + access_Token);
 
             int responseCode = conn.getResponseCode();
-//            System.out.println("responseCode : " + responseCode);
+            System.out.println("responseCode : " + responseCode);
 
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -96,7 +96,7 @@ public class OAuthService {
             while ((line = br.readLine()) != null) {
                 result += line;
             }
-//            System.out.println("response body : " + result);
+            System.out.println("response body : " + result);
 
             //Gson 라이브러리로 JSON파싱
             JsonParser parser = new JsonParser();
@@ -110,7 +110,7 @@ public class OAuthService {
             String birthday = kakao_account.getAsJsonObject().get("birthday").getAsString();
 
             userInfo.put("email", email);
-            userInfo.put("nickname", nickname);
+            userInfo.put("name", nickname);
             userInfo.put("birthday", birthday);
 
             br.close();
@@ -132,7 +132,7 @@ public class OAuthService {
             conn.setRequestProperty("Authorization", "Bearer " + access_Token);
 
             int responseCode = conn.getResponseCode();
-//            System.out.println("responseCode : " + responseCode);
+            System.out.println("responseCode : " + responseCode);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -141,9 +141,9 @@ public class OAuthService {
 
             while ((line = br.readLine()) != null) {
                 result += line;
-//                System.out.println("line : " + line);
+                System.out.println("line : " + line);
             }
-//            System.out.println("result : " + result);
+            System.out.println("result : " + result);
 
         } catch (IOException e) {
             // TODO Auto-generated catch block

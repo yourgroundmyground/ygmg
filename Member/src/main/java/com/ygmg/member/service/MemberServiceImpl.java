@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService{
     public void addMember(HashMap<String, Object> userInfo) {
         Member member = Member.builder()
                 .kakaoEmail((String) userInfo.get("email"))
-                .memberNickname((String) userInfo.get("nickname"))
+                .memberName((String) userInfo.get("name"))
                 .memberBirth((String) userInfo.get("birthday"))
                 .build();
 
@@ -33,4 +33,11 @@ public class UserServiceImpl implements UserService{
         Optional<Member> member = Optional.ofNullable(memberRepository.findByKakaoEmail(email));
         return member;
     }
+
+    @Override
+    public Member getMemberByMemberNickname(String userNickname) {
+        Member member = memberRepository.findByMemberNickname(userNickname);
+        return member;
+    }
+
 }
