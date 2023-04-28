@@ -5,6 +5,7 @@ import com.ygmg.member.service.OAuthService;
 import com.ygmg.member.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -19,6 +20,14 @@ public class OAuthController {
 
     @Autowired
     private UserService userService;
+
+    @RequestMapping("/go")
+    public RedirectView movePage(){
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl("https://kauth.kakao.com/oauth/authorize?client_id=e633b10c3e1c77f0eca01e6abf591367&redirect_uri=http://localhost:8080/oauth/kakao&response_type=code");
+
+        return redirectView;
+    }
 
     @ResponseBody
     @GetMapping("/kakao")
