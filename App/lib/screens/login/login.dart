@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void fetchData() async {
-  final response  = await http.get('url들어갈 자리');
+  final response  = await http.get(Uri.parse('http://localhost:8080/oauth/go'));
 
   if (response.statusCode == 200) {
-    print('Response body: ${response.body}');
+    print('랄ㄹㄹ랄라. Response body: ${response}');
   } else {
     print('Request failed with status: ${response.statusCode}.');
   }
