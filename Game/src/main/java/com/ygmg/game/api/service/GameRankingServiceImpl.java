@@ -26,6 +26,6 @@ public class GameRankingServiceImpl implements GameRankingService {
 
     @Override
     public int getRank(String memberId) {
-        return 0;
+        return rankingRepository.getRank(memberId);
     }
 }

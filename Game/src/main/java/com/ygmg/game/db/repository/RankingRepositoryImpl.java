@@ -23,11 +23,25 @@ public class RankingRepositoryImpl implements RankingRepository{
 
     @Override
     public int getRank(String memberId) {
-        return 0;
+        Long rank = redisTemplate.opsForZSet().reverseRank(SCORES_KEY, memberId);
+        if (rank == null) {
+            // Handle the case where the member does not exist in the ZSet.
+            throw new IllegalArgumentException("Member " + memberId + " does not exist in the ZSet");
+        }
+        // Redis rank starts from 0, so we add 1 to it to make it start from 1.
+        return rank.intValue() + 1;
     }
 
     @Override
     public void updateAreaSize(String memberId, double areaSize) {
-        redisTemplate.opsForZSet().add(SCORES_KEY, memberId, areaSize);
+        Double currentScore = redisTemplate.opsForZSet().score(SCORES_KEY, memberId);
+        if (currentScore == null) {
+            // If the member does not exist in the ZSet, add it with areaSize as its score.
+            redisTemplate.opsForZSet().add(SCORES_KEY, memberId, areaSize);
+        } else {
+            // If the member already exists in the ZSet, add areaSize to its current score and update it.
+            double newScore = currentScore + areaSize;
+            redisTemplate.opsForZSet().add(SCORES_KEY, memberId, newScore);
+        }
     }
 }

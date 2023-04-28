@@ -39,6 +39,7 @@ public class GameRankingController {
     @GetMapping("/{memberId}")
     public ResponseEntity<Integer> getRankingByMemberId(@PathVariable int memberId) throws Exception {
         String id = Integer.toString(memberId);
+        System.out.println(id);
         int rank = rankingService.getRank(id);
         return ResponseEntity.status(200).body(rank);
     }
