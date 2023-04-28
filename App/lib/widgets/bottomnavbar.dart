@@ -56,7 +56,7 @@ class _NavbarState extends State<Navbar> {
                   BottomNavigationBarItem(
                       icon: Image.asset('assets/images/testProfile.png', width: 40,), label: ''),
                   BottomNavigationBarItem(
-                      icon: Image.asset('assets/images/b3d37220175f46299a2639f1bf15ded2.png'), label: 'Game')
+                      icon: Image.asset('assets/images/medal.png'), label: 'Game')
                 ]),
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:location/location.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({Key? key}) : super(key: key);
@@ -11,6 +12,43 @@ class MapSample extends StatefulWidget {
 }
 
 class MapSampleState extends State<MapSample> {
+  Location location = new Location();
+
+  bool _serviceEnabled = false;
+  PermissionStatus _permissionGranted = PermissionStatus.denied;
+  LocationData? _locationData;
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+  void getLocation() async {
+    final location = Location();
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationData = await location.getLocation();
+    setState(() {});
+    var lat = _locationData?.latitude ?? 0;
+    var long = _locationData?.longitude ?? 0;
+    LatLng my_location = _locationData != null ? LatLng(lat, long) : LatLng(37.42796133580664, -122.085749655962);
+
+  }
   final Completer<GoogleMapController> _controller =
   Completer<GoogleMapController>();
 
@@ -27,10 +65,14 @@ class MapSampleState extends State<MapSample> {
 
   @override
   Widget build(BuildContext context) {
+    final cameraPosition = CameraPosition(target: LatLng(_locationData!.latitude!, _locationData!.longitude!), zoom: 14.4746);
+    // final cameraPosition = _locationData != null
+    //     ? CameraPosition(target: LatLng(_locationData!.latitude!, _locationData!.longitude!), zoom: 14.4746)
+    //     : _kGooglePlex;
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
+        initialCameraPosition: cameraPosition,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
