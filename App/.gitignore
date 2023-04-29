@@ -44,10 +44,4 @@ app.*.map.json
 /android/app/release
 
 # API_KEYS
-.env*
-*.env
-.env
-.properties
-*.properties
-.properties*
 local.properties
