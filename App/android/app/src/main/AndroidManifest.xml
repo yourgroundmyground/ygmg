@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+=======
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ddangddangstudio.ygmg">
+>>>>>>> 83382894a5b79800340f6334d42efa32440b647a
     <application
         android:label="app"
         android:name="android.app.Application"

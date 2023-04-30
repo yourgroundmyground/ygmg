@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void fetchData() async {
+<<<<<<< HEAD
   final response  = await http.get('url들어갈 자리');
 
   if (response.statusCode == 200) {
     print('Response body: ${response.body}');
+=======
+  final response  = await http.get(Uri.parse('https://kauth.kakao.com/oauth/authorize?client_id=e633b10c3e1c77f0eca01e6abf591367&redirect_uri=http://localhost:8080/oauth/kakao&response_type=code'));
+
+  if (response.statusCode == 200) {
+    print('랄ㄹㄹ랄라. Response body: ${response}');
+>>>>>>> 83382894a5b79800340f6334d42efa32440b647a
   } else {
     print('Request failed with status: ${response.statusCode}.');
   }
