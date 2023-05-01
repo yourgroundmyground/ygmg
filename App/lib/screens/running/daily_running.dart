@@ -1,3 +1,5 @@
+import 'package:app/screens/game/game_start.dart';
+import 'package:app/screens/running/running_start.dart';
 import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
 
@@ -29,14 +31,23 @@ class DailyRunning extends StatelessWidget {
             // padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.fromLTRB(0, mediaHeight*0.03, 0, mediaHeight*0.1),
-                  child: Text('나의 달리기 결과', style: TextStyle(
-                      fontSize: mediaWidth*0.07,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white
-                  ),),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('나의 달리기 결과',
+                      style: TextStyle(
+                          fontSize: mediaWidth*0.08,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1
+                      ),
+                    ),
+                    IconButton(onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RunningStart()),
+                      );
+                    }, icon: Image.asset('assets/images/closebtn.png'))
+                  ],
                 ),
                 SizedBox(height: mediaHeight*0.04,),
                 Container(
