@@ -1,5 +1,4 @@
 import 'package:app/widgets/game_result.dart';
-import 'package:app/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
 
 class DailyRunning extends StatelessWidget {
@@ -67,7 +66,6 @@ class DailyRunning extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Navbar(),
     );
   }
 }
