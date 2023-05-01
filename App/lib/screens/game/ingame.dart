@@ -15,7 +15,7 @@ class InGame extends StatelessWidget {
           color: Colors.deepPurple,
         ),
         Positioned(
-          left: mediaWidth*0.01,
+          left: mediaWidth*0.03,
           top: mediaHeight*0.03,
           child: Container(
             //왼쪽 위 모달
@@ -33,7 +33,7 @@ class InGame extends StatelessWidget {
           ),
         ),
         Positioned(
-            right: mediaWidth*0.01,
+            right: mediaWidth*0.03,
             top: mediaHeight*0.03,
             child: Container(
               //오른쪽 위 모달
@@ -98,13 +98,13 @@ class InGame extends StatelessWidget {
             )
         ),
         Positioned(
-            bottom: mediaHeight*0.01,
-            left: mediaWidth / 2 - 30,
+            bottom: mediaHeight*0.04,
+            left: mediaWidth / 2 - 40,
             child: Container(
-              width: 60,
-              height: 60,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(50),
                   gradient: LinearGradient(
                       colors: [
                         Color(0xFFFDD987),
@@ -115,12 +115,12 @@ class InGame extends StatelessWidget {
                   ),
                   border: Border.all(
                       color: Colors.white,
-                      width: 2
+                      width: 3
                   )
               ),
               child: FloatingActionButton(
                   backgroundColor: Colors.transparent,
-                  onPressed: (){}, child: Icon(Icons.stop_rounded, size: 40)),
+                  onPressed: (){}, child: Icon(Icons.stop_rounded, size: 45)),
             )
         ),
 
