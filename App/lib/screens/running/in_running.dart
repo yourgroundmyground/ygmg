@@ -41,7 +41,8 @@ class InRunning extends StatelessWidget {
               Container(
                 child: CircleAvatar(
                   backgroundImage: AssetImage('assets/images/running-gif.gif'),
-                  radius: 120,
+                  radius: mediaWidth*0.4,
+
                 ),
               ),
               SizedBox(height: mediaHeight*0.07,),
