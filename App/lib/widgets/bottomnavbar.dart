@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:app/screens/mypage/mypage.dart';
 import 'package:app/screens/game/game_start.dart';
 import 'package:app/screens/running/running_start.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Navbar extends StatefulWidget {
   @override
