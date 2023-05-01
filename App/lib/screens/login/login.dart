@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 
-void fetchData() async {
+// void fetchData() async {
   // final response  = await http.get('url들어갈 자리');
 
   // if (response.statusCode == 200) {
@@ -9,7 +9,7 @@ void fetchData() async {
   // } else {
   //   print('Request failed with status: ${response.statusCode}.');
   // }
-}
+// }
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -41,7 +41,7 @@ class Login extends StatelessWidget {
                 child: GestureDetector(
                   onTap: (){
                     //이미지 클릭시 실행할 코드
-                    fetchData();
+                    // fetchData();
                   },
                   child: Image.asset('assets/images/kakao_login_medium_wide.png'),
                 ),
