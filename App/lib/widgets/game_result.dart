@@ -121,7 +121,7 @@ class DailyInfo extends StatelessWidget {
                                   Transform(
                                       alignment: Alignment.center,
                                       transform: Matrix4.rotationY(math.pi),
-                                      child: Image.asset('assets/images/runningimg.png')
+                                      child: Image.asset('assets/images/fireimg.png')
                                   )
                               ),
                               // SizedBox(height: mediaHeight*0.0025),
@@ -158,7 +158,7 @@ class DailyInfo extends StatelessWidget {
                                   Transform(
                                       alignment: Alignment.center,
                                       transform: Matrix4.rotationY(math.pi),
-                                      child: Image.asset('assets/images/runningimg.png')
+                                      child: Image.asset('assets/images/lighteningimg.png')
                                   )
                               ),
                               // SizedBox(height: mediaHeight*0.0025),

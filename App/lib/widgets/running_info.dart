@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:app/const/colors.dart';
+import 'package:app/screens/running/daily_running.dart';
 
 class RunningInfo extends StatefulWidget {
   const RunningInfo({Key? key}) : super(key: key);
@@ -72,7 +73,9 @@ class _RunningInfoState extends State<RunningInfo> {
                   isPlaying ? Row(
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => DailyRunning()));
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           fixedSize: Size(mediaWidth*0.1, mediaWidth*0.1),
@@ -196,7 +199,7 @@ class _RunningInfoState extends State<RunningInfo> {
                               Transform(
                                   alignment: Alignment.center,
                                   transform: Matrix4.rotationY(math.pi),
-                                  child: Image.asset('assets/images/runningimg.png')
+                                  child: Image.asset('assets/images/fireimg.png')
                               )
                           ),
                           // SizedBox(height: mediaHeight*0.0025),
@@ -231,7 +234,7 @@ class _RunningInfoState extends State<RunningInfo> {
                               Transform(
                                   alignment: Alignment.center,
                                   transform: Matrix4.rotationY(math.pi),
-                                  child: Image.asset('assets/images/runningimg.png')
+                                  child: Image.asset('assets/images/lighteningimg.png')
                               )
                           ),
                           // SizedBox(height: mediaHeight*0.0025),
