@@ -2,6 +2,7 @@ import 'package:app/const/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:app/widgets/runningchart.dart';
+import 'package:app/widgets/chart.dart';
 import 'package:app/widgets/my_weekly_game.dart';
 import 'package:app/utils/map.dart';
 import 'package:location/location.dart';
@@ -182,7 +183,7 @@ class _MypageState extends State<Mypage> {
                           textAlign: TextAlign.start
                       ),
                       Container(
-                        child: RunningChart(),
+                        child: BarChartSample4(),
                         // child: Text('위도: ${_locationData?.latitude ?? '위치 정보 없음'}, 경도: ${_locationData?.longitude ?? '위치 정보 없음'}')
                       )
                     ],
@@ -191,8 +192,6 @@ class _MypageState extends State<Mypage> {
               ),
               Container(
                 child: MyWeeklyGame(),
-                // width: mediaWidth*0.9,
-                // height: mediaWidth*0.15,
                 // decoration: BoxDecoration(
                 //   color: Colors.white,
                 //   borderRadius: BorderRadius.circular(mediaWidth*0.08),
