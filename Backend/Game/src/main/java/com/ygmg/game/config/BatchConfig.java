@@ -119,14 +119,18 @@ public class BatchConfig {
         return new JdbcBatchItemWriterBuilder<RankingData>()
                 .beanMapped()
                 .dataSource(dataSource)
-                .sql("INSERT INTO result (gameId, memberId, resultRanking) VALUES (:gameId, :memberId, :resultArea)")
+                .sql("INSERT INTO result (gameId, memberId, resultArea, resultRanking) VALUES (:gameId, :memberId, :resultArea, :resultRanking)")
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<RankingData>() {
                     @Override
                     public SqlParameterSource createSqlParameterSource(RankingData item) {
                         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
-                        parameterSource.addValue("gameId", "gameId");
+                        parameterSource.addValue("gameId",  SCORES_KEY);
                         parameterSource.addValue("memberId", item.getMemberId());
                         parameterSource.addValue("resultArea", item.getAreaSize());
+                        // Redis에서 rank를 얻어와 resultRanking에 저장합니다.  item.getId()?? 이 부분을 고쳐야함
+                        Long rank = redisTemplate.opsForZSet().reverseRank("1", item.getMemberId());
+                        parameterSource.addValue("resultRanking", rank == null ? null : rank.intValue() + 1);
+
                         return parameterSource;
                     }
                 })
