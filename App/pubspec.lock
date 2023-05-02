@@ -168,6 +168,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.6"
+  google_maps_utils:
+    dependency: "direct main"
+    description:
+      name: google_maps_utils
+      sha256: "3d67c9a8a6be08eaa3af8b4efb8f5ad79b79d2f1dccd41a5db3ab599f7ce6300"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.5.0+0"
   http_parser:
     dependency: transitive
     description:
@@ -361,10 +369,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: eb6ac1540b26de412b3403a163d919ba86f6a973fe6cc50ae3541b80092fdcfb
+      sha256: daadc9baabec998b062c9091525aa95786508b1c48e9c30f1f891b8bf6ff2e64
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.5.2"
   typed_data:
     dependency: transitive
     description:
