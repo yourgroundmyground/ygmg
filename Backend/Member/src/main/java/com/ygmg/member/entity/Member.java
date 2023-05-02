@@ -35,4 +35,7 @@ public class Member {
 
 //    @Column(nullable = false)
     private Long memberAge;
+
+//    @Column(nullable = false)
+    private String profileUrl;
 }

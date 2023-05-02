@@ -39,6 +39,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member getMemberByMemberNickname(String userNickname) {
         Member member = memberRepository.findByMemberNickname(userNickname);
+        System.out.println(member);
         return member;
     }
 

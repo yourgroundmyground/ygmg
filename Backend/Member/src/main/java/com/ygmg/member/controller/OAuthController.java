@@ -48,8 +48,8 @@ public class OAuthController {
 
         // 비가입자라면?
         if(member.equals(Optional.empty())){
-            // 가입 처리
-            memberService.addMember(userInfo);
+            // 가입 처리를 하지말고, UserInfoRes에 담아서 다시 프론트에 ResponseEntity로 보내
+            memberService.addMember(userInfo); // 이거 아니야
             // 기존 회원 X 액세스 토큰 발급 후 전송
 
         }
