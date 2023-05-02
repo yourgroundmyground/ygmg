@@ -12,7 +12,7 @@ public class ResultRes {
     int resultId;
     int resultRanking;
     double resultArea;
-    String resultNickname;
+    int memberId;
     Game game;
 
     public static ResultRes of(Result result){
@@ -21,7 +21,7 @@ public class ResultRes {
         res.setResultId(result.getResultId());
         res.setResultRanking(result.getResultRanking());
         res.setResultArea(result.getResultArea());
-        res.setResultNickname(result.getResultNickname());
+        res.setMemberId(result.getMemberId());
         res.setGame(result.getGame());
 
         return res;

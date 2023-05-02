@@ -30,4 +30,10 @@ public class GameResultController {
         resultService.createResult(resultInfo);
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
+
+//    @GetMapping("/{gameId}/{memberId}")
+//    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
+//        Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
+//        return ResponseEntity.status(200).body(ResultRes.of(result));
+//    }
 }

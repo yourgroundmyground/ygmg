@@ -10,6 +10,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.*;
@@ -23,17 +24,18 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchConfig {
     private static final String SCORES_KEY = "scores";
-    @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+    private final DataSource dataSource;
+    private final RedisTemplate<String, RankingData> redisTemplate;
 
-    @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, DataSource dataSource, @Qualifier("redisBatchTemplate") RedisTemplate<String, RankingData> redisTemplate){
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.dataSource = dataSource;
+        this.redisTemplate = redisTemplate;
+    }
 
-    @Resource(name="redisBatchTemplate")
-    private RedisTemplate<String, RankingData> redisTemplate;
-
-    @Autowired
-    private DataSource dataSource;
 
     @Bean
     public ItemReader<RankingData> rankingDataReader() {
@@ -46,10 +48,6 @@ public class BatchConfig {
         return jobBuilderFactory.get("migrateRankingJob")
                 .start(migrateRankingStep())
                 .listener(new JobExecutionListener() {
-
-                    @Autowired
-                    StringRedisTemplate redisTemplate;
-
                     @Override
                     public void beforeJob(JobExecution jobExecution) {
                         // Nothing to do
@@ -104,7 +102,6 @@ public class BatchConfig {
             }
         }
     }
-
     @Bean
     public ItemProcessor<RankingData, RankingData> rankingDataProcessor() {
         return item -> item;

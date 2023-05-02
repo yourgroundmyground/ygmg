@@ -8,4 +8,6 @@ public interface GameResultService {
     Result getResultByResultId(int resultId);
 
     Result createResult(ResultRegisterPostReq resultInfo);
+
+    Result getResultByGameIdAndMemberId(int gameId, int memberId);
 }

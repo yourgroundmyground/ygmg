@@ -23,8 +23,8 @@ public class Result {
     @Column(nullable = false)
     private double resultArea;
 
-    @Column(nullable = false, length=20)
-    private String resultNickname;
+    @Column(nullable = false)
+    private int memberId;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gameId")

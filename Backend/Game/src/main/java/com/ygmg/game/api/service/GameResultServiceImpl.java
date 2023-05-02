@@ -7,6 +7,8 @@ import com.ygmg.game.db.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class GameResultServiceImpl implements GameResultService {
     private final ResultRepository resultRepository;
@@ -27,9 +29,15 @@ public class GameResultServiceImpl implements GameResultService {
                 .resultRanking(resultInfo.getResultRanking())
                 .resultRanking(resultInfo.getResultRanking())
                 .resultArea(resultInfo.getResultArea())
-                .resultNickname(resultInfo.getResultNickname())
+                .memberId(resultInfo.getMemberId())
                 .build();
 
         return resultRepository.save(result);
+    }
+
+    @Override
+    public Result getResultByGameIdAndMemberId(int gameId, int memberId) {
+        return resultRepository.findByGameGameIdAndMemberId(gameId, memberId)
+                .orElseThrow(() -> new NoSuchElementException("No Result found with gameId: " + gameId + " and memberId: " + memberId));
     }
 }

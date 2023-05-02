@@ -13,4 +13,6 @@ public interface ResultRepository extends JpaRepository<Result, Integer> {
     Optional<Result> findByResultId(Integer integer);
 
     Result save(Result result);
+
+    Optional<Result> findByGameGameIdAndMemberId(int gameId, int memberId);
 }
