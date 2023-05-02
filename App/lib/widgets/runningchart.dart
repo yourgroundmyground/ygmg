@@ -1,350 +1,397 @@
+import 'dart:async';
+import 'dart:math';
 
+import 'package:app/const/colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class RunningChart extends StatefulWidget {
-  RunningChart({super.key});
+class BarChartSample1 extends StatefulWidget {
+  BarChartSample1({super.key});
 
-  final Color dark = Colors.cyan;
-  final Color normal = Colors.cyanAccent;
-  final Color light = Colors.tealAccent;
+  List<Color> get availableColors => const <Color>[
+    YGMG_BEIGE,
+    YGMG_GREEN,
+    YGMG_ORANGE,
+    YGMG_PURPLE,
+    YGMG_RED,
+    YGMG_SKYBLUE,
+    YGMG_YELLOW
+  ];
+
+  final Color barBackgroundColor =
+  YGMG_GREEN.withOpacity(0.3);
+  final Color barColor = YGMG_GREEN;
+  final Color touchedBarColor = YGMG_GREEN;
+
   @override
-  State<StatefulWidget> createState() => RunningChartState();
+  State<StatefulWidget> createState() => BarChartSample1State();
 }
 
-class RunningChartState extends State<RunningChart> {
-  Widget bottomTitles(double value, TitleMeta meta) {
-    const style = TextStyle(fontSize: 10);
-    String text;
-    switch (value.toInt()) {
-      case 0:
-        text = 'Apr';
-        break;
-      case 1:
-        text = 'May';
-        break;
-      case 2:
-        text = 'Jun';
-        break;
-      case 3:
-        text = 'Jul';
-        break;
-      case 4:
-        text = 'Aug';
-        break;
-      default:
-        text = '';
-        break;
-    }
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(text, style: style),
-    );
-  }
+class BarChartSample1State extends State<BarChartSample1> {
+  final Duration animDuration = const Duration(milliseconds: 250);
 
-  Widget leftTitles(double value, TitleMeta meta) {
-    if (value == meta.max) {
-      return Container();
-    }
-    const style = TextStyle(
-      fontSize: 10,
-    );
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(
-        meta.formattedValue,
-        style: style,
-      ),
-    );
-  }
+  int touchedIndex = -1;
+
+  bool isPlaying = false;
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1.66,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final barsSpace = 4.0 * constraints.maxWidth / 400;
-            final barsWidth = 8.0 * constraints.maxWidth / 400;
-            return BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.center,
-                barTouchData: BarTouchData(
-                  enabled: false,
+      aspectRatio: 1,
+      child: Stack(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const Text(
+                  'Mingguan',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 28,
-                      getTitlesWidget: bottomTitles,
+                const SizedBox(
+                  height: 4,
+                ),
+                Text(
+                  'Grafik konsumsi kalori',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 38,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: BarChart(
+                      isPlaying ? randomData() : mainBarData(),
+                      swapAnimationDuration: animDuration,
                     ),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: leftTitles,
-                    ),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
                 ),
-                gridData: FlGridData(
-                  show: true,
-                  checkToShowHorizontalLine: (value) => value % 10 == 0,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.amber,
-                    strokeWidth: 1,
-                  ),
-                  drawVerticalLine: false,
+                const SizedBox(
+                  height: 12,
                 ),
-                borderData: FlBorderData(
-                  show: false,
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: Icon(
+                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  color: Colors.cyan,
                 ),
-                groupsSpace: barsSpace,
-                barGroups: getData(barsWidth, barsSpace),
+                onPressed: () {
+                  setState(() {
+                    isPlaying = !isPlaying;
+                    if (isPlaying) {
+                      refreshState();
+                    }
+                  });
+                },
               ),
-            );
-          },
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
 
-  List<BarChartGroupData> getData(double barsWidth, double barsSpace) {
-    return [
-      BarChartGroupData(
-        x: 0,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 17000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 2000000000, widget.dark),
-              BarChartRodStackItem(2000000000, 12000000000, widget.normal),
-              BarChartRodStackItem(12000000000, 17000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
+  BarChartGroupData makeGroupData(
+      int x,
+      double y, {
+        bool isTouched = false,
+        Color? barColor,
+        double width = 22,
+        List<int> showTooltips = const [],
+      }) {
+    barColor ??= widget.barColor;
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: isTouched ? y + 1 : y,
+          color: isTouched ? widget.touchedBarColor : barColor,
+          width: width,
+          borderSide: isTouched
+              ? BorderSide(color: widget.touchedBarColor.withOpacity(90))
+              : const BorderSide(color: Colors.white, width: 0),
+          backDrawRodData: BackgroundBarChartRodData(
+            show: true,
+            toY: 20,
+            color: widget.barBackgroundColor,
           ),
-          BarChartRodData(
-            toY: 24000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 13000000000, widget.dark),
-              BarChartRodStackItem(13000000000, 14000000000, widget.normal),
-              BarChartRodStackItem(14000000000, 24000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 23000000000.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 6000000000.5, widget.dark),
-              BarChartRodStackItem(6000000000.5, 18000000000, widget.normal),
-              BarChartRodStackItem(18000000000, 23000000000.5, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 29000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 9000000000, widget.dark),
-              BarChartRodStackItem(9000000000, 15000000000, widget.normal),
-              BarChartRodStackItem(15000000000, 29000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 32000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 2000000000.5, widget.dark),
-              BarChartRodStackItem(2000000000.5, 17000000000.5, widget.normal),
-              BarChartRodStackItem(17000000000.5, 32000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
+        ),
+      ],
+      showingTooltipIndicators: showTooltips,
+    );
+  }
+
+  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
+    switch (i) {
+      case 0:
+        return makeGroupData(0, 5, isTouched: i == touchedIndex);
+      case 1:
+        return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
+      case 2:
+        return makeGroupData(2, 5, isTouched: i == touchedIndex);
+      case 3:
+        return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
+      case 4:
+        return makeGroupData(4, 9, isTouched: i == touchedIndex);
+      case 5:
+        return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
+      case 6:
+        return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
+      default:
+        return throw Error();
+    }
+  });
+
+  BarChartData mainBarData() {
+    return BarChartData(
+      barTouchData: BarTouchData(
+        touchTooltipData: BarTouchTooltipData(
+          tooltipBgColor: Colors.blueGrey,
+          tooltipHorizontalAlignment: FLHorizontalAlignment.right,
+          tooltipMargin: -10,
+          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+            String weekDay;
+            switch (group.x) {
+              case 0:
+                weekDay = 'Monday';
+                break;
+              case 1:
+                weekDay = 'Tuesday';
+                break;
+              case 2:
+                weekDay = 'Wednesday';
+                break;
+              case 3:
+                weekDay = 'Thursday';
+                break;
+              case 4:
+                weekDay = 'Friday';
+                break;
+              case 5:
+                weekDay = 'Saturday';
+                break;
+              case 6:
+                weekDay = 'Sunday';
+                break;
+              default:
+                throw Error();
+            }
+            return BarTooltipItem(
+              '$weekDay\n',
+              const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+              children: <TextSpan>[
+                TextSpan(
+                  text: (rod.toY - 1).toString(),
+                  style: TextStyle(
+                    color: widget.touchedBarColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        touchCallback: (FlTouchEvent event, barTouchResponse) {
+          setState(() {
+            if (!event.isInterestedForInteractions ||
+                barTouchResponse == null ||
+                barTouchResponse.spot == null) {
+              touchedIndex = -1;
+              return;
+            }
+            touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+          });
+        },
       ),
-      BarChartGroupData(
-        x: 1,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 31000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 11000000000, widget.dark),
-              BarChartRodStackItem(11000000000, 18000000000, widget.normal),
-              BarChartRodStackItem(18000000000, 31000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
+      titlesData: FlTitlesData(
+        show: true,
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: getTitles,
+            reservedSize: 38,
           ),
-          BarChartRodData(
-            toY: 35000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 14000000000, widget.dark),
-              BarChartRodStackItem(14000000000, 27000000000, widget.normal),
-              BarChartRodStackItem(27000000000, 35000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false,
           ),
-          BarChartRodData(
-            toY: 31000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 8000000000, widget.dark),
-              BarChartRodStackItem(8000000000, 24000000000, widget.normal),
-              BarChartRodStackItem(24000000000, 31000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 15000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 6000000000.5, widget.dark),
-              BarChartRodStackItem(6000000000.5, 12000000000.5, widget.normal),
-              BarChartRodStackItem(12000000000.5, 15000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 17000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 9000000000, widget.dark),
-              BarChartRodStackItem(9000000000, 15000000000, widget.normal),
-              BarChartRodStackItem(15000000000, 17000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
+        ),
       ),
-      BarChartGroupData(
-        x: 2,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 34000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 6000000000, widget.dark),
-              BarChartRodStackItem(6000000000, 23000000000, widget.normal),
-              BarChartRodStackItem(23000000000, 34000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 32000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 7000000000, widget.dark),
-              BarChartRodStackItem(7000000000, 24000000000, widget.normal),
-              BarChartRodStackItem(24000000000, 32000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 14000000000.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 1000000000.5, widget.dark),
-              BarChartRodStackItem(1000000000.5, 12000000000, widget.normal),
-              BarChartRodStackItem(12000000000, 14000000000.5, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 20000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 4000000000, widget.dark),
-              BarChartRodStackItem(4000000000, 15000000000, widget.normal),
-              BarChartRodStackItem(15000000000, 20000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 24000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 4000000000, widget.dark),
-              BarChartRodStackItem(4000000000, 15000000000, widget.normal),
-              BarChartRodStackItem(15000000000, 24000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
+      borderData: FlBorderData(
+        show: false,
       ),
-      BarChartGroupData(
-        x: 3,
-        barsSpace: barsSpace,
-        barRods: [
-          BarChartRodData(
-            toY: 14000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 1000000000.5, widget.dark),
-              BarChartRodStackItem(1000000000.5, 12000000000, widget.normal),
-              BarChartRodStackItem(12000000000, 14000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 27000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 7000000000, widget.dark),
-              BarChartRodStackItem(7000000000, 25000000000, widget.normal),
-              BarChartRodStackItem(25000000000, 27000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 29000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 6000000000, widget.dark),
-              BarChartRodStackItem(6000000000, 23000000000, widget.normal),
-              BarChartRodStackItem(23000000000, 29000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 16000000000.5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 9000000000, widget.dark),
-              BarChartRodStackItem(9000000000, 15000000000, widget.normal),
-              BarChartRodStackItem(15000000000, 16000000000.5, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-          BarChartRodData(
-            toY: 15000000000,
-            rodStackItems: [
-              BarChartRodStackItem(0, 7000000000, widget.dark),
-              BarChartRodStackItem(7000000000, 12000000000.5, widget.normal),
-              BarChartRodStackItem(12000000000.5, 15000000000, widget.light),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
-        ],
+      barGroups: showingGroups(),
+      gridData: FlGridData(show: false),
+    );
+  }
+
+  Widget getTitles(double value, TitleMeta meta) {
+    const style = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 14,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 0:
+        text = const Text('M', style: style);
+        break;
+      case 1:
+        text = const Text('T', style: style);
+        break;
+      case 2:
+        text = const Text('W', style: style);
+        break;
+      case 3:
+        text = const Text('T', style: style);
+        break;
+      case 4:
+        text = const Text('F', style: style);
+        break;
+      case 5:
+        text = const Text('S', style: style);
+        break;
+      case 6:
+        text = const Text('S', style: style);
+        break;
+      default:
+        text = const Text('', style: style);
+        break;
+    }
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 16,
+      child: text,
+    );
+  }
+
+  BarChartData randomData() {
+    return BarChartData(
+      barTouchData: BarTouchData(
+        enabled: false,
       ),
-    ];
+      titlesData: FlTitlesData(
+        show: true,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: getTitles,
+            reservedSize: 38,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false,
+          ),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false,
+          ),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false,
+          ),
+        ),
+      ),
+      borderData: FlBorderData(
+        show: false,
+      ),
+      barGroups: List.generate(7, (i) {
+        switch (i) {
+          case 0:
+            return makeGroupData(
+              0,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 1:
+            return makeGroupData(
+              1,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 2:
+            return makeGroupData(
+              2,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 3:
+            return makeGroupData(
+              3,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 4:
+            return makeGroupData(
+              4,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 5:
+            return makeGroupData(
+              5,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          case 6:
+            return makeGroupData(
+              6,
+              Random().nextInt(15).toDouble() + 6,
+              barColor: widget.availableColors[
+              Random().nextInt(widget.availableColors.length)],
+            );
+          default:
+            return throw Error();
+        }
+      }),
+      gridData: FlGridData(show: false),
+    );
+  }
+
+  Future<dynamic> refreshState() async {
+    setState(() {});
+    await Future<dynamic>.delayed(
+      animDuration + const Duration(milliseconds: 50),
+    );
+    if (isPlaying) {
+      await refreshState();
+    }
   }
 }
