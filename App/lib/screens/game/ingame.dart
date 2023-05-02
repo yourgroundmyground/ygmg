@@ -1,3 +1,4 @@
+import 'package:app/utils/polygonmap.dart';
 import 'package:app/widgets/profile_img.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class InGame extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          color: Colors.deepPurple,
+          child: PolygonMap(),
         ),
         Positioned(
           left: mediaWidth*0.03,
