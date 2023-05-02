@@ -26,9 +26,10 @@ public class GameRankingController {
     public GameRankingController(GameRankingService rankingService){
         this.rankingService = rankingService;
     }
-    @GetMapping("/top")
-    public ResponseEntity<List<RankingRes>> getRanking() throws Exception {
-        Set<ZSetOperations.TypedTuple<String>> topRankings = rankingService.getTopScores();
+    @GetMapping("/top/{gameId}")
+    public ResponseEntity<List<RankingRes>> getRanking(@PathVariable int gameId) throws Exception {
+        String gid = Integer.toString(gameId);
+        Set<ZSetOperations.TypedTuple<String>> topRankings = rankingService.getTopScores(gid);
 
         List<RankingRes> rankingInfoList = topRankings.stream()
                 .map(tuple -> new RankingRes(tuple.getValue(), tuple.getScore()))
@@ -36,17 +37,17 @@ public class GameRankingController {
         return ResponseEntity.status(200).body(rankingInfoList);
     }
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<Integer> getRankingByMemberId(@PathVariable int memberId) throws Exception {
-        String id = Integer.toString(memberId);
-        System.out.println(id);
-        int rank = rankingService.getRank(id);
+    @GetMapping("/{gameId}/{memberId}")
+    public ResponseEntity<Integer> getRankingByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
+        String gid = Integer.toString(gameId);
+        String mid = Integer.toString(memberId);
+        int rank = rankingService.getRank(gid, mid);
         return ResponseEntity.status(200).body(rank);
     }
 
     @PostMapping("/add")
     public ResponseEntity<String> addRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
-        rankingService.updateAreaSize(rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
+        rankingService.updateAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
         return ResponseEntity.status(200).body("Member area size has been added successfully.");
     }
 

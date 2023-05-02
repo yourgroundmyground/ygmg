@@ -8,12 +8,15 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.*;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
@@ -107,12 +110,26 @@ public class BatchConfig {
         return item -> item;
     }
 
+    // ! 아직 구현 안됨
+    // 결과 테이블로 옮기기 : gameId, memberId, resultArea, resultRanking,
+    //
     @Bean
     public ItemWriter<RankingData> rankingDataWriter() {
+
         return new JdbcBatchItemWriterBuilder<RankingData>()
                 .beanMapped()
                 .dataSource(dataSource)
-                .sql("INSERT INTO rankings (memberId, score) VALUES (:memberId, :score)")
+                .sql("INSERT INTO result (gameId, memberId, resultRanking) VALUES (:gameId, :memberId, :resultArea)")
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<RankingData>() {
+                    @Override
+                    public SqlParameterSource createSqlParameterSource(RankingData item) {
+                        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+                        parameterSource.addValue("gameId", "gameId");
+                        parameterSource.addValue("memberId", item.getMemberId());
+                        parameterSource.addValue("resultArea", item.getAreaSize());
+                        return parameterSource;
+                    }
+                })
                 .build();
     }
 

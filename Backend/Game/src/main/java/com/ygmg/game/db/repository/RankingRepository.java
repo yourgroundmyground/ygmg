@@ -8,9 +8,9 @@ import java.util.Set;
 @Repository
 public interface RankingRepository {
 
-    Set<ZSetOperations.TypedTuple<String>> getTopScores();
+    Set<ZSetOperations.TypedTuple<String>> getTopScores(String gameId);
 
-    int getRank(String memberId);
+    int getRank(String gameId, String memberId);
 
-    void updateAreaSize(String memberId, double areaSize);
+    void updateAreaSize(String gameId, String memberId, double areaSize);
 }
