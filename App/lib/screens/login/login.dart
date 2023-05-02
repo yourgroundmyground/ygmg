@@ -61,6 +61,7 @@ void sendCode(var accessToken) async {
     print('Response body: ${response.body}');
   } else {
     print('Request failed with status: ${response.statusCode}.');
+  }
   // 기존 회원가입 유무, id값  -> response로 넘어온다.
   // 기존 회원이라면 액세스 토큰을 우리가 발급해서 주고 메인화면으로 넘어간다.
   // 기존 회원이 아니라면 추가정보 요청페이지로 이동하고 이후 추가정보+id가 다시 백으로 넘어간다.
