@@ -2,6 +2,7 @@ package com.ygmg.member.service;
 
 import com.ygmg.member.entity.Member;
 import com.ygmg.member.repository.MemberRepository;
+import com.ygmg.member.request.JoinMemberPostReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private MemberRepository memberRepository;
 
+    // 카카오 정보 -> DB 저장
     @Override
     public void addMember(HashMap<String, Object> userInfo) {
         Member member = Member.builder()
@@ -38,6 +40,19 @@ public class MemberServiceImpl implements MemberService {
     public Member getMemberByMemberNickname(String userNickname) {
         Member member = memberRepository.findByMemberNickname(userNickname);
         return member;
+    }
+
+    // 인게임 정보 -> DB 저장
+    @Override
+    public void joinMember(JoinMemberPostReq joinMemberPostReq) {
+
+        Member member = Member.builder()
+                .memberNickname(joinMemberPostReq.getMemberNickname())
+                .memberGender(joinMemberPostReq.getMemberGender())
+                .memberAge(joinMemberPostReq.getMemberAge())
+                .build();
+
+        memberRepository.save(member);
     }
 
 }

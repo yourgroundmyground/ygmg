@@ -32,4 +32,7 @@ public class Member {
 
 //    @Column(nullable = false)
     private String memberName;
+
+//    @Column(nullable = false)
+    private Long memberAge;
 }

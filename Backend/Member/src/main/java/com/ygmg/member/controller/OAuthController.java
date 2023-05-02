@@ -27,11 +27,9 @@ public class OAuthController {
     @ResponseBody
     @PostMapping("/auth")
     public String success(@RequestBody Map<String,String> code, HttpSession session){
-
-
         System.out.println("액세스 토큰 : "+ code.get("accessToken"));
 
-        System.out.println(oAuthService.getUserInfo(code.get("accessToken")));
+//        System.out.println(oAuthService.getUserInfo(code.get("accessToken")));
 
         String access_Token = code.get("accessToken");
 
@@ -52,10 +50,12 @@ public class OAuthController {
         if(member.equals(Optional.empty())){
             // 가입 처리
             memberService.addMember(userInfo);
+            // 기존 회원 X 액세스 토큰 발급 후 전송
+
         }
         // 가입자라면? -> 로그인 처리
         else {
-
+            // 기존회원 O 액세스 토큰 발급 후 전송
         }
 
         return code.get("accessToken");
