@@ -1,24 +1,22 @@
+import 'dart:convert';
+import 'package:app/const/data.dart';
+import 'package:app/screens/login/signup.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
 
-// void fetchData() async {
-  // final response  = await http.get('url들어갈 자리');
 
-  // if (response.statusCode == 200) {
-  //   print('Response body: ${response.body}');
-  // } else {
-  //   print('Request failed with status: ${response.statusCode}.');
-  // }
-// }
-
-class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
-
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Dio dio = Dio();
+
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
+
+
+
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -39,9 +37,37 @@ class Login extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: mediaHeight*0.02),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () async {
                     //이미지 클릭시 실행할 코드
-                    // fetchData();
+                    // _login();
+                    final username = 'test@codefactory.ai';
+                    final password = 'testtest';
+                    final basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
+
+                    final resp = await dio.post(
+                          'http://10.0.2.2:3000/auth/login',
+                          // 'http://192.168.137.1:3000/auth/login',
+                          options: Options(
+                            headers: {
+                              'authorization': basicAuth,
+                            },
+                          ),
+                        );
+
+                    // print(resp);
+                    final refreshToken = resp.data['refreshToken'];
+                    final accessToken = resp.data['accessToken'];
+
+                    await storage.write(key: REFRESH_TOKEN_KEY, value: refreshToken);
+                    await storage.write(key: ACCESS_TOKEN_KEY, value: accessToken);
+
+                    // final value22 = await storage.read(key: REFRESH_TOKEN_KEY);
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => SignUpScreen(),
+                      ),
+                    );
+                    print('터치터치');
                   },
                   child: Image.asset('assets/images/kakao_login_medium_wide.png'),
                 ),
