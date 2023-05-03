@@ -13,6 +13,7 @@ class RunningInfo extends StatefulWidget {
 }
 
 class _RunningInfoState extends State<RunningInfo> {
+  bool isStarted = true;
   bool isPlaying = true;
   // *달린 속도 변경
   double runningPace = 0.0;
@@ -20,8 +21,33 @@ class _RunningInfoState extends State<RunningInfo> {
   double runningDist = 0.0;
   // *달린 시간 변경
   Duration runningDuration = Duration.zero;
+  // *태운 칼로리 변경
+  double runningKcal = 0.0;
+
 
   late Timer _timer;
+  int _seconds = 0;
+
+  // 칼로리 계산
+  double calculateRunningKcal(double weight, Duration duration) {
+    double runningMinutes = duration.inMinutes.toDouble();
+    double runningKcal;
+
+    if (runningDist == 0) {
+      return 0;
+    }
+
+    runningKcal = (47.6*3.5*runningMinutes*4 / 1000)*5;
+    print(runningKcal);
+    return runningKcal;
+    // if (gender == 'M') {
+    //   runningKcal = ((age * 0.2017) + ((weight * 0.09036) + ((220 - age) * 0.8 * 0.6309) - 55.0969) * runningMinutes / 4.184);
+    //   return runningKcal;
+    // } else {
+    //   runningKcal = ((age * 0.074) + ((weight * 0.05741) + ((220 - age) * 0.8 * 0.4472) - 20.4022) * runningMinutes / 4.184);
+    //   return runningKcal;
+    // }
+  }
 
   @override
   void initState() {
@@ -30,6 +56,17 @@ class _RunningInfoState extends State<RunningInfo> {
       double speed = (event.x.abs() + event.y.abs() + event.z.abs()) / 3;
       runningPace = (speed * 3.6) * 10;
       runningPace = (runningPace.round() / 10);
+      // 속도가 0인 경우 isPlaying을 false로 바꾸어줍니다.
+      if (runningPace == 0 && isStarted) {
+        _seconds += 1;
+        if (_seconds >= 30) {
+          setState(() {
+            isPlaying = false;
+          });
+        }
+      } else {
+        _seconds = 0;
+      }
     });
 
     _timer = Timer.periodic(Duration(seconds: 1), _updateRunningInfo);
@@ -37,6 +74,7 @@ class _RunningInfoState extends State<RunningInfo> {
 
   @override
   void dispose() {
+    // gyroscopeEvents.drain();
     _timer.cancel();
     super.dispose();
   }
@@ -48,6 +86,7 @@ class _RunningInfoState extends State<RunningInfo> {
         double distance = runningPace * runningDuration.inSeconds / 3600;
         // double distance = runningPace * runningDuration.inSeconds / 1000;
         runningDist += (distance.round() / 10);
+        runningKcal = calculateRunningKcal(47.6, runningDuration);
       });
     }
   }
@@ -219,7 +258,7 @@ class _RunningInfoState extends State<RunningInfo> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text('$runningDist', style: TextStyle(
+                              Text(runningDist.toStringAsFixed(1), style: TextStyle(
                                   fontSize: mediaWidth*0.045,
                                   fontWeight: FontWeight.w700
                               ),),
@@ -254,7 +293,7 @@ class _RunningInfoState extends State<RunningInfo> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text('$runningDist', style: TextStyle(
+                              Text(runningKcal.toStringAsFixed(1), style: TextStyle(
                                   fontSize: mediaWidth*0.045,
                                   fontWeight: FontWeight.w700
                               ),),
