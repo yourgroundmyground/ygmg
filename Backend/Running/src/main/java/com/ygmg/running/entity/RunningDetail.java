@@ -36,10 +36,10 @@ public class RunningDetail {
 
     private Mode runningMode;
 
-    @OneToOne(mappedBy = "running_detail")
+    @OneToOne(mappedBy = "runningDetail")
     private Running running;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "running_detail")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "runningDetail")
     private List<RunningCoordinate> runningCoordinateList = new ArrayList<>();
 
 
