@@ -116,7 +116,9 @@ class GameDetail extends StatelessWidget {
                     IconButton(onPressed: () {}, icon: Image.asset('assets/images/closebtn.png'))
                   ],
                 ),
-                SizedBox(height: mediaHeight*0.04,),
+                SizedBox(
+                  height: mediaHeight*0.04,
+                ),
                 Container(
                   child: ComplicatedImageDemo(),
                 ),
