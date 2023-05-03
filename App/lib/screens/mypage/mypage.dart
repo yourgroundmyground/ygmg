@@ -46,8 +46,6 @@ class _MypageState extends State<Mypage> {
 
     _locationData = await location.getLocation();
     setState(() {});
-    print('내놔');
-    print(_locationData?.latitude);
   }
 
   @override
@@ -59,7 +57,6 @@ class _MypageState extends State<Mypage> {
     // 결과
 
     return  Scaffold(
-      // appBar: AppBar(title: Text('마이페이지')),
       body: SafeArea(
         top: true,
         bottom: false,
@@ -101,8 +98,8 @@ class _MypageState extends State<Mypage> {
                           child: Text(
                             '안녕하세요, ${nickname} 님!',
                             style: TextStyle(
-                                fontSize: mediaWidth*0.04,
-                                fontWeight: FontWeight.w400,
+                                fontSize: mediaWidth*0.045,
+                                fontWeight: FontWeight.w700,
                                 color: Color.fromRGBO(255, 255, 255, 1)
                             ),
                           )),
@@ -143,7 +140,7 @@ class _MypageState extends State<Mypage> {
                       )),
                   Positioned(
                     left: mediaWidth*0.05,
-                    top: mediaHeight*0.03,
+                    top: mediaHeight*0.04,
                     // margin: EdgeInsets.fromLTRB(mediaWidth*0.5, mediaHeight*0.1, 0, mediaHeight*0.1),
                     child: Text('마이페이지', style: TextStyle(
                         fontSize: mediaWidth*0.07,
@@ -153,67 +150,58 @@ class _MypageState extends State<Mypage> {
                   ),
                 ],
               ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                width: mediaWidth*0.9,
-                height: mediaWidth*0.9,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(mediaWidth*0.04),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      // spreadRadius: 7,
-                      blurRadius: 28,
-                      // offset: Offset(0, 7),
+              Expanded(
+                child: ListView(
+                  controller: ScrollController(),
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                      width: mediaWidth*0.9,
+                      height: mediaWidth*0.9,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(mediaWidth*0.04),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            // spreadRadius: 7,
+                            blurRadius: 28,
+                            // offset: Offset(0, 7),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(23, 19, 23, 19),
+                        child: Column(
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('달린 거리',
+                                style: TextStyle(
+                                  fontSize: mediaWidth*0.04,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.start
+                            ),
+                            Container(
+                              child: BarChartSample4(),
+                              // child: Text('위도: ${_locationData?.latitude ?? '위치 정보 없음'}, 경도: ${_locationData?.longitude ?? '위치 정보 없음'}')
+                            )
+                          ],
+                        ),
+                      ),
                     ),
+                    Container(
+                      child: Column(
+                        children: [
+                          MyWeeklyGame(),
+                          MyWeeklyGame(),
+                          MyWeeklyGame(),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(23, 19, 23, 19),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('달린 거리',
-                          style: TextStyle(
-                            fontSize: mediaWidth*0.04,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.start
-                      ),
-                      Container(
-                        child: BarChartSample4(),
-                        // child: Text('위도: ${_locationData?.latitude ?? '위치 정보 없음'}, 경도: ${_locationData?.longitude ?? '위치 정보 없음'}')
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                child: MyWeeklyGame(),
-                // decoration: BoxDecoration(
-                //   color: Colors.white,
-                //   borderRadius: BorderRadius.circular(mediaWidth*0.08),
-                //   boxShadow: [
-                //     BoxShadow(
-                //       color: Colors.grey.withOpacity(0.5),
-                //       // spreadRadius: 7,
-                //       blurRadius: 28,
-                //       // offset: Offset(0, 7),
-                //     ),
-                //   ],
-                // ),
-                // child: Padding(
-                //   padding: const EdgeInsets.fromLTRB(23, 19, 23, 19),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       ,
-                //     ],
-                //   ),
-                // ),
               )
             ],
           ),
