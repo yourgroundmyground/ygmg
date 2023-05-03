@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-class SignUp extends StatelessWidget {
-  const SignUp({Key? key}) : super(key: key);
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
-    final mediaHeight = MediaQuery.of(context).size.height;
 
     return MaterialApp(
       home: Container(
@@ -50,7 +49,6 @@ class SignUp extends StatelessWidget {
                           children: [
                             NicknameField(
                               hintText: '닉네임을 입력하세요',
-                              errorText: '중복입니다.',
                             ),
                             ElevatedButton(
                                 onPressed: (){},
