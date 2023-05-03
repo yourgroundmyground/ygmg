@@ -48,6 +48,7 @@ dependencies:
   dio: ^5.1.1
   flutter_secure_storage: ^8.0.0
   tap_to_expand: ^0.6.1
+  image_picker: ^0.8.7+4
 
 
 dev_dependencies:
