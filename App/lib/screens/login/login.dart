@@ -57,6 +57,9 @@ class LoginScreen extends StatelessWidget {
                     // print(resp);
                     final refreshToken = resp.data['refreshToken'];
                     final accessToken = resp.data['accessToken'];
+                    // final kakaoEmail = resp.data['kakaoEmail'];
+                    // final memberBirth = resp.data['memberBirth'];
+                    // final memberName = resp.data['memberName'];
 
                     await storage.write(key: REFRESH_TOKEN_KEY, value: refreshToken);
                     await storage.write(key: ACCESS_TOKEN_KEY, value: accessToken);
@@ -64,7 +67,11 @@ class LoginScreen extends StatelessWidget {
                     // final value22 = await storage.read(key: REFRESH_TOKEN_KEY);
 
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => SignUpScreen(),
+                      MaterialPageRoute(builder: (_) => SignUpScreen(
+                        // kakaoEmail: kakaoEmail,
+                        // memberBirth: memberBirth,
+                        // memberName: memberName,
+                      ),
                       ),
                     );
                     print('터치터치');
