@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserInfoRes {
-    String kakaoEmail;
-    String memberBirth;
-    String memberName;
+    private String kakaoEmail;
+    private String memberBirth;
+    private String memberName;
 }

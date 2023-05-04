@@ -54,7 +54,7 @@ void sendCode(var accessToken) async {
   final String baseUrl = "http://192.168.100.114:8080";
   Map<String,String> code = {"accessToken" : accessToken};
   var body = json.encode(code);
-  final response = await http.post(Uri.parse(baseUrl + "/oauth/auth/"), headers: {"Content-Type": "application/json"},
+  final response = await http.post(Uri.parse(baseUrl + "/api/kakao/"), headers: {"Content-Type": "application/json"},
       body: body
   );
   if (response.statusCode == 200) {

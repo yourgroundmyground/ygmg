@@ -27,9 +27,12 @@ public interface MemberService {
     // 로그인 완료한 유저 닉네임/성별/나이 설정 후 회원가입 완료
     void joinMember(JoinMemberPostReq joinMemberPostReq);
 
-    ///////////////////
+    //////////////////
 
-    TokenInfo login(Member member);
+    TokenInfo login(JoinMemberPostReq joinMemberPostReq);
 
     ResponseEntity<?> reissue(UserReissuePostReq userReissuePostReq);
+
+    // 이미 회원이라면
+    TokenInfo exist(Member member);
 }

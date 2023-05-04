@@ -9,6 +9,7 @@ import com.ygmg.member.request.JoinMemberPostReq;
 import com.ygmg.member.request.UserReissuePostReq;
 import com.ygmg.member.response.UserAuthPostRes;
 import com.ygmg.member.response.UserInfoRes;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,26 +83,53 @@ public class MemberServiceImpl implements MemberService {
     public void joinMember(JoinMemberPostReq joinMemberPostReq) {
 
         Member member = Member.builder()
+                .kakaoEmail(joinMemberPostReq.getKakaoEmail())
+                .memberName(joinMemberPostReq.getMemberName())
+                .memberBirth(joinMemberPostReq.getMemberBirth())
                 .memberNickname(joinMemberPostReq.getMemberNickname())
-                .memberGender(joinMemberPostReq.getMemberGender())
-                .memberAge(joinMemberPostReq.getMemberAge())
+                .profileUrl(joinMemberPostReq.getProfileUrl())
+                .memberWeight(joinMemberPostReq.getMemberWeight())
                 .build();
 
         memberRepository.save(member);
     }
 
     @Override
-    public TokenInfo login(Member member) {
-        String accessToken = jwtTokenUtil.createAccessToken(member.getKakaoEmail());
-        String refreshToken = jwtTokenUtil.createRefreshToken(member.getKakaoEmail());
+    public TokenInfo login(JoinMemberPostReq joinMemberPostReq) {
+        String accessToken = jwtTokenUtil.createAccessToken(joinMemberPostReq.getKakaoEmail());
+        String refreshToken = jwtTokenUtil.createRefreshToken(joinMemberPostReq.getKakaoEmail());
 
-        TokenInfo tokenInfo = jwtTokenUtil.generateToken(member.getKakaoEmail(), accessToken, refreshToken);
+        TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getKakaoEmail(), accessToken, refreshToken);
 
         // redis에 저장
 //        redisRepository.save(new RefreshToken(member.getUserEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
 
         return tokenInfo;
     }
+
+    @Override
+    public TokenInfo exist(Member member) {
+
+        JoinMemberPostReq joinMemberPostReq = JoinMemberPostReq.builder()
+                .kakaoEmail(member.getKakaoEmail())
+//                .memberName(member.getMemberName())
+//                .memberBirth(member.getMemberBirth())
+//                .memberNickname(member.getMemberNickname())
+//                .profileUrl(member.getProfileUrl())
+//                .memberWeight(member.getMemberWeight())
+                .build();
+
+        String accessToken = jwtTokenUtil.createAccessToken(joinMemberPostReq.getKakaoEmail());
+        String refreshToken = jwtTokenUtil.createRefreshToken(joinMemberPostReq.getKakaoEmail());
+
+        TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getKakaoEmail(), accessToken, refreshToken);
+
+        // redis에 저장
+//        redisRepository.save(new RefreshToken(member.getUserEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
+
+        return tokenInfo;
+    }
+
 
     @Override // 로그인을했는데 리프레시가 만료가됐어. 그럼 다시 액새스랑 리프레시랑 재발급받는거임?
     public ResponseEntity<?> reissue(UserReissuePostReq userReissuePostReq) { // token 재발급

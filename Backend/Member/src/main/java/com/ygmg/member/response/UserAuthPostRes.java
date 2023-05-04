@@ -14,7 +14,6 @@ import lombok.Setter;
 public class UserAuthPostRes extends BaseResponseBody {
     private TokenInfo tokenInfo;
 
-
     public static UserAuthPostRes of(Integer statusCode, String message, TokenInfo tokenInfo) {
         UserAuthPostRes res = new UserAuthPostRes();
         res.setStatusCode(statusCode);
