@@ -17,9 +17,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table("running_coordinate")
 public class RunningCoordinate {
     @Id
+    @GeneratedValue
     private Long id;
 
     private Double runningLat;

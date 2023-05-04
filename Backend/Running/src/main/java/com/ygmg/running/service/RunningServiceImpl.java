@@ -11,7 +11,9 @@ import com.ygmg.running.entity.RunningDetail;
 import com.ygmg.running.repository.RunningDetailRepository;
 import com.ygmg.running.repository.RunningRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Time;
@@ -21,6 +23,7 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RunningServiceImpl implements RunningService{
 
@@ -29,18 +32,11 @@ public class RunningServiceImpl implements RunningService{
     private final RunningDetailRepository runningDetailRepository;
 
     @Override
+    @Transactional
     public void saveRunningRecord(RunningRequest runningRequest) {
 
 
         List<RunningCoordinate> list = new ArrayList<>();
-
-        for(RunningRequest.Coordinate coordinate : runningRequest.getCoordinateList()){
-            list.add(RunningCoordinate.builder()
-                            .runningLat(coordinate.getLat())
-                            .runningLng(coordinate.getLng())
-                            .coordinateTime(coordinate.getCoordinateTime())
-                            .build());
-        }
 
         RunningDetail runningDetail = RunningDetail.builder()
                 .runningStart(runningRequest.getRunningStart())
@@ -53,12 +49,22 @@ public class RunningServiceImpl implements RunningService{
                 .runningCoordinateList(list)
                 .build();
 
+        for(RunningRequest.Coordinate coordinate : runningRequest.getCoordinateList()){
+            list.add(RunningCoordinate.builder()
+                    .runningLat(coordinate.getLat())
+                    .runningLng(coordinate.getLng())
+                    .coordinateTime(coordinate.getCoordinateTime())
+                    .runningDetail(runningDetail)
+                    .build());
+        }
 
         Running running = Running.builder()
                 .runningDate(runningRequest.getRunningStart().toLocalDate())
                 .memberId(runningRequest.getMemberId())
                 .runningDetail(runningDetail)
                 .build();
+
+        runningDetail.saveRunning(running);
 
         runningRepository.save(running);
     }

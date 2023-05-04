@@ -19,6 +19,8 @@ public class RunningListResponse {
     private List<RunningDto> runningList = new ArrayList<>();
 
 
+    @Getter
+    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
