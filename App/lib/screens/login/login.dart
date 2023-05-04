@@ -1,104 +1,22 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'dart:convert';
+import 'package:app/const/data.dart';
+import 'package:app/screens/login/signup.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
-void fetchData() async {
 
-  if(await isKakaoTalkInstalled()){
-
-    try{
-      OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
-      print('카카오톡으로 로그인 성공 ${token.accessToken}');
-      sendCode(token.accessToken);
-    }catch(error){
-      print('카카오톡으로 로그인 실패 $error');
-
-      // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-      // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-      if (error is PlatformException && error.code == 'CANCELED') {
-        return;
-      }
-      // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
-      try {
-        OAuthToken token = await UserApi.instance.loginWithKakaoAccount(prompts: [Prompt.login]);;
-        print('카카오계정으로 로그인 성공1 ${token.accessToken}');
-        sendCode(token.accessToken);
-      } catch (error) {
-        print('카카오계정으로 로그인 실패 $error');
-      }
-    }
-  } else {
-    try {
-      OAuthToken token = await UserApi.instance.loginWithKakaoAccount(prompts: [Prompt.login]);
-      print('카카오계정으로 로그인 성공2 ${token.accessToken}');
-      sendCode(token.accessToken);
-    } catch (error) {
-      print('카카오계정으로 로그인 실패 $error');
-    }
-  }
-  // var response = await http.get(Uri.parse("http://192.168.100.114:8080/oauth/go"));
-  // // final response = await http.get('url들어갈 자리');
-  // print("111111111");
-  //
-  // if (response.statusCode == 200) {
-  //   print("ooooooooooo");
-  //   print('Response body: ${response.body}');
-  // } else {
-  //   print('Request failed with status: ${response.statusCode}.');
-  // }
-
-}
-void sendCode(var accessToken) async {
-  final String baseUrl = "http://192.168.100.114:8080";
-  Map<String,String> code = {"accessToken" : accessToken};
-  var body = json.encode(code);
-  final response = await http.post(Uri.parse(baseUrl + "/api/kakao/"), headers: {"Content-Type": "application/json"},
-      body: body
-  );
-  if (response.statusCode == 200) {
-    print('Response body: ${response.body}');
-  } else {
-    print('Request failed with status: ${response.statusCode}.');
-  }
-  // 기존 회원가입 유무, id값  -> response로 넘어온다.
-  // 기존 회원이라면 액세스 토큰을 우리가 발급해서 주고 메인화면으로 넘어간다.
-  // 기존 회원이 아니라면 추가정보 요청페이지로 이동하고 이후 추가정보+id가 다시 백으로 넘어간다.
-  // 이후 엑세스토큰이 넘어오면 다시 메인화면으로 넘어간다.
-}
-
-// const String kakaoClientId = 'your_kakao_app_client_id';
-// const String kakaoClientSecret = 'your_kakao_app_client_secret';
-// const String redirectUri = 'your_redirect_uri';
-//
-// Future<String> getKakaoAccessToken(String code) async {
-//   final response = await http.post(Uri.parse('https://kauth.kakao.com/oauth/token'),
-//       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-//       body: {
-//         'grant_type': 'authorization_code',
-//         'client_id': "e633b10c3e1c77f0eca01e6abf591367",
-//         'client_secret': "oNp9B58UwNT4RppuHG3ZmkVACBAsDP8F",
-//         'redirect_uri': "http://localhost:8080/oauth/kakao",
-//         'code': code,
-//       });
-//
-//   if (response.statusCode == 200) {
-//     final json = jsonDecode(response.body);
-//     final accessToken = json['access_token'];
-//     return accessToken;
-//   } else {
-//     throw Exception('Failed to get access token');
-//   }
-// }
-
-class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Dio dio = Dio();
+
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
+
+
+
     return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -119,9 +37,44 @@ class Login extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: mediaHeight*0.02),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () async {
                     //이미지 클릭시 실행할 코드
-                    fetchData();
+                    // _login();
+                    final username = 'test@codefactory.ai';
+                    final password = 'testtest';
+                    final basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
+
+                    final resp = await dio.post(
+                          'http://10.0.2.2:3000/auth/login',
+                          // 'http://192.168.137.1:3000/auth/login',
+                          options: Options(
+                            headers: {
+                              'authorization': basicAuth,
+                            },
+                          ),
+                        );
+
+                    // print(resp);
+                    final refreshToken = resp.data['refreshToken'];
+                    final accessToken = resp.data['accessToken'];
+                    // final kakaoEmail = resp.data['kakaoEmail'];
+                    // final memberBirth = resp.data['memberBirth'];
+                    // final memberName = resp.data['memberName'];
+
+                    await storage.write(key: REFRESH_TOKEN_KEY, value: refreshToken);
+                    await storage.write(key: ACCESS_TOKEN_KEY, value: accessToken);
+
+                    // final value22 = await storage.read(key: REFRESH_TOKEN_KEY);
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => SignUpScreen(
+                        // kakaoEmail: kakaoEmail,
+                        // memberBirth: memberBirth,
+                        // memberName: memberName,
+                      ),
+                      ),
+                    );
+                    print('터치터치');
                   },
                   child: Image.asset('assets/images/kakao_login_medium_wide.png'),
                 ),

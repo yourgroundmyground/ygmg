@@ -19,7 +19,7 @@ class CountDownClock extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 20, bottom: 10),
-            child: Text('Custom BoxDecoration & SeparatorType.title'),
+            // child: Text('Custom BoxDecoration & SeparatorType.title'),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

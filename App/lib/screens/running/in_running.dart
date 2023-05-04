@@ -1,4 +1,4 @@
-import 'package:app/widgets/game_result.dart';
+import 'package:app/widgets/running_info.dart';
 import 'package:flutter/material.dart';
 
 class InRunning extends StatelessWidget {
@@ -39,19 +39,14 @@ class InRunning extends StatelessWidget {
                 ),
               ),
               Container(
-                width: mediaWidth*0.75,
-                height: mediaWidth*0.75,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle
-                ),
-                // child: Image.asset(''),
-                child: Text('달리는 이미지',
-                  textAlign: TextAlign.center,
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/running-gif.gif'),
+                  radius: mediaWidth*0.4,
+
                 ),
               ),
               SizedBox(height: mediaHeight*0.07,),
-              GameResultInfo()    //  *running_info 위젯으로 변경하기
+              RunningInfo()    //  *running_info 위젯으로 변경하기
             ]
           )
         )
