@@ -20,14 +20,14 @@ import java.util.List;
 public class Running {
 
     @Id
+    @GeneratedValue
     private Long id;
 
     private Long memberId;
 
     private LocalDate runningDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="running_detail_id")
+    @OneToOne(mappedBy = "running" , cascade = CascadeType.ALL)
     private RunningDetail runningDetail;
 
 

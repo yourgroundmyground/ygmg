@@ -20,6 +20,7 @@ import java.util.List;
 public class RunningDetail {
 
     @Id
+    @GeneratedValue
     private Long id;
 
     private LocalDateTime runningStart;
@@ -36,11 +37,15 @@ public class RunningDetail {
 
     private Mode runningMode;
 
-    @OneToOne(mappedBy = "running_detail")
+    @OneToOne
+    @JoinColumn(name = "running_id")
     private Running running;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "running_detail")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "runningDetail")
     private List<RunningCoordinate> runningCoordinateList = new ArrayList<>();
 
+    public void saveRunning(Running running){
+        this.running = running;
+    }
 
 }
