@@ -1,5 +1,6 @@
 package com.ygmg.member.entity;
 
+import com.ygmg.member.request.JoinMemberPostReq;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,7 +20,7 @@ public class Member {
     private String kakaoEmail;
 
 //    @Column(nullable = false)
-    private String memberGender;
+//    private String memberGender;
 
 //    @Column(nullable = false)
     private String memberBirth;
@@ -28,8 +29,17 @@ public class Member {
     private String memberNickname;
 
 //    @Column(nullable = false)
-    private String memberRole;
+//    private String memberRole;
 
 //    @Column(nullable = false)
     private String memberName;
+
+//    @Column(nullable = false)
+    private Long memberWeight;
+
+//    @Column(nullable = false)
+    private String profileUrl;
+
+    public Member(JoinMemberPostReq joinMemberPostReq) {
+    }
 }
