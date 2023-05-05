@@ -33,7 +33,7 @@ public class RunningServiceImpl implements RunningService{
 
     @Override
     @Transactional
-    public void saveRunningRecord(RunningRequest runningRequest) {
+    public void saveRunningRecord(RunningRequest runningRequest, Mode mode) {
 
 
         List<RunningCoordinate> list = new ArrayList<>();
@@ -45,7 +45,7 @@ public class RunningServiceImpl implements RunningService{
                 .runningDistance(runningRequest.getRunningDistance())
                 .runningPace(runningRequest.getRunningPace())
                 .runningTime(Time.valueOf(runningRequest.getRunningTime()))
-                .runningMode(Mode.RUNNING)
+                .runningMode(mode)
                 .runningCoordinateList(list)
                 .build();
 

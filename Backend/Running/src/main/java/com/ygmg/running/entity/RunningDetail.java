@@ -35,6 +35,7 @@ public class RunningDetail {
 
     private Double runningPace;
 
+    @Enumerated(value = EnumType.STRING)
     private Mode runningMode;
 
     @OneToOne

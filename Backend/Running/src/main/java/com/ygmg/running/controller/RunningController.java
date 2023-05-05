@@ -5,6 +5,7 @@ import com.ygmg.running.dto.RunningCoordinateResponse;
 import com.ygmg.running.dto.RunningListResponse;
 import com.ygmg.running.dto.RunningRequest;
 import com.ygmg.running.dto.RunningResponse;
+import com.ygmg.running.entity.Mode;
 import com.ygmg.running.service.RunningService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -29,7 +30,7 @@ public class RunningController {
     })
     public ResponseEntity<?> saveRunningRecord(@RequestBody  RunningRequest runningRequest){
 
-        runningService.saveRunningRecord(runningRequest);
+        runningService.saveRunningRecord(runningRequest, Mode.RUNNING);
 
         return ResponseEntity.ok("성공적으로 저장되었습니다.");
 
