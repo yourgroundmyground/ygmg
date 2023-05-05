@@ -3,10 +3,14 @@ package com.ygmg.member.controller;
 import com.ygmg.member.common.auth.TokenInfo;
 import com.ygmg.member.entity.Member;
 import com.ygmg.member.request.JoinMemberPostReq;
+import com.ygmg.member.request.UserReissuePostReq;
 import com.ygmg.member.response.UserAuthPostRes;
 import com.ygmg.member.response.UserInfoRes;
 import com.ygmg.member.service.OAuthService;
 import com.ygmg.member.service.MemberService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -86,7 +90,6 @@ public class OAuthController {
             // 기존 회원 X -> 카카오 로그인 정보를 전송
             return ResponseEntity.status(200).body(userInfoRes);
         }
-        
         // 기존 가입자라면? -> 로그인 처리 (토큰 유효성 확인)
         else {
             // TODO: 2023-05-04  기존회원 O -> 그냥 토큰만 보내주면 된다
@@ -98,6 +101,18 @@ public class OAuthController {
         }
 
 //        return ResponseEntity.status(200).body("kakao 로그인 성공");
+    }
+
+    @PostMapping("/reissue")
+    @ApiOperation(value = "토큰 재발급", notes = "<strong>AccessToken,RefreshToken</strong>을 받아 재발급 합니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "성공", response = UserAuthPostRes.class),
+            @ApiResponse(code = 401, message = "RefreshToken 유효하지 않음", response = UserAuthPostRes.class),
+            @ApiResponse(code = 404, message = "RefreshToken 정보가 잘못되었음", response = UserAuthPostRes.class),
+            @ApiResponse(code = 500, message = "서버 오류", response = UserAuthPostRes.class)
+    })
+    public ResponseEntity<?> reissue(@RequestBody UserReissuePostReq userReissuePostReq){
+        return memberService.reissue(userReissuePostReq);
     }
 
     @RequestMapping(value="/logout")

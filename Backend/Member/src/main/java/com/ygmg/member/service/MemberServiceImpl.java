@@ -1,17 +1,16 @@
 package com.ygmg.member.service;
 
-import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.ygmg.member.common.auth.TokenInfo;
 import com.ygmg.member.common.util.JwtTokenUtil;
 import com.ygmg.member.entity.Member;
+import com.ygmg.member.entity.RefreshToken;
 import com.ygmg.member.repository.MemberRepository;
+import com.ygmg.member.repository.RedisRepository;
 import com.ygmg.member.request.JoinMemberPostReq;
 import com.ygmg.member.request.UserReissuePostReq;
 import com.ygmg.member.response.UserAuthPostRes;
 import com.ygmg.member.response.UserInfoRes;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +26,9 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final JwtTokenUtil jwtTokenUtil;
-
+    private final RedisRepository redisRepository;
     private final PasswordEncoder passwordEncoder;
 
-//    private final RedisRepository redisRepository;
 
     // 카카오 정보 -> DB 저장
 //    @Override
@@ -101,7 +99,7 @@ public class MemberServiceImpl implements MemberService {
 
         TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getKakaoEmail(), accessToken, refreshToken);
 
-        // redis에 저장
+//         redis에 저장
 //        redisRepository.save(new RefreshToken(member.getUserEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
 
         return tokenInfo;
@@ -131,17 +129,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    @Override // 로그인을했는데 리프레시가 만료가됐어. 그럼 다시 액새스랑 리프레시랑 재발급받는거임?
-    public ResponseEntity<?> reissue(UserReissuePostReq userReissuePostReq) { // token 재발급
-        if(!jwtTokenUtil.validateToken(userReissuePostReq.getRefreshToken())){ // 리프레시 만료됬으면 로그인다시해야지
+    @Override // api요청을 보냈는데 액세스 토큰이 만료됐어. 그럼 다시 액새스랑 리프레시 재발급 과정을 거쳐야함
+    public ResponseEntity<?> reissue(UserReissuePostReq userReissuePostReq) {
+        if(!jwtTokenUtil.validateToken(userReissuePostReq.getRefreshToken())){ // 먼저 refresh token 검증 -> 만료됐다면?
             return ResponseEntity.status(401).body(UserAuthPostRes.of(401, "Refresh Token 정보가 유효하지 않습니다.",null));
         }
+        // 리프레쉬 유효하면 ? 리프레시 토큰 재발급해줌
         Authentication authentication = jwtTokenUtil.getAuthentication(userReissuePostReq.getRefreshToken());
 //        if(!redisRepository.findById(authentication.getName()).get().getRefreshToken().equals(userReissuePostReq.getRefreshToken())){
 //            return ResponseEntity.status(404).body(UserAuthPostRes.of(404, "RefreshToken 정보가 잘못되었습니다..",null));
 //        }
 
-        // 리프레시 유효한 상황
+        // 리프레시 유효한 상황 -> 액세스, 리프레시 두개 재발급
         String accessToken = jwtTokenUtil.createAccessToken(authentication.getName());
         String refreshToken = jwtTokenUtil.createRefreshToken(authentication.getName());
         TokenInfo tokenInfo = jwtTokenUtil.generateToken(authentication.getName(), accessToken, refreshToken);

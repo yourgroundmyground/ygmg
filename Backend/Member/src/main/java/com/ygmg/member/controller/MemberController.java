@@ -43,7 +43,7 @@ public class MemberController {
      * 3. 닉네임 불러오기
      */
     @GetMapping("/me")
-    public ResponseEntity<?> logout(@ApiIgnore Authentication authentication) {
+    public ResponseEntity<?> nicknameCheck(@ApiIgnore Authentication authentication) {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Member member = userDetails.getMember();
