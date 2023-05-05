@@ -1,5 +1,6 @@
 package com.ygmg.game.api.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ygmg.game.db.model.Area;
 import com.ygmg.game.db.model.Game;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 public class AreaCoordinateRegisterPostReq {
     double areaCoordinateLat;
     double areaCoordinateLng;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     LocalDateTime areaCoordinateTime;
     Area area;
 }
