@@ -45,12 +45,12 @@ public class GameResultController {
 
     //Running 서비스 런닝 데이터 보내는 로직
     @PostMapping("/running")
-    public String sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
+    public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
 
         String message = objectMapper.writeValueAsString(runningDataReq);
         rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
 
-        return "ok";
+        return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
 
 
