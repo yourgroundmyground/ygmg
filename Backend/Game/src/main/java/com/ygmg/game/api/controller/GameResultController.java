@@ -37,7 +37,7 @@ public class GameResultController {
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
 
-    @GetMapping("/running/save")
+    @PostMapping("/save/running")
     public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
 
         String message = objectMapper.writeValueAsString(runningDataReq);
