@@ -6,11 +6,11 @@ import java.util.Set;
 
 public interface GameRankingService {
 
-    void updateAreaSize(String memberId, double areaSize);
+    void updateAreaSize(String gameId, String memberId, double areaSize);
 
     //    List<RankingRes> getRanking();
-    Set<ZSetOperations.TypedTuple<String>> getTopScores();
+    Set<ZSetOperations.TypedTuple<String>> getTopScores(String gameId);
 
 
-    int getRank(String memberId);
+    int getRank(String gameId, String memberId);
 }

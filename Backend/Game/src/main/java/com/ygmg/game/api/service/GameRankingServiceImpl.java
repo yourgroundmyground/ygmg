@@ -15,17 +15,17 @@ public class GameRankingServiceImpl implements GameRankingService {
     }
 
     @Override
-    public void updateAreaSize(String memberId, double areaSize) {
-        rankingRepository.updateAreaSize(memberId, areaSize);
+    public void updateAreaSize(String gameId, String memberId, double areaSize) {
+        rankingRepository.updateAreaSize(gameId, memberId, areaSize);
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<String>> getTopScores() {
-        return rankingRepository.getTopScores();
+    public Set<ZSetOperations.TypedTuple<String>> getTopScores(String gameId) {
+        return rankingRepository.getTopScores(gameId);
     }
 
     @Override
-    public int getRank(String memberId) {
-        return rankingRepository.getRank(memberId);
+    public int getRank(String gameId, String memberId) {
+        return rankingRepository.getRank(gameId, memberId);
     }
 }

@@ -10,6 +10,6 @@ public class ResultRegisterPostReq {
     int resultId;
     int resultRanking;
     double resultArea;
-    String resultNickname;
+    int memberId;
     Game game;
 }

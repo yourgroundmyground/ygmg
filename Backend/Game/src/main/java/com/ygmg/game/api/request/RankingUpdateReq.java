@@ -9,9 +9,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class RankingUpdateReq {
+    private String gameId;
     private String memberId;
     private double areaSize;
 
+    public String getGameId() {
+        return gameId;
+    }
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
     public String getMemberId() {
         return memberId;
     }

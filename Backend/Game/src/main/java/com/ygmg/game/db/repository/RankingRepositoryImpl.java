@@ -17,13 +17,13 @@ public class RankingRepositoryImpl implements RankingRepository{
     }
 
     @Override
-    public Set<ZSetOperations.TypedTuple<String>> getTopScores() {
-        return redisTemplate.opsForZSet().reverseRangeWithScores(SCORES_KEY, 0, 2);
+    public Set<ZSetOperations.TypedTuple<String>> getTopScores(String gameId) {
+        return redisTemplate.opsForZSet().reverseRangeWithScores(gameId, 0, 2);
     }
 
     @Override
-    public int getRank(String memberId) {
-        Long rank = redisTemplate.opsForZSet().reverseRank(SCORES_KEY, memberId);
+    public int getRank(String gameId, String memberId) {
+        Long rank = redisTemplate.opsForZSet().reverseRank(gameId, memberId);
         if (rank == null) {
             // Handle the case where the member does not exist in the ZSet.
             throw new IllegalArgumentException("Member " + memberId + " does not exist in the ZSet");
@@ -33,15 +33,15 @@ public class RankingRepositoryImpl implements RankingRepository{
     }
 
     @Override
-    public void updateAreaSize(String memberId, double areaSize) {
-        Double currentScore = redisTemplate.opsForZSet().score(SCORES_KEY, memberId);
+    public void updateAreaSize(String gameId, String memberId, double areaSize) {
+        Double currentScore = redisTemplate.opsForZSet().score(gameId, memberId);
         if (currentScore == null) {
             // If the member does not exist in the ZSet, add it with areaSize as its score.
-            redisTemplate.opsForZSet().add(SCORES_KEY, memberId, areaSize);
+            redisTemplate.opsForZSet().add(gameId, memberId, areaSize);
         } else {
             // If the member already exists in the ZSet, add areaSize to its current score and update it.
             double newScore = currentScore + areaSize;
-            redisTemplate.opsForZSet().add(SCORES_KEY, memberId, newScore);
+            redisTemplate.opsForZSet().add(gameId, memberId, newScore);
         }
     }
 }

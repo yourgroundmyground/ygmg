@@ -12,12 +12,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
+    private final JobLauncher jobLauncher;
+    private final Job migrateRankingJob;
 
-    @Autowired
-    JobLauncher jobLauncher;
-
-    @Autowired
-    Job migrateRankingJob;
+    public SchedulerConfig(JobLauncher jobLauncher, Job migrateRankingJob) {
+        this.jobLauncher = jobLauncher;
+        this.migrateRankingJob = migrateRankingJob;
+    }
 
     @Scheduled(cron = "0 0 0 * * 0") // 매주 일요일 자정에 작업 실행
     public void runMigrateRankingJob() throws Exception {

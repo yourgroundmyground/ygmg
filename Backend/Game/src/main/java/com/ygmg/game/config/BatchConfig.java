@@ -8,11 +8,15 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.*;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
@@ -23,17 +27,18 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchConfig {
     private static final String SCORES_KEY = "scores";
-    @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+    private final DataSource dataSource;
+    private final RedisTemplate<String, RankingData> redisTemplate;
 
-    @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    public BatchConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, DataSource dataSource, @Qualifier("redisBatchTemplate") RedisTemplate<String, RankingData> redisTemplate){
+        this.jobBuilderFactory = jobBuilderFactory;
+        this.stepBuilderFactory = stepBuilderFactory;
+        this.dataSource = dataSource;
+        this.redisTemplate = redisTemplate;
+    }
 
-    @Resource(name="redisBatchTemplate")
-    private RedisTemplate<String, RankingData> redisTemplate;
-
-    @Autowired
-    private DataSource dataSource;
 
     @Bean
     public ItemReader<RankingData> rankingDataReader() {
@@ -46,10 +51,6 @@ public class BatchConfig {
         return jobBuilderFactory.get("migrateRankingJob")
                 .start(migrateRankingStep())
                 .listener(new JobExecutionListener() {
-
-                    @Autowired
-                    StringRedisTemplate redisTemplate;
-
                     @Override
                     public void beforeJob(JobExecution jobExecution) {
                         // Nothing to do
@@ -104,18 +105,35 @@ public class BatchConfig {
             }
         }
     }
-
     @Bean
     public ItemProcessor<RankingData, RankingData> rankingDataProcessor() {
         return item -> item;
     }
 
+    // ! 아직 구현 안됨
+    // 결과 테이블로 옮기기 : gameId, memberId, resultArea, resultRanking,
+    //
     @Bean
     public ItemWriter<RankingData> rankingDataWriter() {
+
         return new JdbcBatchItemWriterBuilder<RankingData>()
                 .beanMapped()
                 .dataSource(dataSource)
-                .sql("INSERT INTO rankings (memberId, score) VALUES (:memberId, :score)")
+                .sql("INSERT INTO result (gameId, memberId, resultArea, resultRanking) VALUES (:gameId, :memberId, :resultArea, :resultRanking)")
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<RankingData>() {
+                    @Override
+                    public SqlParameterSource createSqlParameterSource(RankingData item) {
+                        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+                        parameterSource.addValue("gameId",  SCORES_KEY);
+                        parameterSource.addValue("memberId", item.getMemberId());
+                        parameterSource.addValue("resultArea", item.getAreaSize());
+                        // Redis에서 rank를 얻어와 resultRanking에 저장합니다.  item.getId()?? 이 부분을 고쳐야함
+                        Long rank = redisTemplate.opsForZSet().reverseRank("1", item.getMemberId());
+                        parameterSource.addValue("resultRanking", rank == null ? null : rank.intValue() + 1);
+
+                        return parameterSource;
+                    }
+                })
                 .build();
     }
 
