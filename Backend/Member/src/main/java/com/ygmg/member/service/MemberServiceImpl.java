@@ -79,8 +79,8 @@ public class MemberServiceImpl implements MemberService {
 
         TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getMemberNickname(), memberId, accessToken, refreshToken);
 
-//         redis에 저장
-//        redisRepository.save(new RefreshToken(member.getUserEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
+        // redis에 저장
+        redisRepository.save(new RefreshToken(member.getKakaoEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
 
         return tokenInfo;
     }
@@ -95,7 +95,7 @@ public class MemberServiceImpl implements MemberService {
         TokenInfo tokenInfo = jwtTokenUtil.generateToken(member.getMemberNickname(), memberId, accessToken, refreshToken);
 
         // redis에 저장
-//        redisRepository.save(new RefreshToken(member.getUserEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
+        redisRepository.save(new RefreshToken(member.getKakaoEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
 
         return tokenInfo;
     }
@@ -120,9 +120,9 @@ public class MemberServiceImpl implements MemberService {
         }
         // 리프레쉬 유효하면? 리프레쉬 토큰으로 회원정보 가져옴
         Authentication authentication = jwtTokenUtil.getAuthentication(userReissuePostReq.getRefreshToken());
-//        if(!redisRepository.findById(authentication.getName()).get().getRefreshToken().equals(userReissuePostReq.getRefreshToken())){
-//            return ResponseEntity.status(404).body(UserAuthPostRes.of(404, "RefreshToken 정보가 잘못되었습니다..",null));
-//        }
+        if(!redisRepository.findById(authentication.getName()).get().getRefreshToken().equals(userReissuePostReq.getRefreshToken())){
+            return ResponseEntity.status(404).body(UserAuthPostRes.of(404, "RefreshToken 정보가 잘못되었습니다..",null));
+        }
 
         // 토큰에 담아줄 memberNicname과 memberId
         String kakaoEmail = authentication.getName();
@@ -134,7 +134,7 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtTokenUtil.createAccessToken(authentication.getName());
         String refreshToken = jwtTokenUtil.createRefreshToken(authentication.getName());
         TokenInfo tokenInfo = jwtTokenUtil.generateToken(Nickname, memberId, accessToken, refreshToken);
-//        redisRepository.save(new RefreshToken(authentication.getName(), refreshToken ,tokenInfo.getRefreshTokenExpirationTime()));
+        redisRepository.save(new RefreshToken(authentication.getName(), refreshToken ,tokenInfo.getRefreshTokenExpirationTime()));
 
         return ResponseEntity.ok(UserAuthPostRes.of(200, "Token 정보가 갱신되었습니다.", tokenInfo));
     }
