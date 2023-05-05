@@ -20,16 +20,10 @@ public class Member {
     private String kakaoEmail;
 
 //    @Column(nullable = false)
-//    private String memberGender;
-
-//    @Column(nullable = false)
     private String memberBirth;
 
 //    @Column(nullable = false)
     private String memberNickname;
-
-//    @Column(nullable = false)
-//    private String memberRole;
 
 //    @Column(nullable = false)
     private String memberName;
@@ -39,7 +33,4 @@ public class Member {
 
 //    @Column(nullable = false)
     private String profileUrl;
-
-    public Member(JoinMemberPostReq joinMemberPostReq) {
-    }
 }

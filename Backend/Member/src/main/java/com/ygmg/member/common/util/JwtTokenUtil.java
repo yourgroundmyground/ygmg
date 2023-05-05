@@ -52,10 +52,11 @@ public class JwtTokenUtil {
     }
 
     //토큰 생성
-    public TokenInfo generateToken(String userId, String accessToken, String refreshToken){
+    public TokenInfo generateToken(String memberNickname, Long memberId, String accessToken, String refreshToken){
 
         return TokenInfo.builder()
-                .userId(userId)
+                .memberNickname(memberNickname)
+                .memberId(memberId)
                 .grantType(TOKEN_PREFIX)
                 .authorization(accessToken)
                 .refreshToken(refreshToken)

@@ -10,8 +10,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class TokenInfo {
-
-    private String userId;
+    private Long memberId;
+    private String memberNickname;
     private String grantType;
     private String authorization;
     private String refreshToken;
