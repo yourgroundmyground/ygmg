@@ -25,7 +25,6 @@ public class GameResultServiceImpl implements GameResultService {
     @Override
     public Result createResult(ResultRegisterPostReq resultInfo) {
         Result result = Result.builder()
-                .resultId(resultInfo.getResultId())
                 .resultRanking(resultInfo.getResultRanking())
                 .resultRanking(resultInfo.getResultRanking())
                 .resultArea(resultInfo.getResultArea())

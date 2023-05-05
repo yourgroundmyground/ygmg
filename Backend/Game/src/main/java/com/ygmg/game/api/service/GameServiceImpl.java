@@ -25,7 +25,6 @@ public class GameServiceImpl implements GameService {
     @Override
     public Game createGame(GameRegisterPostReq gameInfo) {
         Game game = Game.builder()
-                .gameId(gameInfo.getGameId())
                 .gameStart(gameInfo.getGameStart())
                 .gameEnd(gameInfo.getGameEnd())
                 .gamePlace(gameInfo.getGamePlace())

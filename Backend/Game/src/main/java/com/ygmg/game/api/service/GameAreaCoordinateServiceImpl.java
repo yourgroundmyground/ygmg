@@ -25,7 +25,6 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
     @Override
     public AreaCoordinate createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo) {
         AreaCoordinate cor = AreaCoordinate.builder()
-                .areaCoordinateId(coordinateInfo.getAreaCoordinateId())
                 .areaCoordinateLat(coordinateInfo.getAreaCoordinateLat())
                 .areaCoordinateLng(coordinateInfo.getAreaCoordinateLng())
                 .areaCoordinateTime(coordinateInfo.getAreaCoordinateTime())

@@ -55,7 +55,6 @@ public class GameAreaServiceImpl implements GameAreaService {
     @Override
     public Area createArea(AreaRegisterPostReq areaInfo) {
         Area area = Area.builder()
-                .areaId(areaInfo.getAreaId())
                 .areaDate(areaInfo.getAreaDate())
                 .areaSize(areaInfo.getAreaSize())
                 .memberId(areaInfo.getMemberId())

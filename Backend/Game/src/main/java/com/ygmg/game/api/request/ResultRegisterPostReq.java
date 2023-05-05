@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResultRegisterPostReq {
-    int resultId;
     int resultRanking;
     double resultArea;
     int memberId;

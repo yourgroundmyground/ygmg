@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AreaCoordinateRegisterPostReq {
-    int areaCoordinateId;
     double areaCoordinateLat;
     double areaCoordinateLng;
     LocalDateTime areaCoordinateTime;
