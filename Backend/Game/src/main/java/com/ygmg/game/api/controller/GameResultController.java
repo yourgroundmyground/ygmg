@@ -37,14 +37,7 @@ public class GameResultController {
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
 
-//    @GetMapping("/{gameId}/{memberId}")
-//    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
-//        Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
-//        return ResponseEntity.status(200).body(ResultRes.of(result));
-//    }
-
-    //Running 서비스 런닝 데이터 보내는 로직
-    @PostMapping("/running")
+    @PostMapping("/running/")
     public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
 
         String message = objectMapper.writeValueAsString(runningDataReq);
@@ -53,5 +46,14 @@ public class GameResultController {
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
 
+
+//    @GetMapping("/{gameId}/{memberId}")
+//    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
+//        Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
+//        return ResponseEntity.status(200).body(ResultRes.of(result));
+//    }
+
+    //Running 서비스 런닝 데이터 보내는 로직
+    
 
 }
