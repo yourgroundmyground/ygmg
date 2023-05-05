@@ -37,13 +37,13 @@ public class GameResultController {
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");
     }
 
-    @GetMapping("/running")
+    @GetMapping("/running/save")
     public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
 
         String message = objectMapper.writeValueAsString(runningDataReq);
         rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
 
-        return ResponseEntity.status(200).body("결과가 생성되었습니다.");
+        return ResponseEntity.status(200).body("저장되었습니다.");
     }
 
 
