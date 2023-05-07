@@ -25,6 +25,8 @@ public class GameController {
     private final GameService gameService;
     private final RabbitTemplate rabbitTemplate;
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
 
 
     @PostMapping("/")
@@ -43,7 +45,9 @@ public class GameController {
 
         log.debug("런닝 데이터 요청 아이디 : " + runningDataReq.getMemberId());
 
-        rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#","test");
+        String message = objectMapper.writeValueAsString(runningDataReq);
+
+        rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
 
         return ResponseEntity.status(200).body("저장되었습니다.");
     }
