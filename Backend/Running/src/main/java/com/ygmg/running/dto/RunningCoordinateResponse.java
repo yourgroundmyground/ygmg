@@ -1,7 +1,8 @@
 package com.ygmg.running.dto;
 
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ public class RunningCoordinateResponse {
 
         private Double runningLng;
 
+
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
         private LocalTime coordinateTime;
 
     }
