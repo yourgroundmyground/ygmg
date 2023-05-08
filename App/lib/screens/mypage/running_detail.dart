@@ -10,7 +10,7 @@ class RunningDetail extends StatefulWidget {
 // 페이지뷰
 class _RunningDetailState extends State<RunningDetail> {
   int _seletedItem = 0;
-  var _pages = [RunningDetailView1(), RunningDetailView2()];
+  var _pages = [RunningDetailView1()];
   var _pageController = PageController();
 
   @override

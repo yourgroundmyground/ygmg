@@ -71,7 +71,7 @@ class DailyRunning extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo()
+                // GameResultInfo()
               ],
             ),
           ),
