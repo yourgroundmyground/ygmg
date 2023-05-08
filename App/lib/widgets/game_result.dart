@@ -3,27 +3,27 @@ import 'dart:math' as math;
 import 'package:app/const/colors.dart';
 
 class GameResultInfo extends StatelessWidget {
-  const GameResultInfo({Key? key}) : super(key: key);
+  final String modalType;
+  final String runningTime;
+  final double runningDist;
+  final double runningKcal;
+  final double runningPace;
+
+  const GameResultInfo({
+    required this.modalType,
+    required this.runningTime,
+    required this.runningDist,
+    required this.runningKcal,
+    required this.runningPace,
+    Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return DailyInfo();   // *추후에 페이지별로 다르게 세팅해야 함
-  }
-}
-
-class DailyInfo extends StatelessWidget {
-  const DailyInfo({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-
+    // return DailyInfo();   // *추후에 페이지별로 다르게 세팅해야 함
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
     // *달린 시간 변경
-    const runningTime = '01:09:44';
-    // *달린 거리 변경
-    const runningDist = 10.9;
     return Stack(
       children: [
         Container(
@@ -44,18 +44,19 @@ class DailyInfo extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text('달린 시간',
+                  Text(modalType == 'running' ? '달린 시간' : '내가 따먹은 땅 크기',
                     style: TextStyle(
                         fontSize: mediaWidth*0.04,
                         color: Colors.black45
                     ),
-                  ),
+                  )
                 ],
               ),
               SizedBox(height: mediaHeight*0.005),
               Row(
                 children: [
-                  Text('$runningTime',
+                  // Text(modalType == 'running' ? runningTime : '$runningArea m²',     // *게임일 경우 면적으로 표시되게 하기
+                  Text(runningTime,
                     style: TextStyle(
                       fontSize: mediaWidth*0.08,
                       fontWeight: FontWeight.w700,
@@ -92,7 +93,7 @@ class DailyInfo extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text('$runningDist', style: TextStyle(
+                                  Text(runningDist.toStringAsFixed(1), style: TextStyle(
                                       fontSize: mediaWidth*0.045,
                                       fontWeight: FontWeight.w700
                                   ),),
@@ -129,7 +130,7 @@ class DailyInfo extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text('$runningDist', style: TextStyle(
+                                  Text(runningKcal.toStringAsFixed(1), style: TextStyle(
                                       fontSize: mediaWidth*0.045,
                                       fontWeight: FontWeight.w700
                                   ),),
@@ -166,7 +167,7 @@ class DailyInfo extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text('$runningDist', style: TextStyle(
+                                  Text(runningPace.toStringAsFixed(1), style: TextStyle(
                                       fontSize: mediaWidth*0.045,
                                       fontWeight: FontWeight.w700
                                   ),),
@@ -192,3 +193,4 @@ class DailyInfo extends StatelessWidget {
     );
   }
 }
+
