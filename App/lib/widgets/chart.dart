@@ -1,18 +1,19 @@
 import 'package:app/const/colors.dart';
+import 'package:app/screens/mypage/running_detail.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class BarChartSample4 extends StatefulWidget {
-  BarChartSample4({super.key});
+class RunningChart extends StatefulWidget {
+  RunningChart({super.key});
 
   final Color dark = YGMG_BEIGE;
   final Color normal = YGMG_ORANGE;
 
   @override
-  State<StatefulWidget> createState() => BarChartSample4State();
+  State<StatefulWidget> createState() => RunningChartState();
 }
 
-class BarChartSample4State extends State<BarChartSample4> {
+class RunningChartState extends State<RunningChart> {
   int touchedIndex = -1;
   Widget bottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(fontSize: 10);
@@ -61,8 +62,8 @@ class BarChartSample4State extends State<BarChartSample4> {
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
                     tooltipBgColor: Colors.blueGrey,
-                    tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-                    tooltipMargin: -10,
+                    tooltipHorizontalAlignment: FLHorizontalAlignment.center,
+                    tooltipMargin: 0,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       String weekDay;
                       switch (group.x) {
@@ -118,7 +119,42 @@ class BarChartSample4State extends State<BarChartSample4> {
                         touchedIndex = -1;
                         return;
                       }
-                      touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                      String weekDay;
+                      switch (barTouchResponse.spot!.touchedBarGroupIndex) {
+                        case 0:
+                          weekDay = 'Monday';
+                          break;
+                        case 1:
+                          weekDay = 'Tuesday';
+                          break;
+                        case 2:
+                          weekDay = 'Wednesday';
+                          break;
+                        case 3:
+                          weekDay = 'Thursday';
+                          break;
+                        case 4:
+                          weekDay = 'Friday';
+                          break;
+                        case 5:
+                          weekDay = 'Saturday';
+                          break;
+                        case 6:
+                          weekDay = 'Sunday';
+                          break;
+                        default:
+                          throw Error();
+                      }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RunningDetail(
+                                // weekDay: weekDay,
+                                // value: (barTouchResponse.spot!.y - 1).toString(),
+                              ),
+                        ),
+                      );
                     });
                   },
                 ),
