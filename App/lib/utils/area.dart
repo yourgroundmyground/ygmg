@@ -22,7 +22,13 @@ class _DrawPolygonState extends State<DrawPolygon> {
   LocationData? currentLocation;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+  // 실시간 위치를 표시할 좌표 리스트와 폴리라인
+  List<LatLng> _currentPoints = [];
+  Set<Polyline> _currentPolylines = {};
+  // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
+  List<List> _pointsSets = [];
+  List<Set> _polygonSets = [];
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
@@ -31,18 +37,8 @@ class _DrawPolygonState extends State<DrawPolygon> {
   final _userAccelerometerValues = <double>[0, 0, 0];
   final _gyroscopeValues = <double>[0, 0, 0];
   var customMapStyle;
-  Polygon _polygon =
-  Polygon(polygonId: PolygonId('_Polygon'), points: [LatLng(35.2051205, 126.8116811), LatLng(35.2051147, 126.8116459), LatLng(35.2051522, 126.8116607),], strokeWidth: 5, fillColor: Colors.amber);
-  void updateInitialPolygons() {
-    if (_points.isNotEmpty) {
-      _polygon = Polygon(
-        polygonId: PolygonId('_polygon'),
-        points: _points,
-        strokeWidth: 5,
-        fillColor: Colors.amber,
-      );
-    }
-  }
+  Polygon? _polygon;
+  var area = 0.0;
 
   void setCustomMarkerIcon() {
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(100, 100)), "assets/images/testProfile.png")
@@ -65,7 +61,6 @@ class _DrawPolygonState extends State<DrawPolygon> {
     });
     getLocation();
     setCustomMarkerIcon();
-    updateInitialPolygons();
     super.initState();
     accelerometerEvents.listen((AccelerometerEvent event) {
       setState(() {
@@ -126,16 +121,17 @@ class _DrawPolygonState extends State<DrawPolygon> {
           });
           return;
         }
+        _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
         _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
         LatLng newLocation = LatLng(location.latitude!, location.longitude!);
         Polyline route = Polyline(
           polylineId: PolylineId('route1'),
-          points: [..._polylines.first.points, newLocation],
+          points: [..._currentPolylines.first.points, newLocation],
           width: 5,
           color: Colors.blue,
         );
         setState(() {
-          _polylines = {_polylines.first, route};
+          _currentPolylines = {_currentPolylines.first, route};
           currentLocation = location;
           _markers = {
             Marker(
@@ -144,12 +140,6 @@ class _DrawPolygonState extends State<DrawPolygon> {
               position: newLocation,
             ),
           };
-          // _polygon = Polygon(
-          //     polygonId: PolygonId('_Polygon'),
-          //     points: _points,
-          //     strokeWidth: 5,
-          //     fillColor: Colors.amber
-          //   );
           }
         );
       }
@@ -179,7 +169,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
       _polylines = {
         Polyline(
           polylineId: PolylineId('route1'),
-          points: _points,
+          points: _currentPoints,
           width: 5,
           color: Colors.blue,
         ),
@@ -187,34 +177,60 @@ class _DrawPolygonState extends State<DrawPolygon> {
     });
   }
 
+  void calculate() {
+    final points = _points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
+    if (points.isNotEmpty) {
+      final distance = _distanceBetweenFirstAndLastPoint();
+      if (distance <= 50) {
+        final polyline = Polyline(
+          polylineId: PolylineId('myPolyline${_polylines.length}'),
+          points: _points,
+          width: 2,
+          color: Colors.red,
+        );
+        _polylines.add(polyline);
+        _pointsSets.add(_points);
+        _polygon = Polygon(
+          polygonId: PolygonId('myPolygon'),
+          points: _points,
+          fillColor: Colors.red.withOpacity(0.5),
+          strokeWidth: 2,
+          strokeColor: Colors.red,
+        );
+        final polygonArea = SphericalUtils.computeArea(points);
+        print('점들 : ${points}');
+        print('면적 : ${_polygon}');
+        area = area + polygonArea;
+        print(area);
+      }
+      _points = [];
+      _currentPoints = [];
+      _currentPolylines = {};
+
+    } else {
+      print('영역이 생성되지 않았습니다.');
+    }
+  }
+
+  double _distanceBetweenFirstAndLastPoint() {
+    if (_points.length < 2) {
+      return double.infinity;
+    }
+
+    final first = _points.first;
+    final last = _points.last;
+    final firstPoint = Point(first.latitude, first.longitude);
+    final lastPoint = Point(last.latitude, last.longitude);
+    return SphericalUtils.computeDistanceBetween(firstPoint, lastPoint);
+  }
+
   @override
 
   Widget build(BuildContext context) {
-    final points = _points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
-    // Polygon? polygon;
-    // if (points != []) {
-    //   LatLng first = _points.first;
-    //   LatLng last = _points.last;
-    //   print(points);
-    //   Point<num> firstPoint = Point(first.latitude, first.longitude);
-    //   Point<num> lastPoint = Point(last.latitude, last.longitude);
-    //   print(firstPoint);
-    //   double distance = SphericalUtils.computeDistanceBetween(firstPoint, lastPoint);
-      // polygon = Polygon(
-      //   polygonId: PolygonId('myPolygon'),
-      //   points: _points,
-      //   fillColor: Colors.blue.withOpacity(0.5),
-      //   strokeWidth: 2,
-      //   strokeColor: Colors.blue,
-      // );
-      // final polygonArea = SphericalUtils.computeArea(points);
-    // }
-    print('점들 : ${points}');
-    // print('면적 : ${polygonArea}');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking Test'),
+        title: Text('${area}'),
       ),
       body: currentLocation == null
           ? Center(
@@ -232,13 +248,14 @@ class _DrawPolygonState extends State<DrawPolygon> {
         // myLocationEnabled: true,
         markers: _markers,
         polylines: _polylines,
-        // polygons:  polygon != null ? {polygon} : {},
+        polygons:  _polygon != null ? {_polygon!} : {},
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
             isWalking = !isWalking;
           });
+          calculate();
         },
         child: Icon(isWalking ? Icons.pause : Icons.play_arrow),
       ),

@@ -1,4 +1,5 @@
 import 'package:app/screens/login/login.dart';
+import 'package:app/screens/mypage/mypage.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
