@@ -1,5 +1,6 @@
 import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 class RunningDetail extends StatelessWidget {
   const RunningDetail({Key? key}) : super(key: key);
@@ -62,8 +63,14 @@ class RunningDetail extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo()
-
+                GameResultInfo(
+                  modalType: 'running',
+                  // *여기에 get 으로 받은 데이터를 넣어주세요!
+                  runningPace: 0,
+                  runningDist: 0,
+                  runningKcal: 0,
+                  runningTime: 'asdf',
+                )
               ],
             ),
           ),
