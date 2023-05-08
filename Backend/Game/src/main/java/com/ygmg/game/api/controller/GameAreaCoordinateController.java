@@ -22,8 +22,10 @@ public class GameAreaCoordinateController {
         this.coordinateService = coordinateService;
     }
     @PostMapping("/")
-    public ResponseEntity<String> createCoordinate(@RequestBody AreaCoordinateRegisterPostReq coordinateInfo) throws Exception {
-        coordinateService.createAreaCoordinate(coordinateInfo);
+    public ResponseEntity<String> createCoordinate(@RequestBody List<AreaCoordinateRegisterPostReq> coordinateInfoList) throws Exception {
+        for (AreaCoordinateRegisterPostReq coordinateInfo : coordinateInfoList) {
+            coordinateService.createAreaCoordinate(coordinateInfo);
+        }
         return ResponseEntity.status(200).body("면적 좌표가 생성되었습니다.");
     }
 
