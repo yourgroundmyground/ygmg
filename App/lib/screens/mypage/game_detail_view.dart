@@ -15,7 +15,7 @@ class _GameDetailView1State extends State<GameDetailView1> {
 
   // Dio 객체 생성
   Dio dio = Dio();
-
+햐
   @override
   void initState() {
     super.initState();
