@@ -8,14 +8,12 @@ class GameDetailView1 extends StatefulWidget {
   @override
   _GameDetailView1State createState() => _GameDetailView1State();
 }
-
 class _GameDetailView1State extends State<GameDetailView1> {
   // GET 요청으로 받아온 데이터를 저장할 변수
   Map<String, dynamic>? gameData;
 
   // Dio 객체 생성
   Dio dio = Dio();
-햐
   @override
   void initState() {
     super.initState();
