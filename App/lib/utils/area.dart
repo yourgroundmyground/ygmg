@@ -22,7 +22,13 @@ class _DrawPolygonState extends State<DrawPolygon> {
   LocationData? currentLocation;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+  // 실시간 위치를 표시할 좌표 리스트와 폴리라인
+  List<LatLng> _currentPoints = [];
+  Set<Polyline> _currentPolylines = {};
+  // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
+  List<List> _pointsSets = [];
+  List<Set> _polygonSets = [];
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
@@ -115,16 +121,17 @@ class _DrawPolygonState extends State<DrawPolygon> {
           });
           return;
         }
+        _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
         _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
         LatLng newLocation = LatLng(location.latitude!, location.longitude!);
         Polyline route = Polyline(
           polylineId: PolylineId('route1'),
-          points: [..._polylines.first.points, newLocation],
+          points: [..._currentPolylines.first.points, newLocation],
           width: 5,
           color: Colors.blue,
         );
         setState(() {
-          _polylines = {_polylines.first, route};
+          _currentPolylines = {_currentPolylines.first, route};
           currentLocation = location;
           _markers = {
             Marker(
@@ -162,7 +169,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
       _polylines = {
         Polyline(
           polylineId: PolylineId('route1'),
-          points: _points,
+          points: _currentPoints,
           width: 5,
           color: Colors.blue,
         ),
@@ -182,12 +189,13 @@ class _DrawPolygonState extends State<DrawPolygon> {
           color: Colors.red,
         );
         _polylines.add(polyline);
+        _pointsSets.add(_points);
         _polygon = Polygon(
           polygonId: PolygonId('myPolygon'),
           points: _points,
-          fillColor: Colors.blue.withOpacity(0.5),
+          fillColor: Colors.red.withOpacity(0.5),
           strokeWidth: 2,
-          strokeColor: Colors.blue,
+          strokeColor: Colors.red,
         );
         final polygonArea = SphericalUtils.computeArea(points);
         print('점들 : ${points}');
@@ -196,6 +204,9 @@ class _DrawPolygonState extends State<DrawPolygon> {
         print(area);
       }
       _points = [];
+      _currentPoints = [];
+      _currentPolylines = {};
+
     } else {
       print('영역이 생성되지 않았습니다.');
     }
@@ -219,7 +230,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking Test'),
+        title: Text('${area}'),
       ),
       body: currentLocation == null
           ? Center(
