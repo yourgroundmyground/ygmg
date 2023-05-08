@@ -1,7 +1,8 @@
 package com.ygmg.running.dto;
 
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class RunningListResponse {
 
         private Long runningId;
 
+        @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
         private LocalDate runningDate;
     }
 }

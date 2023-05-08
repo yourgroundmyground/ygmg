@@ -36,6 +36,29 @@ public class OAuthController {
 
     private final S3UploaderService s3UploaderService;
 
+    @PostMapping("/memberimage")
+    public ResponseEntity<?> appImage(@RequestPart(value = "profile") MultipartFile multipartFile) throws IOException {
+        // s3 버킷에 사진 저장
+        String url = s3UploaderService.upload(multipartFile, "ygmg", "profile");
+
+        // 회원DB에 url 저장
+        Long memberId = memberService.putUrl(url);
+
+        return ResponseEntity.status(200).body("memberId : "+memberId);
+    }
+
+    @PostMapping("/memberinfo")
+    public ResponseEntity<?> appJoin(@RequestBody JoinMemberPostReq joinMemberPostReq){
+        // 넘어온 5개 정보 memberId에 맞춰 저장
+        memberService.joinMember2(joinMemberPostReq);
+
+        // 토큰 발급
+        TokenInfo tokenInfo = memberService.login(joinMemberPostReq);
+
+        // 200과 함께 토큰 보내줌
+        return ResponseEntity.ok(new UserAuthPostRes().of(200, "Success", tokenInfo));
+    }
+
     // 회원가입 요청 -> 6개 정보 들어옴 -> 토큰을 프론트로 넘겨줌
     @PostMapping("/app")
     public ResponseEntity<?> appJoin(@RequestPart(value = "joinMemberPostReq") JoinMemberPostReq joinMemberPostReq, @RequestPart(value = "profile") MultipartFile multipartFile) throws IOException {

@@ -29,6 +29,7 @@ public class GameResultServiceImpl implements GameResultService {
                 .resultRanking(resultInfo.getResultRanking())
                 .resultArea(resultInfo.getResultArea())
                 .memberId(resultInfo.getMemberId())
+                .game(resultInfo.getGame())
                 .build();
 
         return resultRepository.save(result);

@@ -1,18 +1,72 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
+
+//객체 정의
+class JoinMemberPostReq {
+  final String memberNickname;
+  final int memberWeight;
+  final String kakaoEmail;
+  final String memberBirth;
+  final String memberName;
+
+
+  JoinMemberPostReq ({
+    required this.memberNickname,
+    required this.memberWeight,
+    required this.kakaoEmail,
+    required this.memberBirth,
+    required this.memberName,
+  });
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['memberNickname'] = this.memberNickname;
+    data['memberWeight'] = this.memberWeight;
+    data['kakaoEmail'] = this.kakaoEmail;
+    data['memberBirth'] = this.memberBirth;
+    data['memberName'] = this.memberName;
+    print('데이터 $data');
+    return data;
+  }
+}
+
+//닉네임 중복 확인
+Future<String> checkNickname(String nickname) async {
+  Dio dio = Dio();
+  try {
+    var encodedNickname = Uri.encodeComponent(nickname);
+    var response = await dio.get(
+        "http://k8c107.p.ssafy.io:8080/api/member/$nickname",
+      queryParameters: {"memberNickname": encodedNickname});
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.data);
+      return response.data;
+    }
+  } catch (e) {
+    print(e);
+    // 에러 발생 시 false 반환
+    return '닉네임 체크 에러 발생';
+  }
+}
+
 class SignUpScreen extends StatefulWidget {
-  // final String kakaoEmail;
-  // final String memberBirth;
-  // final String memberName;
+  final String kakaoEmail;
+  final String memberBirth;
+  final String memberName;
 
   const SignUpScreen({
-    // required this.kakaoEmail,
-    // required this.memberBirth,
-    // required this.memberName,
+    required this.kakaoEmail,
+    required this.memberBirth,
+    required this.memberName,
     Key? key
   }) : super(key: key);
 
@@ -21,20 +75,22 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  File? _image;
+  File? _image = null;
+  bool _isNicknameValid = false;
   final picker = ImagePicker();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
+  final GlobalKey<_NicknameFieldState> _nicknameFieldKey = GlobalKey<_NicknameFieldState>();
 
-  //갤러리에서 프로필 이미지 선택
+  //프로필 이미지 선택
   Future selectImage() async {
     final pickedProfileImage = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedProfileImage != null) {
+    if (pickedProfileImage == null) {
       setState(() {
         _image = null;
       });
-    } else {
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('프로필 이미지를 선택해주세요')),
       );
@@ -42,14 +98,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
     setState(() {
       _image = File(pickedProfileImage.path);
-    }
-    );
+    });
   }
 
 
   Future uploadData() async {
-    String url = "https://your-server-endpoint";
-    Dio dio = Dio();
+    var dio = Dio();
 
     if (_image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,23 +112,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
+    //객체 생성
+    JoinMemberPostReq  joinMemberPostReq = JoinMemberPostReq (
+      memberNickname: _nicknameController.text,
+      memberWeight: int.parse(_weightController.text),
+      kakaoEmail: widget.kakaoEmail,
+      memberBirth: widget.memberBirth,
+      memberName: widget.memberName,
+  );
+
+    Map<String, dynamic> jsonData = joinMemberPostReq.toJson();
+    print('joinMemberPostReq : $jsonData');
 
     FormData formData = FormData.fromMap({
-      "file": await MultipartFile.fromFile(_image!.path),
-      "nickname": _nicknameController.text,
-      "weight": _weightController.text,
-      // "kakaoEmail": widget.kakaoEmail,
-      // "memberBirth": widget.memberBirth,
-      // "memberName": widget.memberName,
+      "profile": await MultipartFile.fromFile(_image!.path),
+      "joinMemberPostReq": MultipartFile.fromString(
+        jsonEncode(joinMemberPostReq),
+        contentType: MediaType('application','json'),
+      )
     });
 
+
+
     try {
-      var response = await dio.post(url, data: formData);
-      print('성공');
-      print(response);
+      final response = await dio.post(
+        'http://k8c107.p.ssafy.io:8080/api/app',
+        data: formData,
+        options: Options(
+          // method: 'POST',
+          // headers: {
+            // Headers.contentTypeHeader: 'multipart/form-data'
+            // 'Content-Type': 'application/json',
+          // },
+        ),
+      );
+      print('회원가입 성공 $response.data');
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print('에러 응답 코드: ${e.response!.statusCode}');
+        print('에러 응답 데이터: ${e.response!.data}');
+      } else {
+        print('에러: $e');
+      }
     } catch (e) {
-      print('에러');
-      print(e);
+      print('에러: $e');
     }
   }
 
@@ -167,7 +248,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 hintText: '닉네임을 입력하세요',
                               ),
                               ElevatedButton(
-                                  onPressed: (){
+                                  onPressed: () async {
+                                    // checkNickname(_nicknameController.text);
+
+                                    String nicknameCheckMessage = await checkNickname(_nicknameController.text);
+
+                                    if (nicknameCheckMessage == '사용가능한 닉네임입니다.') {
+                                      _isNicknameValid = true;
+                                      _nicknameFieldKey.currentState
+                                          ?.updateMessages(newHintText: nicknameCheckMessage, newErrorText: null);
+                                      print('사용가능 사용가능');
+
+                                    } else if (nicknameCheckMessage == '중복된 닉네임입니다.') {
+                                      _isNicknameValid = false;
+                                      _nicknameFieldKey.currentState
+                                          ?.updateMessages(newHintText: '닉네임을 입력하세요', newErrorText: nicknameCheckMessage);
+                                      print('사용불가사용불가');
+
+                                    }
+
+
 
                                   },
                                   child: Text('중복확인'))
@@ -207,13 +307,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ElevatedButton(
-                          onPressed: (){
+                          onPressed: _isNicknameValid
+                              ? () {
                             if (_formKey.currentState!.validate()) {
                               uploadData();
                             }
-                          },
+                          }
+                          : null, //버튼 비활성화
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFFDA65),
+                              backgroundColor:
+                                  _isNicknameValid ? Color(0xFFFFDA65) : Colors.grey,
                               elevation: 8
                           ),
                           child: Text('확인', style: TextStyle(color: Colors.black)),
@@ -232,19 +335,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
 
 
-class NicknameField extends StatelessWidget {
+class NicknameField extends StatefulWidget {
   final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
   final String? hintText;
   final String? errorText;
 
   const NicknameField({
     this.controller,
+    this.onChanged,
     this.hintText,
     this.errorText,
     Key? key}) : super(key: key);
 
   @override
+  State<NicknameField> createState() => _NicknameFieldState();
+}
+
+class _NicknameFieldState extends State<NicknameField> {
+  String? hintText;
+  String? errorText;
+
+  void updateMessages({String? newHintText, String? newErrorText}) {
+    setState(() {
+      hintText = newHintText;
+      errorText = newErrorText;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print('hint mesage $hintText');
+
     final mediaWidth = MediaQuery.of(context).size.width;
     final baseBorder = UnderlineInputBorder(
         borderSide: BorderSide(
@@ -258,9 +380,11 @@ class NicknameField extends StatelessWidget {
         SizedBox(
           width: mediaWidth*0.6,
           child: TextFormField(
-            controller: controller,
+
+            controller: widget.controller,
             cursorColor: Colors.teal,
             autovalidateMode: AutovalidateMode.onUserInteraction,
+            onChanged: widget.onChanged,
             validator: (value) {
               if (value!.length>8) {
                 return '8글자를 넘을 수 없습니다';
@@ -272,7 +396,8 @@ class NicknameField extends StatelessWidget {
             },
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(10),
-              hintText: hintText,
+              focusedBorder: InputBorder.none, //밑줄 없애기
+              hintText: hintText ?? '닉네임을 입력하세요',
               errorText: errorText,
               hintStyle: TextStyle(color: Colors.grey),
               filled: true,
@@ -290,11 +415,13 @@ class WeightField extends StatelessWidget {
   final TextEditingController? controller;
   final String? hintText;
   final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   const WeightField({
     this.controller,
     this.hintText,
     this.errorText,
+    this.onChanged,
     Key? key}) : super(key: key);
 
   @override
@@ -316,6 +443,7 @@ class WeightField extends StatelessWidget {
             cursorColor: Colors.teal,
             keyboardType: TextInputType.number,
             autovalidateMode: AutovalidateMode.onUserInteraction,
+            onChanged: onChanged,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(10),
               hintText: hintText,
@@ -328,9 +456,13 @@ class WeightField extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return '몸무게를 입력해주세요';
-              } else if (int.parse(value) > 400 || int.parse(value) <10) {
-                return '실제 몸무게가 맞나요?';
+              } else {
+                int? parsedValue = int.tryParse(value);
+                if (parsedValue == null || parsedValue > 400 || parsedValue < 10) {
+                  return '실제 몸무게가 맞나요?';
+                }
               }
+
               return null;
             },
           ),

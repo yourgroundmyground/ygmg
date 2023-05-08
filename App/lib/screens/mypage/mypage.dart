@@ -15,38 +15,10 @@ class Mypage extends StatefulWidget {
   _MypageState createState() => _MypageState();
 }
 class _MypageState extends State<Mypage> {
-  Location location = new Location();
-
-  bool _serviceEnabled = false;
-  PermissionStatus _permissionGranted = PermissionStatus.denied;
-  LocationData? _locationData;
 
   @override
   void initState() {
     super.initState();
-    getLocation();
-  }
-
-  void getLocation() async {
-    final location = Location();
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-    setState(() {});
   }
 
   @override
@@ -185,8 +157,7 @@ class _MypageState extends State<Mypage> {
                                 textAlign: TextAlign.start
                             ),
                             Container(
-                              child: BarChartSample4(),
-                              // child: Text('위도: ${_locationData?.latitude ?? '위치 정보 없음'}, 경도: ${_locationData?.longitude ?? '위치 정보 없음'}')
+                              child: RunningChart(),
                             )
                           ],
                         ),

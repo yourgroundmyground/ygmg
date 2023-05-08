@@ -29,13 +29,11 @@ public class GameResultController {
     }
 
 
-
-
-//    @GetMapping("/{gameId}/{memberId}")
-//    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
-//        Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
-//        return ResponseEntity.status(200).body(ResultRes.of(result));
-//    }
+    @GetMapping("/{gameId}/{memberId}")
+    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
+        Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
+        return ResponseEntity.status(200).body(ResultRes.of(result));
+    }
 
     //Running 서비스 런닝 데이터 보내는 로직
     
