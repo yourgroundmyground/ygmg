@@ -123,7 +123,14 @@ class GameDetail extends StatelessWidget {
                   child: ComplicatedImageDemo(),
                 ),
                 SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo()
+                GameResultInfo(
+                  modalType: 'game',
+                  // *여기에 get 으로 받은 데이터를 넣어주세요!
+                  runningPace: 0,
+                  runningDist: 0,
+                  runningKcal: 0,
+                  runningTime: 'asdf',
+                )
               ],
             ),
           ),
