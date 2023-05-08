@@ -9,6 +9,7 @@ import java.sql.Date;
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
@@ -33,4 +34,5 @@ public class Member {
 
 //    @Column(nullable = false)
     private String profileUrl;
+
 }

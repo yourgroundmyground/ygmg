@@ -138,4 +138,27 @@ public class MemberServiceImpl implements MemberService {
 
         return ResponseEntity.ok(UserAuthPostRes.of(200, "Token 정보가 갱신되었습니다.", tokenInfo));
     }
+
+    @Override
+    public Long putUrl(String url) {
+        Member member = new Member();
+        member.setProfileUrl(url);
+        memberRepository.save(member);
+
+        return member.getId();
+    }
+
+    @Override
+    public void joinMember2(JoinMemberPostReq joinMemberPostReq) {
+        Long memberId = joinMemberPostReq.getMemberId();
+        Member member = memberRepository.findMemberById(memberId);
+
+        member.setKakaoEmail(joinMemberPostReq.getKakaoEmail());
+        member.setMemberBirth(joinMemberPostReq.getMemberBirth());
+        member.setMemberName(joinMemberPostReq.getMemberName());
+        member.setMemberNickname(joinMemberPostReq.getMemberNickname());
+        member.setMemberWeight(joinMemberPostReq.getMemberWeight());
+
+        memberRepository.save(member);
+    }
 }
