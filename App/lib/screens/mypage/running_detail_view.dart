@@ -1,11 +1,42 @@
 import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
 import 'package:app/screens/mypage/mypage.dart';
+import 'package:dio/dio.dart';
 
 
-class RunningDetailView1 extends StatelessWidget {
+class RunningDetailView1 extends StatefulWidget {
   const RunningDetailView1({Key? key}) : super(key: key);
+  @override
+  _RunningDetailView1State createState() => _RunningDetailView1State();
+}
+class _RunningDetailView1State extends State<RunningDetailView1> {
+  // GET 요청으로 받아온 데이터를 저장할 변수
+  Map<String, dynamic>? runningData;
 
+  // Dio 객체 생성
+  Dio dio = Dio();
+  @override
+  void initState() {
+    super.initState();
+    // GET 요청 보내기
+    _fetchRunningData();
+  }
+
+  Future<void> _fetchRunningData() async {
+    try {
+      Response response =
+      await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/6');
+      setState(() {
+        List<dynamic> responseData = response.data;
+        print(response.data);
+        runningData = responseData.length > 0 ? responseData[0] as Map<String, dynamic> : null;
+      });
+      print('데이터 내놔 ${runningData}');
+
+    } catch (e) {
+      print(e);
+    }
+  }
   @override
   Widget build(BuildContext context) {
 
