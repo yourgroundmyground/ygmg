@@ -176,18 +176,81 @@ class _TrackingPolygonState extends State<TrackingPolygon> {
     }
   }
 
+  // 다각형의 중심점 구하기
+  LatLng findPolygonCenter(List<LatLng> points) {
+    double latitude = 0;
+    double longitude = 0;
+
+    for (LatLng point in points) {
+      latitude += point.latitude;
+      longitude += point.longitude;
+    }
+
+    latitude /= points.length;
+    longitude /= points.length;
+
+    return LatLng(latitude, longitude);
+  }
+
+  // 다각형 생성 - 다각형, 다각형 안의 마커
   void _onPolygonCreated(Set<Polygon> polygons) {
     print('이제 다각형을 만들거예요');
-    print(_points);
+    LatLng center = findPolygonCenter(_points);
+    // LatLng center = findPolygonCenter([LatLng(35.2051205, 126.8116811), LatLng(35.2051147, 126.8116459), LatLng(35.2051522, 126.8116607), LatLng(35.2051534, 126.8116587), LatLng(35.2051526, 126.8116458), LatLng(35.2051459, 126.8116281), LatLng(35.2051564, 126.8115957), LatLng(35.2051682, 126.8115753), LatLng(35.2051978, 126.81154), LatLng(35.2052461, 126.8114945), LatLng(35.2052722, 126.8114794), LatLng(35.205295, 126.8114691), LatLng(35.2053052, 126.8114564), LatLng(35.2053247, 126.8114475), LatLng(35.2053539, 126.8114448), LatLng(35.2053727, 126.8114486), LatLng(35.205395, 126.8114547), LatLng(35.2054234, 126.8114613), LatLng(35.2054932, 126.8115306), LatLng(35.2055264, 126.8116026), LatLng(35.2054981, 126.8115984), LatLng(35.2054439, 126.8116201), LatLng(35.2053836, 126.8116399), LatLng(35.2053173, 126.8116604), LatLng(35.2052645, 126.8116918), LatLng(35.2052134, 126.8117058), LatLng(35.2051926, 126.8117058), LatLng(35.205178, 126.8117015), LatLng(35.2051708, 126.811692), LatLng(35.2051968, 126.8115868), LatLng(35.2052249, 126.811472)]);
+    // 미디어 사이즈
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
+
     setState(() {
       _polygons.add(
       Polygon(
         polygonId: PolygonId("mypolygon"),
-        points: [LatLng(35.2051205, 126.8116811), LatLng(35.2051147, 126.8116459), LatLng(35.2051522, 126.8116607), LatLng(35.2051534, 126.8116587), LatLng(35.2051526, 126.8116458), LatLng(35.2051459, 126.8116281), LatLng(35.2051564, 126.8115957), LatLng(35.2051682, 126.8115753), LatLng(35.2051978, 126.81154), LatLng(35.2052461, 126.8114945), LatLng(35.2052722, 126.8114794), LatLng(35.205295, 126.8114691), LatLng(35.2053052, 126.8114564), LatLng(35.2053247, 126.8114475), LatLng(35.2053539, 126.8114448), LatLng(35.2053727, 126.8114486), LatLng(35.205395, 126.8114547), LatLng(35.2054234, 126.8114613), LatLng(35.2054932, 126.8115306), LatLng(35.2055264, 126.8116026), LatLng(35.2054981, 126.8115984), LatLng(35.2054439, 126.8116201), LatLng(35.2053836, 126.8116399), LatLng(35.2053173, 126.8116604), LatLng(35.2052645, 126.8116918), LatLng(35.2052134, 126.8117058), LatLng(35.2051926, 126.8117058), LatLng(35.205178, 126.8117015), LatLng(35.2051708, 126.811692), LatLng(35.2051968, 126.8115868), LatLng(35.2052249, 126.811472),],
+        // points: [LatLng(35.2051205, 126.8116811), LatLng(35.2051147, 126.8116459), LatLng(35.2051522, 126.8116607), LatLng(35.2051534, 126.8116587), LatLng(35.2051526, 126.8116458), LatLng(35.2051459, 126.8116281), LatLng(35.2051564, 126.8115957), LatLng(35.2051682, 126.8115753), LatLng(35.2051978, 126.81154), LatLng(35.2052461, 126.8114945), LatLng(35.2052722, 126.8114794), LatLng(35.205295, 126.8114691), LatLng(35.2053052, 126.8114564), LatLng(35.2053247, 126.8114475), LatLng(35.2053539, 126.8114448), LatLng(35.2053727, 126.8114486), LatLng(35.205395, 126.8114547), LatLng(35.2054234, 126.8114613), LatLng(35.2054932, 126.8115306), LatLng(35.2055264, 126.8116026), LatLng(35.2054981, 126.8115984), LatLng(35.2054439, 126.8116201), LatLng(35.2053836, 126.8116399), LatLng(35.2053173, 126.8116604), LatLng(35.2052645, 126.8116918), LatLng(35.2052134, 126.8117058), LatLng(35.2051926, 126.8117058), LatLng(35.205178, 126.8117015), LatLng(35.2051708, 126.811692), LatLng(35.2051968, 126.8115868), LatLng(35.2052249, 126.811472),],
+        points: _points,
         fillColor: Colors.red,
         strokeColor: Colors.blue,
         strokeWidth: 2,
       ));
+      // 마커 클릭시 하단시트 모달로 프로필, 닉네임 보여주기
+      _markers.add(
+        Marker(
+          markerId: MarkerId("marker-id"),
+          position: center,
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return SizedBox(
+                  height: mediaHeight*0.2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: mediaWidth*0.1),
+                      Container(
+                        width: mediaWidth*0.2,
+                        height: mediaWidth*0.2,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            "assets/images/runningbgi.png",    // *사용자 프로필 이미지
+                            height: mediaWidth*0.2,
+                            width: mediaWidth*0.2,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      ),
+                      Text("닉네임", style: TextStyle(fontSize: mediaWidth*0.04)),
+                      SizedBox(width: mediaWidth*0.1),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        )
+      );
     });
   }
 
