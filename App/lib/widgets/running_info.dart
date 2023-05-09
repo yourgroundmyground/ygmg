@@ -10,6 +10,7 @@ import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RunningInfo extends StatefulWidget {
   const RunningInfo({Key? key}) : super(key: key);
@@ -21,14 +22,19 @@ class RunningInfo extends StatefulWidget {
 class _RunningInfoState extends State<RunningInfo> {
   bool isStarted = true;
   bool isPlaying = true;
+  double gyrorunningPace = 0.0;
   late DateTime runningStart;
 
   // *달린 속도 변경
   double runningPace = 0.0;
+  double runningPaceKm = 0.0;
+
   // *달린 거리 변경
   double runningDist = 0.0;
+
   // *달린 시간 변경
   Duration runningDuration = Duration.zero;
+
   // *태운 칼로리 변경
   double runningKcal = 0.0;
 
@@ -75,11 +81,11 @@ class _RunningInfoState extends State<RunningInfo> {
     super.initState();
     runningStart = DateTime.now();
     gyroscopeEvents.listen((GyroscopeEvent event) {
-      // double speed = (event.x.abs() + event.y.abs() + event.z.abs()) / 3;
-      // runningPace = (speed * 3.6) * 10;
-      // runningPace = (runningPace.round() / 10);
+      double speed = (event.x.abs() + event.y.abs() + event.z.abs()) / 3;
+      gyrorunningPace = (speed * 3.6) * 10;
+      gyrorunningPace = (gyrorunningPace.round() / 10);
       // 속도가 0인 경우 isPlaying을 false로 바꾸어줍니다.
-      if (runningPace == 0 && isStarted) {
+      if (gyrorunningPace < 1.0 && isStarted) {
         _count += 1;
         if (_count >= 30) {
           setState(() {
@@ -100,9 +106,9 @@ class _RunningInfoState extends State<RunningInfo> {
 
   @override
   void dispose() {
-    // gyroscopeEvents.drain();
-    _locationSubscription.cancel();
     _timer.cancel();
+    _locationSubscription.cancel();
+    gyroscopeEvents.drain();
     super.dispose();
   }
 
@@ -131,38 +137,110 @@ class _RunningInfoState extends State<RunningInfo> {
   }
 
   void _updateRunningInfo(LocationData locationData) {
-    if (_previousLocationData != null) {
-      Point<num> previousPoint = Point(
-        _previousLocationData!.latitude!,
-        _previousLocationData!.longitude!,
-      );
-      Point<num> currentPoint = Point(
-        locationData.latitude!,
-        locationData.longitude!,
-      );
-      double distanceInMeters = SphericalUtils.computeDistanceBetween(
-        previousPoint,
-        currentPoint,
-      );
-      _distance += distanceInMeters / 1000; // 단위: km
+    if (_previousLocationData == null) {
+      _previousLocationData = locationData;
+      return;
+    }
 
-      double timeInSeconds =
-          (locationData.time! - _previousLocationData!.time!) / 1000.0;
-      _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
+    Point<num> previousPoint = Point(
+      _previousLocationData!.latitude!,
+      _previousLocationData!.longitude!,
+    );
+    Point<num> currentPoint = Point(
+      locationData.latitude!,
+      locationData.longitude!,
+    );
+    double distanceInMeters = SphericalUtils.computeDistanceBetween(
+      previousPoint,
+      currentPoint,
+    );
 
-      setState(() {
+    // 위치 보정 전
+    _distance += distanceInMeters / 1000; // 단위: km
+
+    double timeInSeconds =
+        (locationData.time! - _previousLocationData!.time!) / 1000.0;
+    _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
+
+    setState(() {
+      if (_currentSpeed >= 2.0) {
         runningDist = _distance;
         runningPace = _currentSpeed;
         runningKcal = calculateRunningKcal(47.6, runningDuration);
-
         // 위치 좌표 리스트에 추가
-        _locationList.add(
-            {'coordinateTime': locationData.time!, 'lat': locationData.latitude!, 'lng': locationData.longitude!});
-      });
-    }
+        _locationList.add({
+          'coordinateTime': locationData.time!,
+          'lat': locationData.latitude!,
+          'lng': locationData.longitude!
+        });
+      } else {
+        runningPace = 0.0;
+      }
 
+    });
+    print(_locationList);
     _previousLocationData = locationData;
     saveRunningData();
+    // if (_previousLocationData != null) {
+    //   Point<num> previousPoint = Point(
+    //     _previousLocationData!.latitude!,
+    //     _previousLocationData!.longitude!,
+    //   );
+    //   Point<num> currentPoint = Point(
+    //     locationData.latitude!,
+    //     locationData.longitude!,
+    //   );
+    //   double distanceInMeters = SphericalUtils.computeDistanceBetween(
+    //     previousPoint,
+    //     currentPoint,
+    //   );
+    //
+    //   // 위치 보정 전
+    //   _distance += distanceInMeters / 1000; // 단위: km
+    //
+    //   double timeInSeconds =
+    //       (locationData.time! - _previousLocationData!.time!) / 1000.0;
+    //   _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
+    //
+    //   setState(() {
+    //     runningDist = _distance;
+    //     runningPace = _currentSpeed;
+    //     runningKcal = calculateRunningKcal(47.6, runningDuration);
+    //
+    //     // 위치 좌표 리스트에 추가
+    //     _locationList.add({
+    //       'coordinateTime': locationData.time!,
+    //       'lat': locationData.latitude!,
+    //       'lng': locationData.longitude!
+    //     });
+    //   });
+    //   _previousLocationData = locationData;
+    //   saveRunningData();
+
+      // 위치 보정 후
+      // if (distanceInMeters > 30) {
+      //   _distance += distanceInMeters / 1000; // 단위: km
+      //
+      //   double timeInSeconds =
+      //       (locationData.time! - _previousLocationData!.time!) / 1000.0;
+      //   _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
+      //
+      //   setState(() {
+      //     runningDist = _distance;
+      //     runningPace = _currentSpeed;
+      //     runningKcal = calculateRunningKcal(47.6, runningDuration);
+      //
+      //     // 위치 좌표 리스트에 추가
+      //     _locationList.add({
+      //       'coordinateTime': locationData.time!,
+      //       'lat': locationData.latitude!,
+      //       'lng': locationData.longitude!
+      //     });
+      //   });
+      //   _previousLocationData = locationData;
+      //   saveRunningData();
+      // }
+    // }
   }
 
   void _updateRunningTime(Timer timer) {
@@ -181,11 +259,12 @@ class _RunningInfoState extends State<RunningInfo> {
   }
 
   Future<void> saveRunningData() async {
+    runningPaceKm = runningDist / runningDuration.inHours;
     SharedPreferences runningResult = await SharedPreferences.getInstance();
     // 위치 좌표 리스트를 로컬에 저장
     await runningResult.setString('locationList', jsonEncode(_locationList));
     await runningResult.setDouble('runningPace', runningPace);
-    await runningResult.setDouble('runningDist', runningDist);
+    await runningResult.setDouble('runningDist', runningPaceKm);
     await runningResult.setString(
         'runningDuration', runningDuration.toString());
     await runningResult.setDouble('runningKcal', runningKcal);
@@ -214,6 +293,7 @@ class _RunningInfoState extends State<RunningInfo> {
       ),
       child: Column(
         children: [
+          Text('$_currentSpeed'),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -285,7 +365,7 @@ class _RunningInfoState extends State<RunningInfo> {
                                           runningEnd:
                                               DateFormat('yyyy-MM-dd HH:mm:ss')
                                                   .format(runningEnd),
-                                          runningPace: runningPace,
+                                          runningPace: runningPaceKm,
                                           runningDist: runningDist,
                                           runningDuration:
                                               formatDuration(runningDuration),
