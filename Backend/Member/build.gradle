@@ -45,6 +45,9 @@ dependencies {
 	// aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	// mysql
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
 	implementation('com.auth0:java-jwt:4.2.1')
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'

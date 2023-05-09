@@ -1,8 +1,31 @@
 import 'package:app/widgets/running_info.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
-class InRunning extends StatelessWidget {
+class InRunning extends StatefulWidget {
   const InRunning({Key? key}) : super(key: key);
+
+  @override
+  State<InRunning> createState() => _InRunningState();
+}
+  Future<String> loadMapStyle() async {
+    return await rootBundle.loadString('assets/style/map_style.txt');
+  }
+
+class _InRunningState extends State<InRunning> {
+
+  var customMapStyle;
+
+  @override
+  void initState() {
+    super.initState();
+    loadMapStyle().then((value) {
+      setState(() {
+        customMapStyle = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +61,28 @@ class InRunning extends StatelessWidget {
                   )
                 ),
               ),
-              Container(
-                child: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/running-gif.gif'),
-                  radius: mediaWidth*0.4,
-
+              CircleAvatar(
+                radius: mediaWidth*0.4,
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                    bearing: 0,
+                    target: LatLng(35.2051965, 126.8117383),
+                    zoom: 18.0,
+                  ),
+                  onMapCreated: (GoogleMapController controller) {
+                    controller.setMapStyle(customMapStyle);
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  rotateGesturesEnabled: false,
+                  zoomControlsEnabled: false,
                 ),
               ),
+              // CircleAvatar(
+              //   backgroundImage: AssetImage('assets/images/running-gif.gif'),
+              //   radius: mediaWidth*0.4,
+              // ),
               SizedBox(height: mediaHeight*0.07,),
               RunningInfo()    //  *running_info 위젯으로 변경하기
             ]

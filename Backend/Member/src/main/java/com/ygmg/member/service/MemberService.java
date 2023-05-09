@@ -6,6 +6,7 @@ import com.ygmg.member.request.JoinMemberPostReq;
 import com.ygmg.member.request.UserReissuePostReq;
 import com.ygmg.member.response.UserInfoRes;
 import com.ygmg.member.response.UserMypageInfoRes;
+import com.ygmg.member.response.UserNickImgRes;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
@@ -36,4 +37,7 @@ public interface MemberService {
 
     // 마이페이지 정보조회
     UserMypageInfoRes mypageInfo(Member member);
+
+    // 메인에 보여줄 멤버의 프로필사진과 닉네임 정보 조회
+    UserNickImgRes showTopMember(Long memberId);
 }
