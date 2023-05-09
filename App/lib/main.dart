@@ -1,5 +1,5 @@
-import 'package:app/screens/login/login.dart';
-import 'package:app/screens/mypage/mypage.dart';
+import 'package:app/const/state_provider_screen.dart';
+import 'package:app/screens/login/loading.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -13,8 +13,23 @@ void main() async {
     nativeAppKey: 'bc0af151df3f9f3634ed6376aa5f3866',
     javaScriptAppKey: 'c59918aaed79bd379c5c09f3fc61be93',
   );
+  //토큰 정보 불러오기
+  TokenInfo tokenInfo = await loadTokenFromSecureStorage();
+
+  //토큰 값 확인
+  print('Loaded accessToken: ${tokenInfo.accessToken}');
+  print('Loaded refreshToken: ${tokenInfo.refreshToken}');
+  print('Loaded memberId: ${tokenInfo.memberId}');
+  print('Loaded memberNickname: ${tokenInfo.memberNickname}');
+  print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+
   runApp(
     ProviderScope(
+      overrides: [
+        //불러온 토큰 정보 설정
+        userInfoProvider.overrideWithProvider(StateNotifierProvider<UserInfoNotifier, TokenInfo>(
+                (ref) => UserInfoNotifier()..setUserInfo(tokenInfo)))
+      ],
       child: MyApp(),
     )
   );
@@ -28,7 +43,7 @@ class MyApp extends StatelessWidget{
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: LoginScreen(),
+      home: LoadingScreen(),
     );
   }
 }
