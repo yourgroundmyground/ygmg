@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void fetchData(BuildContext context) async {
-  Dio dio = Dio();
+  // Dio dio = Dio();
   if(await isKakaoTalkInstalled()){
     try{
       OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
@@ -48,13 +48,12 @@ void sendCode(BuildContext context, var accessToken) async {
   // var body = json.encode(code);
 
     final response = await dio.post(
-      "http://k8c107.p.ssafy.io:8080/api/kakao/",
+      "http://k8c107.p.ssafy.io:8080/api/member/kakao",
       options: Options(
           headers: {"Content-Type": "application/json"}),
       data: jsonEncode(code),
     );
     if (response.statusCode == 200) {
-      print('이백이다');
       print('Response body: ${response.data}');
       final String kakaoEmail = response.data['kakaoEmail'];
       final String memberBirth = response.data['memberBirth'];
@@ -80,7 +79,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Dio dio = Dio();
+    // Dio dio = Dio();
 
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
