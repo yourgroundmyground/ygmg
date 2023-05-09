@@ -13,13 +13,20 @@ import java.sql.Date;
 @AllArgsConstructor
 @ToString
 public class Member {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String kakaoEmail;
+
     private String memberBirth;
+
     private String memberNickname;
+
     private String memberName;
+
     private Long memberWeight;
+
     private String profileUrl;
 }

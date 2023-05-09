@@ -9,9 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, String> {
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByKakaoEmail(String email);
 
     Member findByMemberNickname(String memberNickname);
+
 }
