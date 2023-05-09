@@ -51,21 +51,20 @@ public class JwtTokenUtil {
         this.REFRESH_TOKEN_EXPIRE_TIME = REFRESH_TOKEN_EXPIRE_TIME;
     }
 
-    //토큰 생성
-    public TokenInfo generateToken(String memberNickname, Long memberId, String accessToken, String refreshToken){
+    // 첫 회원가입 한 사람 토큰 생성
+    public TokenInfo generateToken(String memberNickname, Long memberId, Long memberWeight, String accessToken, String refreshToken){
 
         return TokenInfo.builder()
                 .memberNickname(memberNickname)
                 .memberId(memberId)
+                .memberWeight(memberWeight)
                 .grantType(TOKEN_PREFIX)
                 .authorization(accessToken)
                 .refreshToken(refreshToken)
                 .accessTokenExpirationTime(ACCESS_TOKEN_EXPIRE_TIME)
                 .refreshTokenExpirationTime(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
-
     }
-
 
     //accessToken 생성
     public  String createAccessToken(String userId) {
@@ -118,38 +117,4 @@ public class JwtTokenUtil {
             return request.getHeader("authorization");
         return null;
     }
-
-//    public Role getRoles(String userId) {
-//        return userRepository.findByUserEmail(userId).get().getRole();
-//    }
-
-    //    public static void handleError(String token) {
-//        JWTVerifier verifier = JWT
-//                .require(Algorithm.HMAC512(secretKey.getBytes()))
-//                .withIssuer(ISSUER)
-//                .build();
-//
-//        try {
-//            verifier.verify(token.replace(TOKEN_PREFIX, ""));
-//        } catch (AlgorithmMismatchException ex) {
-//            throw ex;
-//        } catch (InvalidClaimException ex) {
-//            throw ex;
-//        } catch (SignatureGenerationException ex) {
-//            throw ex;
-//        } catch (SignatureVerificationException ex) {
-//            throw ex;
-//        } catch (TokenExpiredException ex) {
-//            throw ex;
-//        } catch (JWTCreationException ex) {
-//            throw ex;
-//        } catch (JWTDecodeException ex) {
-//            throw ex;
-//        } catch (JWTVerificationException ex) {
-//            throw ex;
-//        } catch (Exception ex) {
-//            throw ex;
-//
-//        }
-//    }
 }

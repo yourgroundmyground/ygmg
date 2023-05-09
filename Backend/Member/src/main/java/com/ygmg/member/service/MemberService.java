@@ -36,8 +36,4 @@ public interface MemberService {
 
     // 마이페이지 정보조회
     UserMypageInfoRes mypageInfo(Member member);
-
-    Long putUrl(String url);
-
-    void joinMember2(JoinMemberPostReq joinMemberPostReq);
 }
