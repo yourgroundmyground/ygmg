@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app/const/state_provider_screen.dart';
+import 'package:app/screens/game/game_start.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
@@ -42,7 +44,7 @@ Future<String> checkNickname(String nickname) async {
     var encodedNickname = Uri.encodeComponent(nickname);
     var response = await dio.get(
         "http://k8c107.p.ssafy.io:8080/api/member/$nickname",
-      queryParameters: {"memberNickname": encodedNickname});
+        queryParameters: {"memberNickname": encodedNickname});
 
     if (response.statusCode == 200) {
       print(response.data);
@@ -53,10 +55,11 @@ Future<String> checkNickname(String nickname) async {
     }
   } catch (e) {
     print(e);
-    // 에러 발생 시 false 반환
     return '닉네임 체크 에러 발생';
   }
 }
+
+
 
 class SignUpScreen extends StatefulWidget {
   final String kakaoEmail;
@@ -76,7 +79,7 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   File? _image = null;
-  bool _isNicknameValid = false;
+  bool _isNicknameValid = false; //닉네임 중복 확인
   final picker = ImagePicker();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
@@ -101,7 +104,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-
   Future uploadData() async {
     var dio = Dio();
 
@@ -119,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       kakaoEmail: widget.kakaoEmail,
       memberBirth: widget.memberBirth,
       memberName: widget.memberName,
-  );
+    );
 
     Map<String, dynamic> jsonData = joinMemberPostReq.toJson();
     print('joinMemberPostReq : $jsonData');
@@ -133,30 +135,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
 
 
-
     try {
       final response = await dio.post(
-        'http://k8c107.p.ssafy.io:8080/api/app',
+        'http://k8c107.p.ssafy.io:8080/api/member/app',
         data: formData,
         options: Options(
           // method: 'POST',
           // headers: {
-            // Headers.contentTypeHeader: 'multipart/form-data'
-            // 'Content-Type': 'application/json',
+          // Headers.contentTypeHeader: 'multipart/form-data'
+          // 'Content-Type': 'application/json',
           // },
         ),
       );
-      print('회원가입 성공 $response.data');
+
+      print('회원가입 성공! $response.data');
+
+      if (response.data['statusCode'] == 200) {
+        int memberId = response.data['tokenInfo']['memberId'];
+        String memberNickname = response.data['tokenInfo']['memberNickname'];
+        double memberWeight = response.data['tokenInfo']['memberWeight'].toDouble();
+        String accessToken = response.data['tokenInfo']['authorization'];
+        String refreshToken = response.data['tokenInfo']['refreshToken'];
+
+        TokenInfo tokenInfo = TokenInfo(
+          memberId: memberId,
+          memberNickname: memberNickname,
+          memberWeight: memberWeight,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        );
+
+        print('회원가입 성공???????? $response.data');
+        await saveTokenSecureStorage(tokenInfo);
+        print('회원가입 성공~~ $response.data');
+        return true;
+
+      }
+      return false;
     } on DioError catch (e) {
       if (e.response != null) {
         print('에러 응답 코드: ${e.response!.statusCode}');
         print('에러 응답 데이터: ${e.response!.data}');
       } else {
-        print('에러: $e');
+        print('에러e: $e');
       }
-    } catch (e) {
-      print('에러: $e');
     }
+    // catch (e) {
+    //   print('에러c: $e');
+    // }
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -165,32 +191,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
 
-    return MaterialApp(
-      home: Container(
-        // width: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            image: AssetImage('assets/images/mainbg2.png'),
-          ),
+    return Container(
+      // width: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.cover,
+          image: AssetImage('assets/images/mainbg2.png'),
         ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Container(
-            alignment: Alignment.center,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 100),
-                    GestureDetector(
-                      onTap: selectImage,
-                      child: Container(
-                        height: 167,
-                        width: 167,
-                        decoration: BoxDecoration(
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          alignment: Alignment.center,
+          child: Form(
+            key: _formKey,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 100),
+                  GestureDetector(
+                    onTap: selectImage,
+                    child: Container(
+                      height: 167,
+                      width: 167,
+                      decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white,
@@ -203,8 +228,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               offset: Offset(0,3)
 
                           )]
-                        ),
-                        child: _image == null
+                      ),
+                      child: _image == null
                           ? Container(
                           width: 167,
                           height: 167,
@@ -213,118 +238,143 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             color: Colors.white,
                           ),
                           child:Image.asset('assets/images/plus.png')
-                        )
+                      )
                           : ClipOval(
-                          child: Image.file(
+                        child: Image.file(
                           _image!,
                           fit: BoxFit.cover,
-                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Column(
+                  ),
+                  const SizedBox(height: 20),
+                  Column(
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        // crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.1),//마진수정
+                            child: Text('닉네임',
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: mediaWidth*0.7,
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 5,
+                                      offset: Offset(0,3)
+                                  )
+                                ],
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                NicknameField(
+                                  controller: _nicknameController,
+                                  hintText: '닉네임을 입력하세요',
+                                ),
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      // checkNickname(_nicknameController.text);
+
+                                      String nicknameCheckMessage = await checkNickname(_nicknameController.text);
+
+                                      if (nicknameCheckMessage == '사용가능한 닉네임입니다.') {
+                                        _isNicknameValid = true;
+                                        _nicknameFieldKey.currentState
+                                            ?.updateMessages(newHintText: nicknameCheckMessage, newErrorText: null);
+                                        print('닉네임 사용가능');
+
+                                      } else if (nicknameCheckMessage == '중복된 닉네임입니다.') {
+                                        _isNicknameValid = false;
+                                        _nicknameFieldKey.currentState
+                                            ?.updateMessages(newHintText: '닉네임을 입력하세요', newErrorText: nicknameCheckMessage);
+                                        print('닉네임 사용불가');
+
+                                      }
+
+
+
+                                    },
+                                    child: Text('중복확인'))
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('몸무게'),
+                          const SizedBox(width: 10),
+                          Container(
+                            width: mediaWidth*0.6,
+                            decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 5,
+                                      offset: Offset(0,3)
+                                  )
+                                ],
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                WeightField(
+                                  controller: _weightController,
+                                  hintText: '몸무게를 입력하세요',
+                                ),
+                                Text('kg'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 80),
+                  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('닉네임'),
-                        Container(
-                          width: mediaWidth*0.85,
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 5,
-                                    offset: Offset(0,3)
-                                )
-                              ],
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              NicknameField(
-                                controller: _nicknameController,
-                                hintText: '닉네임을 입력하세요',
-                              ),
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    // checkNickname(_nicknameController.text);
-
-                                    String nicknameCheckMessage = await checkNickname(_nicknameController.text);
-
-                                    if (nicknameCheckMessage == '사용가능한 닉네임입니다.') {
-                                      _isNicknameValid = true;
-                                      _nicknameFieldKey.currentState
-                                          ?.updateMessages(newHintText: nicknameCheckMessage, newErrorText: null);
-                                      print('사용가능 사용가능');
-
-                                    } else if (nicknameCheckMessage == '중복된 닉네임입니다.') {
-                                      _isNicknameValid = false;
-                                      _nicknameFieldKey.currentState
-                                          ?.updateMessages(newHintText: '닉네임을 입력하세요', newErrorText: nicknameCheckMessage);
-                                      print('사용불가사용불가');
-
-                                    }
-
-
-
-                                  },
-                                  child: Text('중복확인'))
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text('몸무게'),
-                        Container(
-                          width: mediaWidth*0.45,
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 5,
-                                    offset: Offset(0,3)
-                                )
-                              ],
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              WeightField(
-                                controller: _weightController,
-                                hintText: '몸무게를 입력하세요',
-                              ),
-                              Text('kg'),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 80),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ElevatedButton(
+                        ElevatedButton(
                           onPressed: _isNicknameValid
                               ? () {
                             if (_formKey.currentState!.validate()) {
-                              uploadData();
+                              uploadData().then((response) {
+                                if (response ?? false) {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => GameStart()),
+                                      (route) => false,
+                                  );
+                                }
+                              });
                             }
                           }
-                          : null, //버튼 비활성화
+                              : null, //버튼 비활성화
                           style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  _isNicknameValid ? Color(0xFFFFDA65) : Colors.grey,
+                              _isNicknameValid ? Color(0xFFFFDA65) : Colors.grey,
                               elevation: 8
                           ),
                           child: Text('확인', style: TextStyle(color: Colors.black)),
-                      )
-                    ]
-                    )
-                  ]
-              ),
+                        )
+                      ]
+                  )
+                ]
             ),
           ),
         ),
@@ -378,7 +428,7 @@ class _NicknameFieldState extends State<NicknameField> {
     return Row(
       children: [
         SizedBox(
-          width: mediaWidth*0.6,
+          width: mediaWidth*0.4,
           child: TextFormField(
 
             controller: widget.controller,
@@ -455,7 +505,7 @@ class WeightField extends StatelessWidget {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return '몸무게를 입력해주세요';
+                return '몸무게를 입력하세요';
               } else {
                 int? parsedValue = int.tryParse(value);
                 if (parsedValue == null || parsedValue > 400 || parsedValue < 10) {
@@ -471,6 +521,3 @@ class WeightField extends StatelessWidget {
     );
   }
 }
-
-
-
