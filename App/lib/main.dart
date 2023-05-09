@@ -1,4 +1,5 @@
-import 'package:app/const/state_provider_screen.dart';
+import 'package:app/const/state_provider_interceptor.dart';
+import 'package:app/const/state_provider_token.dart';
 import 'package:app/screens/login/loading.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,18 @@ void main() async {
   print('Loaded memberId: ${tokenInfo.memberId}');
   print('Loaded memberNickname: ${tokenInfo.memberNickname}');
   print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+
+  //토큰 인터셉터
+  final container = ProviderContainer(
+    overrides: [
+      userInfoProvider.overrideWithProvider(
+          StateNotifierProvider<UserInfoNotifier, TokenInfo>(
+                  (ref) => UserInfoNotifier()..setUserInfo(tokenInfo)))
+    ]
+  );
+
+  setupDio(container);
+  print('인터셉터');
 
   runApp(
     ProviderScope(
