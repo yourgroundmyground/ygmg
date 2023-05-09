@@ -28,7 +28,6 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisRepository redisRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserInfoRes sendMemberInfo(HashMap<String, Object> userInfo) {
@@ -55,7 +54,7 @@ public class MemberServiceImpl implements MemberService {
         return member;
     }
 
-    // 인게임 정보 -> DB 저장
+    // 회원가입 -> DB 저장
     @Override
     public void joinMember(JoinMemberPostReq joinMemberPostReq, String url) {
         Member member = Member.builder()
@@ -73,11 +72,14 @@ public class MemberServiceImpl implements MemberService {
     public TokenInfo login(JoinMemberPostReq joinMemberPostReq) {
         Member member = memberRepository.findByMemberNickname(joinMemberPostReq.getMemberNickname());
         Long memberId = member.getId();
+        Long memberWeight = member.getMemberWeight();
 
+        // 토큰 생성
         String accessToken = jwtTokenUtil.createAccessToken(joinMemberPostReq.getKakaoEmail());
         String refreshToken = jwtTokenUtil.createRefreshToken(joinMemberPostReq.getKakaoEmail());
 
-        TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getMemberNickname(), memberId, accessToken, refreshToken);
+        // 토큰 info 생성
+        TokenInfo tokenInfo = jwtTokenUtil.generateToken(joinMemberPostReq.getMemberNickname(), memberId, memberWeight,accessToken, refreshToken);
 
         // redis에 저장
         redisRepository.save(new RefreshToken(member.getKakaoEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
@@ -88,11 +90,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public TokenInfo exist(Member member) {
         Long memberId = member.getId();
+        Long memberWeight = member.getMemberWeight();
 
+        // 토큰 생성
         String accessToken = jwtTokenUtil.createAccessToken(member.getKakaoEmail());
         String refreshToken = jwtTokenUtil.createRefreshToken(member.getKakaoEmail());
 
-        TokenInfo tokenInfo = jwtTokenUtil.generateToken(member.getMemberNickname(), memberId, accessToken, refreshToken);
+        // 토큰 info 생성
+        TokenInfo tokenInfo = jwtTokenUtil.generateToken(member.getMemberNickname(), memberId, memberWeight, accessToken, refreshToken);
 
         // redis에 저장
         redisRepository.save(new RefreshToken(member.getKakaoEmail(), refreshToken, tokenInfo.getRefreshTokenExpirationTime()));
@@ -124,41 +129,19 @@ public class MemberServiceImpl implements MemberService {
             return ResponseEntity.status(404).body(UserAuthPostRes.of(404, "RefreshToken 정보가 잘못되었습니다..",null));
         }
 
-        // 토큰에 담아줄 memberNicname과 memberId
+        // 토큰에 담아줄 memberNickname과 memberId, memberWeight
         String kakaoEmail = authentication.getName();
         Optional<Member> member = memberRepository.findByKakaoEmail(kakaoEmail);
         Long memberId = member.get().getId();
         String Nickname = member.get().getMemberNickname();
+        Long memberWeight = member.get().getMemberWeight();
 
         // 리프레시 유효한 상황이므로 -> 액세스, 리프레시 두개 재발급
         String accessToken = jwtTokenUtil.createAccessToken(authentication.getName());
         String refreshToken = jwtTokenUtil.createRefreshToken(authentication.getName());
-        TokenInfo tokenInfo = jwtTokenUtil.generateToken(Nickname, memberId, accessToken, refreshToken);
+        TokenInfo tokenInfo = jwtTokenUtil.generateToken(Nickname, memberId, memberWeight, accessToken, refreshToken);
         redisRepository.save(new RefreshToken(authentication.getName(), refreshToken ,tokenInfo.getRefreshTokenExpirationTime()));
 
         return ResponseEntity.ok(UserAuthPostRes.of(200, "Token 정보가 갱신되었습니다.", tokenInfo));
-    }
-
-    @Override
-    public Long putUrl(String url) {
-        Member member = new Member();
-        member.setProfileUrl(url);
-        memberRepository.save(member);
-
-        return member.getId();
-    }
-
-    @Override
-    public void joinMember2(JoinMemberPostReq joinMemberPostReq) {
-        Long memberId = joinMemberPostReq.getMemberId();
-        Member member = memberRepository.findMemberById(memberId);
-
-        member.setKakaoEmail(joinMemberPostReq.getKakaoEmail());
-        member.setMemberBirth(joinMemberPostReq.getMemberBirth());
-        member.setMemberName(joinMemberPostReq.getMemberName());
-        member.setMemberNickname(joinMemberPostReq.getMemberNickname());
-        member.setMemberWeight(joinMemberPostReq.getMemberWeight());
-
-        memberRepository.save(member);
     }
 }
