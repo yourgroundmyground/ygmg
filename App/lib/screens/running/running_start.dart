@@ -38,7 +38,7 @@ class _RunningStartState extends State<RunningStart> {
       myTodayGoal.clear();
     } else {
       setState(() {
-        runningDist = savedNow ?? 0.0;
+        runningDist += savedNow ?? 0.0;
         todayGoal = savedTodayGoal ?? 0.0;
         currentDate = savedCurrentDate ?? '';
       });
