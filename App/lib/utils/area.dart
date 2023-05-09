@@ -28,7 +28,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
   // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
   List<List> _pointsSets = [];
-  List<Set> _polygonSets = [];
+  List<Polygon> _polygonSets = [];
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
@@ -197,6 +197,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
           strokeWidth: 2,
           strokeColor: Colors.red,
         );
+        _polygonSets.add(_polygon!);
         final polygonArea = SphericalUtils.computeArea(points);
         print('점들 : ${points}');
         print('면적 : ${_polygon}');
@@ -222,6 +223,42 @@ class _DrawPolygonState extends State<DrawPolygon> {
     final firstPoint = Point(first.latitude, first.longitude);
     final lastPoint = Point(last.latitude, last.longitude);
     return SphericalUtils.computeDistanceBetween(firstPoint, lastPoint);
+  }
+
+  // Polygon 클리핑 함수
+  List<LatLng> clipPolygon(List<LatLng> polygon1, List<LatLng> polygon2) {
+    List<LatLng> result = [];
+    // polygon1의 좌표를 모두 추가
+    for (int i = 0; i < polygon1.length; i++) {
+      result.add(polygon1[i]);
+    }
+    // polygon1과 polygon2를 클리핑하여 중복된 좌표를 제거
+    for (int i = 0; i < polygon2.length; i++) {
+      if (isPointInsidePolygon(polygon1, polygon2[i])) {
+        result.add(polygon2[i]);
+      }
+    }
+    // 결과 polygon 반환
+    return result;
+  }
+
+  // Point가 Polygon 내부에 있는지 검사하는 함수
+  bool isPointInsidePolygon(List<LatLng> polygon, LatLng point) {
+    int intersections = 0;
+    for (int i = 0; i < polygon.length; i++) {
+      LatLng p1 = polygon[i];
+      LatLng p2 = polygon[(i + 1) % polygon.length];
+      if (p1.longitude > point.longitude == p2.longitude > point.longitude) {
+        continue;
+      }
+      double x = (point.longitude - p1.longitude) * (p2.latitude - p1.latitude) /
+          (p2.longitude - p1.longitude) +
+          p1.latitude;
+      if (x > point.latitude) {
+        intersections++;
+      }
+    }
+    return intersections % 2 == 1;
   }
 
   @override
@@ -256,6 +293,15 @@ class _DrawPolygonState extends State<DrawPolygon> {
             isWalking = !isWalking;
           });
           calculate();
+          if (_polygonSets.isNotEmpty) {
+            // 첫번째 폴리곤과 두번째 폴리곤이 겹치는지 검사
+            if (isPointInsidePolygon(_polygonSets[0].points, _polygonSets[1].points[0])) {
+              // 겹치는 영역을 클리핑
+              final clippedPoints = clipPolygon(_polygonSets[0].points, _polygonSets[1].points);
+              // 첫번째 폴리곤 업데이트
+              _polygonSets[0] = _polygonSets[0].copyWith(pointsParam: clippedPoints);
+            }
+          }
         },
         child: Icon(isWalking ? Icons.pause : Icons.play_arrow),
       ),
