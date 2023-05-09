@@ -9,7 +9,7 @@ import 'package:app/utils/area.dart';
 import 'package:location/location.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Mypage extends StatefulWidget {
   const Mypage({Key? key}) : super(key: key);
@@ -27,8 +27,10 @@ class _MypageState extends State<Mypage> {
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
+
     // 닉네임
-    var nickname = '달려달려';
+    final nickname = ${context.read(nicknameProvider)}
+    final image = ${context.read(nicknameProvider)}
     // 결과
     void main() async {
       await initializeDateFormatting('ko_KR', null);
