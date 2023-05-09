@@ -17,9 +17,10 @@ class TokenInfo {
   });
 }
 
-//상태관리
+//상태관리 클래스 생성
 class UserInfoNotifier extends StateNotifier<TokenInfo> {
-  UserInfoNotifier(): super(TokenInfo(
+  UserInfoNotifier(): super(
+      TokenInfo(
       memberId: 0,
       memberNickname: '',
       memberWeight: 0,
@@ -32,6 +33,8 @@ class UserInfoNotifier extends StateNotifier<TokenInfo> {
   }
 
 }
+
+//notifier를 관리하는 provider 생성
 final userInfoProvider = StateNotifierProvider<UserInfoNotifier, TokenInfo>((ref) => UserInfoNotifier());
 final storage = FlutterSecureStorage();
 
