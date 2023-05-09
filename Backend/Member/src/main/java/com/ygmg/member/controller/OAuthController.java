@@ -50,7 +50,7 @@ public class OAuthController {
         TokenInfo tokenInfo = memberService.login(joinMemberPostReq);
 
         // 200과 함께 토큰 보내줌
-        return ResponseEntity.ok(new UserAuthPostRes().of(200, "회원가입성공", tokenInfo));
+        return ResponseEntity.ok(new UserAuthPostRes().of(200, "비회원", tokenInfo));
     }
 
     @ResponseBody
@@ -80,7 +80,7 @@ public class OAuthController {
             TokenInfo tokenInfo = memberService.exist(member.get());
 
             // 200과 함께 토큰 보내줌
-            return ResponseEntity.ok(new UserAuthPostRes().of(200, "로그인성공", tokenInfo));
+            return ResponseEntity.ok(new UserAuthPostRes().of(200, "회원", tokenInfo));
         }
     }
 
