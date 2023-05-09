@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/screens/game/game_start.dart';
 import 'package:app/screens/login/signup.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -54,21 +55,33 @@ void sendCode(BuildContext context, var accessToken) async {
       data: jsonEncode(code),
     );
     if (response.statusCode == 200) {
-      print('Response body: ${response.data}');
-      final String kakaoEmail = response.data['kakaoEmail'];
-      final String memberBirth = response.data['memberBirth'];
-      final String memberName = response.data['memberName'];
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) =>
-              SignUpScreen(
-                kakaoEmail: kakaoEmail,
-                memberBirth: memberBirth,
-                memberName: memberName,
-              ),
-        ),
-      );
+      //비회원일 때
+      if (response.data['message'] == '비회원') {
+        final String kakaoEmail = response.data['kakaoEmail'];
+        final String memberBirth = response.data['memberBirth'];
+        final String memberName = response.data['memberName'];
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) =>
+                SignUpScreen(
+                  kakaoEmail: kakaoEmail,
+                  memberBirth: memberBirth,
+                  memberName: memberName,
+                ),
+          ),
+        );
+      } else { //회원일때
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) =>
+                GameStart()
+          ),
+        );
+      }
+      print('Response body: ${response.data}');
+
     } else {
       print('Request failed with status: ${response.statusCode}.');
     }
