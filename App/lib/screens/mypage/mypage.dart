@@ -7,6 +7,8 @@ import 'package:app/widgets/my_weekly_game.dart';
 import 'package:app/utils/map.dart';
 import 'package:app/utils/area.dart';
 import 'package:location/location.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 
 class Mypage extends StatefulWidget {
@@ -28,7 +30,39 @@ class _MypageState extends State<Mypage> {
     // 닉네임
     var nickname = '달려달려';
     // 결과
+    void main() async {
+      await initializeDateFormatting('ko_KR', null);
+      // 오늘의 날짜 가져오기
+      DateTime today = DateTime.now();
 
+      // 이번 주의 첫 날짜 가져오기 (월요일)
+      DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+
+      // 이번 주의 마지막 날짜 가져오기 (일요일)
+      DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+
+      // 이번 주의 모든 날짜 가져오기
+      List<DateTime> daysOfWeek = [];
+      for (var i = 0; i < 7; i++) {
+        daysOfWeek.add(startOfWeek.add(Duration(days: i)));
+      }
+
+      // 출력하기
+      for (var day in daysOfWeek) {
+        print(DateFormat.yMd('ko_KR').format(day));
+      }
+      var now = DateTime.now();
+      // var today = DateFormat('yyyy.MM.dd EEEE', 'ko_KR').format(now);
+      var weekdayName = DateFormat('EEEE', 'ko_KR').format(now);
+      var nextWeek = List.generate(
+        7,
+            (index) => DateFormat('yyyy.MM.dd EEEE', 'ko_KR').format(now.add(Duration(days: index))),
+      );
+
+      print(today);
+      print(weekdayName);
+      print(nextWeek);
+    }
     return  Scaffold(
       body: SafeArea(
         top: true,
@@ -179,7 +213,11 @@ class _MypageState extends State<Mypage> {
           ),
         ),
       ),
-      bottomNavigationBar:  DrawPolygon(),
+      // bottomNavigationBar: DrawPolygon(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: main,
+        child: Icon(Icons.ice_skating),
+      ),
     );
   }
 }
