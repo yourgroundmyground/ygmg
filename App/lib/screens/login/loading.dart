@@ -30,6 +30,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
     TokenInfo tokenInfo = await loadTokenFromSecureStorage();
 
+    await Future.delayed(Duration(seconds: 2));
+
     //토큰 유무에 따라 이동할 페이지 순서
     if (tokenInfo.refreshToken.isEmpty || tokenInfo.accessToken.isEmpty) {
       Navigator.of(context).pushAndRemoveUntil(
