@@ -3,6 +3,7 @@ package com.ygmg.member.controller;
 import com.ygmg.member.common.auth.CustomUserDetails;
 import com.ygmg.member.entity.Member;
 import com.ygmg.member.response.UserMypageInfoRes;
+import com.ygmg.member.response.UserNickImgRes;
 import com.ygmg.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,10 @@ public class MemberController {
     /**
      * 2. 닉네임 불러오기
      */
-    @GetMapping("/me")
-    public ResponseEntity<?> nicknameCheck(Authentication authentication) {
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Member member = userDetails.getMember();
-
-        String nickName = member.getMemberNickname();
-
-        return ResponseEntity.status(200).body(nickName);
+    @GetMapping("/me/{memberId}")
+    public ResponseEntity<?> nicknameCheck(@PathVariable Long memberId) {
+        UserNickImgRes userNickImgRes = memberService.showTopMember(memberId);
+        return ResponseEntity.status(200).body(userNickImgRes);
     }
 
     /**

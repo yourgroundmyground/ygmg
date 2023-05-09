@@ -11,6 +11,7 @@ import com.ygmg.member.request.UserReissuePostReq;
 import com.ygmg.member.response.UserAuthPostRes;
 import com.ygmg.member.response.UserInfoRes;
 import com.ygmg.member.response.UserMypageInfoRes;
+import com.ygmg.member.response.UserNickImgRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -116,6 +117,16 @@ public class MemberServiceImpl implements MemberService {
                 .profileImg(member.getProfileUrl())
                 .build();
         return userMypageInfoRes;
+    }
+
+    @Override
+    public UserNickImgRes showTopMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).get();
+        UserNickImgRes userNickImgRes = UserNickImgRes.builder()
+                .memberNickname(member.getMemberNickname())
+                .profileUrl(member.getProfileUrl())
+                .build();
+        return userNickImgRes;
     }
 
     @Override // api요청을 보냈는데 액세스 토큰이 만료됐어. 유효한 토큰인지 검증 후 재발급 과정을 거쳐야함
