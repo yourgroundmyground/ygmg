@@ -1,4 +1,4 @@
-import 'package:app/const/data.dart';
+import 'package:app/const/state_provider_screen.dart';
 import 'package:app/screens/game/game_start.dart';
 import 'package:app/screens/login/login.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
 
-    deleteToken();
+    // deleteToken();
     checkToken();
 
   }
@@ -26,11 +26,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
    void checkToken() async {
-    final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
-    final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+    // final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
+    // final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+    TokenInfo tokenInfo = await loadTokenFromSecureStorage();
 
     //토큰 유무에 따라 이동할 페이지 순서
-    if (refreshToken == null || accessToken == null) {
+    if (tokenInfo.refreshToken.isEmpty || tokenInfo.accessToken.isEmpty) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => LoginScreen(),
           ), (route) => false);
