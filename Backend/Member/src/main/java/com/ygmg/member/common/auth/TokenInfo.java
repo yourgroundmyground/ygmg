@@ -12,6 +12,8 @@ import lombok.Setter;
 public class TokenInfo {
     private Long memberId;
     private String memberNickname;
+    private Long memberWeight;
+
     private String grantType;
     private String authorization;
     private String refreshToken;

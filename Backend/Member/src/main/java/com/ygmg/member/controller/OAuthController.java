@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @RestController
 @Slf4j
-@RequestMapping("/api")
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 public class OAuthController {
 
@@ -35,29 +35,6 @@ public class OAuthController {
     private final MemberService memberService;
 
     private final S3UploaderService s3UploaderService;
-
-    @PostMapping("/memberimage")
-    public ResponseEntity<?> appImage(@RequestPart(value = "profile") MultipartFile multipartFile) throws IOException {
-        // s3 버킷에 사진 저장
-        String url = s3UploaderService.upload(multipartFile, "ygmg", "profile");
-
-        // 회원DB에 url 저장
-        Long memberId = memberService.putUrl(url);
-
-        return ResponseEntity.status(200).body("memberId : "+memberId);
-    }
-
-    @PostMapping("/memberinfo")
-    public ResponseEntity<?> appJoin(@RequestBody JoinMemberPostReq joinMemberPostReq){
-        // 넘어온 5개 정보 memberId에 맞춰 저장
-        memberService.joinMember2(joinMemberPostReq);
-
-        // 토큰 발급
-        TokenInfo tokenInfo = memberService.login(joinMemberPostReq);
-
-        // 200과 함께 토큰 보내줌
-        return ResponseEntity.ok(new UserAuthPostRes().of(200, "Success", tokenInfo));
-    }
 
     // 회원가입 요청 -> 6개 정보 들어옴 -> 토큰을 프론트로 넘겨줌
     @PostMapping("/app")
@@ -69,13 +46,11 @@ public class OAuthController {
         // 6개 파라미터(넘어온 5개 정보 + s3 사진url)을 DB에 저장
         memberService.joinMember(joinMemberPostReq, url);
 
+        // 토큰에 정보 저장
         TokenInfo tokenInfo = memberService.login(joinMemberPostReq);
 
-//        log.info("accessToken : " + tokenInfo.getAuthorization());
-//        log.info("refreshToken : " + tokenInfo.getRefreshToken());
-
         // 200과 함께 토큰 보내줌
-        return ResponseEntity.ok(new UserAuthPostRes().of(200, "Success", tokenInfo));
+        return ResponseEntity.ok(new UserAuthPostRes().of(200, "비회원", tokenInfo));
     }
 
     @ResponseBody
@@ -93,16 +68,19 @@ public class OAuthController {
 
         // 비회원이라면?
         if(member.equals(Optional.empty())){
+            System.out.println("비회원");
             // 카카오 로그인 한 정보를 userInfoRes에 담아서 front에 보냄
             UserInfoRes userInfoRes = memberService.sendMemberInfo(userInfo);
             return ResponseEntity.status(200).body(userInfoRes);
         }
         // 회원이라면? -> 로그인 처리
         else {
+            System.out.println("회원");
             // TODO: 2023-05-04  기존회원 O -> 그냥 토큰 재발급해서 보내주면 됨
             TokenInfo tokenInfo = memberService.exist(member.get());
+
             // 200과 함께 토큰 보내줌
-            return ResponseEntity.ok(new UserAuthPostRes().of(200, "Success", tokenInfo));
+            return ResponseEntity.ok(new UserAuthPostRes().of(200, "회원", tokenInfo));
         }
     }
 

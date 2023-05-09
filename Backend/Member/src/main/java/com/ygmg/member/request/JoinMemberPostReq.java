@@ -11,6 +11,4 @@ public class JoinMemberPostReq {
     private String memberName;
     private String memberNickname;
     private Long memberWeight;
-
-    private Long memberId;
 }

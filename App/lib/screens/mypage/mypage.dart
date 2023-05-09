@@ -5,6 +5,7 @@ import 'package:app/widgets/runningchart.dart';
 import 'package:app/widgets/chart.dart';
 import 'package:app/widgets/my_weekly_game.dart';
 import 'package:app/utils/map.dart';
+import 'package:app/utils/area.dart';
 import 'package:location/location.dart';
 
 
@@ -178,7 +179,7 @@ class _MypageState extends State<Mypage> {
           ),
         ),
       ),
-      // bottomNavigationBar:  MapSample(),
+      bottomNavigationBar:  DrawPolygon(),
     );
   }
 }

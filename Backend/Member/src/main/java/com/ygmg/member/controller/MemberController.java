@@ -2,7 +2,6 @@ package com.ygmg.member.controller;
 
 import com.ygmg.member.common.auth.CustomUserDetails;
 import com.ygmg.member.entity.Member;
-import com.ygmg.member.request.JoinMemberPostReq;
 import com.ygmg.member.response.UserMypageInfoRes;
 import com.ygmg.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +27,7 @@ public class MemberController {
         else
             return ResponseEntity.status(200).body("중복된 닉네임입니다.");
     }
+
     /**
      * 2. 닉네임 불러오기
      */
@@ -41,6 +41,7 @@ public class MemberController {
 
         return ResponseEntity.status(200).body(nickName);
     }
+
     /**
      * 3. 마이페이지 정보 불러오기
      */
