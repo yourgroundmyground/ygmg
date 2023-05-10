@@ -19,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -123,10 +125,29 @@ public class MemberServiceImpl implements MemberService {
     public UserNickImgRes showTopMember(Long memberId) {
         Member member = memberRepository.findById(memberId).get();
         UserNickImgRes userNickImgRes = UserNickImgRes.builder()
+                .memberId(member.getId())
                 .memberNickname(member.getMemberNickname())
                 .profileUrl(member.getProfileUrl())
                 .build();
         return userNickImgRes;
+    }
+
+    @Override
+    public List<UserNickImgRes> showMemberProfileList(List<Long> memberIdList) {
+
+        List<UserNickImgRes> userNickImgResList = new ArrayList<>();
+
+        for(Long memberId : memberIdList){
+            Member member = memberRepository.findById(memberId).get();
+
+            userNickImgResList.add(UserNickImgRes.builder()
+                    .memberId(memberId)
+                    .profileUrl(member.getProfileUrl())
+                    .memberNickname(member.getMemberNickname())
+                    .build());
+        }
+
+        return userNickImgResList;
     }
 
     @Override // api요청을 보냈는데 액세스 토큰이 만료됐어. 유효한 토큰인지 검증 후 재발급 과정을 거쳐야함
