@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:app/const/state_provider_token.dart';
 import 'package:app/screens/game/game_start.dart';
 import 'package:app/screens/login/signup.dart';
 import 'package:dio/dio.dart';
@@ -72,8 +73,27 @@ void sendCode(BuildContext context, var accessToken) async {
                 ),
           ),
         );
-      } else { //회원일때
-        Navigator.of(context).push(
+      } else { //회원일때 token
+
+        int memberId = response.data['tokenInfo']['memberId'];
+        String memberNickname = response.data['tokenInfo']['memberNickname'];
+        double memberWeight = response.data['tokenInfo']['memberWeight'].toDouble();
+        String accessToken = response.data['tokenInfo']['authorization'];
+        String refreshToken = response.data['tokenInfo']['refreshToken'];
+
+        TokenInfo tokenInfo = TokenInfo(
+          memberId: memberId,
+          memberNickname: memberNickname,
+          memberWeight: memberWeight,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        );
+
+        await saveTokenSecureStorage(tokenInfo);
+        print('로그인성공 && 토큰 정보 저장');
+
+
+        await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) =>
                 GameStart()
@@ -81,6 +101,15 @@ void sendCode(BuildContext context, var accessToken) async {
         );
       }
       print('Response body: ${response.data}');
+
+      final tokenInfo = await loadTokenFromSecureStorage();
+      print('Loaded accessToken: ${tokenInfo.accessToken}');
+      print('Loaded refreshToken: ${tokenInfo.refreshToken}');
+      print('Loaded memberId: ${tokenInfo.memberId}');
+      print('Loaded memberNickname: ${tokenInfo.memberNickname}');
+      print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+
+
 
     } else {
       print('Request failed with status: ${response.statusCode}.');
