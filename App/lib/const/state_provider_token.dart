@@ -72,3 +72,7 @@ Future<TokenInfo> loadTokenFromSecureStorage() async {
 
 }
 
+//토큰 삭제
+Future<void> deleteToken() async {
+  await storage.deleteAll();
+}
