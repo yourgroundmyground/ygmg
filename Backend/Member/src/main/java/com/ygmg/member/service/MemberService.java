@@ -10,6 +10,7 @@ import com.ygmg.member.response.UserNickImgRes;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberService {
@@ -40,4 +41,7 @@ public interface MemberService {
 
     // 메인에 보여줄 멤버의 프로필사진과 닉네임 정보 조회
     UserNickImgRes showTopMember(Long memberId);
+
+    // 메인에 보여줄 멤버의 프로필사진과 닉네임 정보 조회 - 여러명(멤버아이디를 리스트로 받음)
+    List<UserNickImgRes> showMemberProfileList(List<Long> memberIdList);
 }
