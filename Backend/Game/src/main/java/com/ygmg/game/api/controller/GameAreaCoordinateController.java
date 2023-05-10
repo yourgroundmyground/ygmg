@@ -22,21 +22,21 @@ public class GameAreaCoordinateController {
         this.coordinateService = coordinateService;
     }
     @PostMapping("/")
-    public ResponseEntity<String> createCoordinate(@RequestBody List<AreaCoordinateRegisterPostReq> coordinateInfoList) throws Exception {
-        for (AreaCoordinateRegisterPostReq coordinateInfo : coordinateInfoList) {
-            coordinateService.createAreaCoordinate(coordinateInfo);
-        }
+    public ResponseEntity<String> createCoordinate(@RequestBody AreaCoordinateRegisterPostReq areaCoordinateRegisterPostReq) throws Exception {
+
+            coordinateService.createAreaCoordinate(areaCoordinateRegisterPostReq);
+
         return ResponseEntity.status(200).body("면적 좌표가 생성되었습니다.");
     }
 
     @GetMapping("/{areaCoordinateId}")
-    public ResponseEntity<AreaCoordinate> getCoordinate(@PathVariable int areaCoordinateId) throws Exception {
+    public ResponseEntity<AreaCoordinate> getCoordinate(@PathVariable Long areaCoordinateId) throws Exception {
         AreaCoordinate coordinate = coordinateService.getCoordinateByCoordinateId(areaCoordinateId);
         return ResponseEntity.status(200).body(coordinate);
     }
 
     @GetMapping("/area/{areaId}")
-    public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable int areaId) throws Exception {
+    public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable Long areaId) throws Exception {
         List<CoordinateRes> coordinates = coordinateService.getCoordinateByAreaId(areaId);
         return ResponseEntity.status(200).body(coordinates);
     }

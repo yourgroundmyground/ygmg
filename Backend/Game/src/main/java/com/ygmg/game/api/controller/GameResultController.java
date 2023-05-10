@@ -16,7 +16,7 @@ public class GameResultController {
     private final GameResultService resultService;
 
     @GetMapping("/{resultId}")
-    public ResponseEntity<ResultRes> getResult(@PathVariable int resultId) throws Exception {
+    public ResponseEntity<ResultRes> getResult(@PathVariable Long resultId) throws Exception {
         Result result = resultService.getResultByResultId(resultId);
         return ResponseEntity.status(200).body(ResultRes.of(result));
     }
@@ -30,7 +30,7 @@ public class GameResultController {
 
 
     @GetMapping("/{gameId}/{memberId}")
-    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
+    public ResponseEntity<ResultRes> getResultByMemberId(@PathVariable Long gameId, @PathVariable Long memberId) throws Exception {
         Result result = resultService.getResultByGameIdAndMemberId(gameId, memberId);
         return ResponseEntity.status(200).body(ResultRes.of(result));
     }

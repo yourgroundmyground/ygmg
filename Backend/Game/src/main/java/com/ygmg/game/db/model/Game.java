@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int gameId;
+    private Long id;
 
     @Column(nullable = false)
     private LocalDateTime gameStart;

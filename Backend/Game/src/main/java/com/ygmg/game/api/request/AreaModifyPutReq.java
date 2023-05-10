@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AreaModifyPutReq {
-    int areaId;
+    Long areaId;
     double areaSize;
 }

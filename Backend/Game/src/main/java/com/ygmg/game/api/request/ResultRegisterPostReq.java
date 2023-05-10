@@ -9,6 +9,6 @@ import lombok.Setter;
 public class ResultRegisterPostReq {
     int resultRanking;
     double resultArea;
-    int memberId;
-    Game game;
+    Long memberId;
+    Long gameId;
 }
