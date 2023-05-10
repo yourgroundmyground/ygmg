@@ -15,20 +15,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AreaRepository extends JpaRepository<Area, Integer> {
+public interface AreaRepository extends JpaRepository<Area, Long> {
 
-    Optional<Area> findByAreaId(int areaId);
+    Optional<Area> findById(Long areaId);
 
-    List<Area> findByGameGameId(int gameId);
+    List<Area> findByGame_Id(Long gameId);
 
-    List<Area> findByMemberId(int memberId);
+    List<Area> findByMemberId(Long memberId);
 
-    @Transactional
-    @Modifying
-    @Query(value = "UPDATE Area set areaSize = :modifySize WHERE areaId = :id")
-    void updateAreaSize(@Param("id") int id, @Param("modifySize") double modifySize);
+//    @Transactional
+//    @Modifying
+//    @Query(value = "UPDATE Area set areaSize = :modifySize WHERE  = :id")
+//    void updateAreaSize(@Param("id") int id, @Param("modifySize") double modifySize);
 
     @Query("SELECT a FROM Area a WHERE a.memberId = :memberId AND a.areaDate >= :startDate AND a.areaDate < :endDate")
-    List<Area> findByMemberIdAndAreaDate(@Param("memberId") int memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<Area> findByMemberIdAndAreaDate(@Param("memberId") Long memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 }

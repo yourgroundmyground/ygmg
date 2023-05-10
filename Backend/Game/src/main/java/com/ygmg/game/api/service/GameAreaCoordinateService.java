@@ -1,5 +1,6 @@
 package com.ygmg.game.api.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ygmg.game.api.request.AreaCoordinateRegisterPostReq;
 import com.ygmg.game.api.request.AreaModifyPutReq;
 import com.ygmg.game.api.request.AreaRegisterPostReq;
@@ -17,9 +18,9 @@ public interface GameAreaCoordinateService {
 //
 //    List<AreaRes> getAreaByMemberId(int memberId);
 
-    AreaCoordinate createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo);
+    void createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo) throws JsonProcessingException;
 
-    List<CoordinateRes> getCoordinateByAreaId(int areaId);
+    List<CoordinateRes> getCoordinateByAreaId(Long areaId);
 
-    AreaCoordinate getCoordinateByCoordinateId(int areaCoordinateId);
+    AreaCoordinate getCoordinateByCoordinateId(Long areaCoordinateId);
 }

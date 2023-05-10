@@ -5,6 +5,8 @@ import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,10 +18,10 @@ import java.time.LocalDateTime;
 public class Area {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int areaId;
+    private Long id;
 
     @Column(nullable = false)
-    private int memberId;
+    private Long memberId;
 
     @Column(nullable = false)
     private LocalDateTime areaDate;
@@ -28,8 +30,15 @@ public class Area {
     private double areaSize;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="gameId")
+    @JoinColumn(name="game_id")
     private Game game; // DB는 오브젝트를 저장할 수 없다. FK, 자바는 오브젝트를 저장할 수 있다.
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "area")
+    private List<AreaCoordinate> areaCoordinateList = new ArrayList<>();
+
+    public void updateAreaSize(double areaSize){
+        this.areaSize = areaSize;
+    }
 
 
 }

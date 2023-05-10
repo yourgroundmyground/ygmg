@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserNickImgRes {
+    private Long memberId;
     private String memberNickname;
     private String profileUrl;
 }

@@ -17,13 +17,12 @@ class _LoadingScreenState extends State<LoadingScreen> {
     super.initState();
 
     // deleteToken();
+    // print('딜리트토큰');
     checkToken();
+    print('체크토큰');
 
   }
 
-  void deleteToken() async {
-    await storage.deleteAll();
-  }
 
    void checkToken() async {
     // final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);

@@ -14,8 +14,8 @@ import javax.persistence.*;
 @Table(name = "result")
 public class Result {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int resultId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(nullable = false)
     private int resultRanking;
@@ -24,10 +24,10 @@ public class Result {
     private double resultArea;
 
     @Column(nullable = false)
-    private int memberId;
+    private Long memberId;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="gameId")
+    @JoinColumn(name="game_id")
     private Game game; // DB는 오브젝트를 저장할 수 없다. FK, 자바는 오브젝트를 저장할 수 있다.
 
 }
