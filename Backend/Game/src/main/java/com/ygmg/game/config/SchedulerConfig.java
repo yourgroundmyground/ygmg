@@ -20,7 +20,8 @@ public class SchedulerConfig {
         this.migrateRankingJob = migrateRankingJob;
     }
 
-    @Scheduled(cron = "0 0 0 * * 0") // 매주 일요일 자정에 작업 실행
+//    @Scheduled(cron = "0 0 0 * * 0") // 매주 일요일 자정에 작업 실행
+    @Scheduled(cron = "0 19 17 * * *")
     public void runMigrateRankingJob() throws Exception {
         JobParameters params = new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
