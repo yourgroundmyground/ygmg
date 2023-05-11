@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void fetchData(BuildContext context) async {
-  // Dio dio = Dio();
   if(await isKakaoTalkInstalled()){
     try{
       OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
@@ -45,7 +44,7 @@ void fetchData(BuildContext context) async {
 void sendCode(BuildContext context, var accessToken) async {
   print('sndcode 호출됌');
   Dio dio = Dio();
-  // final String baseUrl = "http://192.168.100.60:8080"; //ip수정
+
   Map<String, dynamic> code = {"accessToken" : accessToken};
   // var body = json.encode(code);
 
@@ -91,6 +90,8 @@ void sendCode(BuildContext context, var accessToken) async {
 
         await saveTokenSecureStorage(tokenInfo);
         print('로그인성공 && 토큰 정보 저장');
+        // print('로그인시 accessToken: ${tokenInfo.accessToken}');
+
 
 
         await Navigator.of(context).push(
@@ -102,12 +103,12 @@ void sendCode(BuildContext context, var accessToken) async {
       }
       print('Response body: ${response.data}');
 
-      final tokenInfo = await loadTokenFromSecureStorage();
-      print('Loaded accessToken: ${tokenInfo.accessToken}');
-      print('Loaded refreshToken: ${tokenInfo.refreshToken}');
-      print('Loaded memberId: ${tokenInfo.memberId}');
-      print('Loaded memberNickname: ${tokenInfo.memberNickname}');
-      print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+      // final tokenInfo = await loadTokenFromSecureStorage();
+      // print('로깅 accessToken: ${tokenInfo.accessToken}');
+      // print('로깅 refreshToken: ${tokenInfo.refreshToken}');
+      // print('로깅 memberId: ${tokenInfo.memberId}');
+      // print('로깅 memberNickname: ${tokenInfo.memberNickname}');
+      // print('로깅 memberWeight: ${tokenInfo.memberWeight}');
 
 
 
@@ -121,7 +122,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dio dio = Dio();
 
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
