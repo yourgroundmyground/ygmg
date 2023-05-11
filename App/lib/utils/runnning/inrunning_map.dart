@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:location/location.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class InRunningMap extends StatefulWidget {
@@ -16,6 +17,19 @@ class InRunningMap extends StatefulWidget {
 class _InRunningMapState extends State<InRunningMap> {
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   var customMapStyle;
+  late Location location;
+  LocationData? currentPosition;
+
+  void _getCurrentLocation() async {
+    try {
+      LocationData position = await location.getLocation();
+      setState(() {
+        currentPosition = position;
+      });
+    } catch (e) {
+      print('Error: ${e.toString()}');
+    }
+  }
 
   @override
   void initState() {
@@ -25,6 +39,8 @@ class _InRunningMapState extends State<InRunningMap> {
         customMapStyle = value;
       });
     });
+    location = Location();
+    _getCurrentLocation();
   }
 
   @override
@@ -33,7 +49,7 @@ class _InRunningMapState extends State<InRunningMap> {
       mapType: MapType.normal,
       initialCameraPosition: CameraPosition(
         bearing: 0,
-        target: LatLng(35.2051965, 126.8117383),
+        target: LatLng(currentPosition!.latitude!, currentPosition!.longitude!),
         zoom: 18.0,
       ),
       onMapCreated: (GoogleMapController controller) {
