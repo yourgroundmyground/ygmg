@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AreaCoordinateRepository extends JpaRepository<AreaCoordinate, Integer> {
+public interface AreaCoordinateRepository extends JpaRepository<AreaCoordinate, Long> {
 
-    List<AreaCoordinate> findByAreaAreaId(int areaId);
+    List<AreaCoordinate> findByArea_Id(Long areaId);
 
-    Optional<AreaCoordinate> findByAreaCoordinateId(int areaCoordinateId);
+    Optional<AreaCoordinate> findById(Long areaCoordinateId);
 }

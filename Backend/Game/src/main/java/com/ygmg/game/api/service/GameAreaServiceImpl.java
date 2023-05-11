@@ -4,7 +4,10 @@ import com.ygmg.game.api.request.AreaModifyPutReq;
 import com.ygmg.game.api.request.AreaRegisterPostReq;
 import com.ygmg.game.api.response.AreaRes;
 import com.ygmg.game.db.model.Area;
+import com.ygmg.game.db.model.Game;
 import com.ygmg.game.db.repository.AreaRepository;
+import com.ygmg.game.db.repository.GameRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +15,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class GameAreaServiceImpl implements GameAreaService {
     private final AreaRepository areaRepository;
 
-    GameAreaServiceImpl(AreaRepository areaRepository){
-        this.areaRepository = areaRepository;
-    }
+    private final GameRepository gameRepository;
+
 
 
     @Override
-    public List<AreaRes> getArea(int gameId) {
-        List<Area> areas = areaRepository.findByGameGameId(gameId);
+    public List<AreaRes> getArea(Long gameId) {
+        List<Area> areas = areaRepository.findByGame_Id(gameId);
         List<AreaRes> areaResList = new ArrayList<>();
 
         for(Area area : areas){
@@ -35,13 +39,13 @@ public class GameAreaServiceImpl implements GameAreaService {
     }
 
     @Override
-    public Area getAreaByAreaId(int areaId) {
-        Area area = areaRepository.findByAreaId(areaId).get();
+    public Area getAreaByAreaId(Long areaId) {
+        Area area = areaRepository.findById(areaId).get();
         return area;
     }
 
     @Override
-    public List<AreaRes> getAreaByMemberId(int memberId) {
+    public List<AreaRes> getAreaByMemberId(Long memberId) {
         List<Area> areas = areaRepository.findByMemberId(memberId);
         List<AreaRes> areaResList = new ArrayList<>();
 
@@ -54,11 +58,14 @@ public class GameAreaServiceImpl implements GameAreaService {
 
     @Override
     public Area createArea(AreaRegisterPostReq areaInfo) {
+
+        Game game = gameRepository.findById(areaInfo.getGameId()).get();
+
         Area area = Area.builder()
                 .areaDate(areaInfo.getAreaDate())
                 .areaSize(areaInfo.getAreaSize())
                 .memberId(areaInfo.getMemberId())
-                .game(areaInfo.getGame())
+                .game(game)
                 .build();
 
         return areaRepository.save(area);
@@ -66,15 +73,17 @@ public class GameAreaServiceImpl implements GameAreaService {
 
     @Override
     public void modifyArea(AreaModifyPutReq areaInfo) {
-        int areaId = areaInfo.getAreaId();
+        Long areaId = areaInfo.getAreaId();
         double modifySize = areaInfo.getAreaSize();
-        areaRepository.updateAreaSize(areaId, modifySize);
+        Area area = areaRepository.findById(areaId).get();
+        area.updateAreaSize(modifySize);
+        areaRepository.save(area);
     }
 
 
 
     @Override
-    public List<AreaRes> getAreaByMemberIdAndAreaDate(int memberId, LocalDate areaDate) {
+    public List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate) {
         LocalDateTime startDate = areaDate.atStartOfDay();
         LocalDateTime endDate = areaDate.plusDays(1).atStartOfDay();
 

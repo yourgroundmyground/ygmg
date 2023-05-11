@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class GameRes {
-    int gameId;
+    Long gameId;
     LocalDateTime gameStart;
     LocalDateTime gameEnd;
     String gamePlace;
@@ -18,7 +18,7 @@ public class GameRes {
     public static GameRes of(Game game){
         GameRes res = new GameRes();
 
-        res.setGameId(game.getGameId());
+        res.setGameId(game.getId());
         res.setGameStart(game.getGameStart());
         res.setGameEnd(game.getGameEnd());
         res.setGamePlace(game.getGamePlace());

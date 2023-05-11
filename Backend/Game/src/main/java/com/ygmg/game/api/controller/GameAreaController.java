@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RestController
@@ -55,25 +56,29 @@ public class GameAreaController {
         return ResponseEntity.status(200).body("면적이 변경되었습니다.");
     }
     @GetMapping("/{areaId}")
-    public ResponseEntity<AreaRes> getArea(@PathVariable int areaId) throws Exception {
-        Area area = areaService.getAreaByAreaId(areaId);
-        return ResponseEntity.status(200).body(AreaRes.of(area));
+    public ResponseEntity<?> getArea(@PathVariable Long areaId) throws Exception {
+        try {
+            Area area = areaService.getAreaByAreaId(areaId);
+            return ResponseEntity.status(200).body(AreaRes.of(area));
+        }catch (NoSuchElementException e){
+            return ResponseEntity.badRequest().body("Area가 존재 하지 않습니다."); //Default 예외처리
+        }
     }
 
     @GetMapping("game/{gameId}")
-    public ResponseEntity<List<AreaRes>> getGameArea(@PathVariable int gameId) throws Exception {
+    public ResponseEntity<List<AreaRes>> getGameArea(@PathVariable Long gameId) throws Exception {
         List<AreaRes> areas = areaService.getArea(gameId);
         return ResponseEntity.status(200).body(areas);
     }
 
 
     @GetMapping("member/{memberId}")
-    public ResponseEntity<List<AreaRes>> getMemberAreaAll(@PathVariable int memberId) throws Exception {
+    public ResponseEntity<List<AreaRes>> getMemberAreaAll(@PathVariable Long memberId) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberId(memberId);
         return ResponseEntity.status(200).body(areas);
     }
     @GetMapping("member/{memberId}/{areaDate}")
-    public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable int memberId, @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate areaDate) throws Exception {
+    public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable Long memberId, @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate areaDate) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberIdAndAreaDate(memberId, areaDate);
         return ResponseEntity.status(200).body(areas);
     }

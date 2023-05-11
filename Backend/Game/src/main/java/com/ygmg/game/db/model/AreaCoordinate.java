@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 @Table(name = "area_coordinate")
 public class AreaCoordinate {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int areaCoordinateId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(nullable = false)
     private double areaCoordinateLat;
@@ -28,7 +28,7 @@ public class AreaCoordinate {
     private LocalDateTime areaCoordinateTime;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="areaId")
+    @JoinColumn(name="area_id")
     private Area area; // DB는 오브젝트를 저장할 수 없다. FK, 자바는 오브젝트를 저장할 수 있다.
 
 

@@ -2,10 +2,7 @@ package com.ygmg.game.api.request;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,6 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RunningDataReq {
@@ -39,6 +37,8 @@ public class RunningDataReq {
 
 
     @Getter
+    @Builder
+    @Setter
     public static class Coordinate{
         private Double lat;
 
