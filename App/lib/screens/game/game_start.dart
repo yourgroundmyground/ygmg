@@ -33,11 +33,11 @@ class _GameStartState extends State<GameStart> {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
 
-    print('멤버아이디 ${_tokenInfo?.memberId}');
-    print('멤버닉네임 ${_tokenInfo?.memberNickname}');
-    print('멤버몸무게 ${_tokenInfo?.memberWeight}');
-    print('액세스토큰 ${_tokenInfo?.accessToken}');
-    print('리프레쉬토큰 ${_tokenInfo?.refreshToken}');
+    // print('멤버아이디 ${_tokenInfo?.memberId}');
+    // print('멤버닉네임 ${_tokenInfo?.memberNickname}');
+    // print('멤버몸무게 ${_tokenInfo?.memberWeight}');
+    // print('액세스토큰 ${_tokenInfo?.accessToken}');
+    // print('리프레쉬토큰 ${_tokenInfo?.refreshToken}');
 
 
     return Scaffold(
