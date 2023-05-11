@@ -38,7 +38,7 @@ public class GameAreaCoordinateController {
     @GetMapping("/area/{areaId}")
     public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable Long areaId) throws Exception {
         List<CoordinateRes> coordinates = coordinateService.getCoordinateByAreaId(areaId);
-        return ResponseEntity.status(200).body(coordinates);
+        return ResponseEntity.ok(coordinates);
     }
 
 }
