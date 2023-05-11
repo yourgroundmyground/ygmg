@@ -7,9 +7,17 @@ import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class DrawPolygon extends StatefulWidget {
-  const DrawPolygon({Key? key}) : super(key: key);
+  final bool isWalking;
+  final bool drawGround;
+
+  const DrawPolygon(
+      {required this.isWalking,
+        required this.drawGround,
+        Key? key})
+      : super(key: key);
 
   @override
   State<DrawPolygon> createState() => _DrawPolygonState();
@@ -32,8 +40,9 @@ class _DrawPolygonState extends State<DrawPolygon> {
   Set<Polygon> _polygonSets = {};
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
+  StreamSubscription<bool>? _calculate;
+  Stream<bool> drawGroundStream = StreamController<bool>().stream;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
-  bool isWalking = false;
   final _gyroscopeValues = <double>[0, 0, 0];
   var customMapStyle;
   Polygon? _polygon;
@@ -59,6 +68,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
         customMapStyle = value;
       });
     });
+    setupSubscription(widget.drawGround);
     getLocation();
     setCustomMarkerIcon();
     super.initState();
@@ -67,6 +77,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
   @override
   void dispose() {
     _locationSubscription?.cancel();
+    _calculate?.cancel();
     super.dispose();
   }
 
@@ -96,7 +107,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
         });
         _onMapCreated(mapController);
       } else {
-        if (isWalking == false) {
+        if (widget.isWalking == false) {
           setState(() {
             currentLocation = location;
           });
@@ -194,6 +205,35 @@ class _DrawPolygonState extends State<DrawPolygon> {
 
     return LatLng(latitude, longitude);
   }
+  _onCustomAnimationAlertPressed(context) {
+    Alert(
+      context: context,
+      title: "영역생성 실패!",
+      desc: "경로가 모두 초기화됩니다.",
+      alertAnimation: fadeAlertAnimation,
+    ).show();
+  }
+
+  Widget fadeAlertAnimation(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+      ) {
+    return Align(
+      child: FadeTransition(
+        opacity: animation,
+        child: child,
+      ),
+    );
+  }
+  void setupSubscription(bool drawGround) {
+    _calculate = drawGroundStream.listen((drawGround) {
+      if (drawGround) {
+        calculate();
+      }
+    });
+  }
   // 폴리곤 면적 계산
   void calculate() {
     LatLng center = findPolygonCenter(_points);
@@ -214,57 +254,71 @@ class _DrawPolygonState extends State<DrawPolygon> {
           _polylines.add(polyline);
           _pointsSets.add(_points);
         });
-        final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
-        _polygon = Polygon(
-          polygonId: polygonId,
-          points: _currentPoints,
-          fillColor: Colors.red.withOpacity(0.5),
-          strokeWidth: 2,
-          strokeColor: Colors.red,
-        );
-        setState(() {
-          _polygonSets.add(_polygon!);
-          _markers.add(
-              Marker(
-                markerId: MarkerId("marker-id"),
-                position: center,
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return SizedBox(
-                        height: mediaHeight*0.2,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(width: mediaWidth*0.1),
-                            Container(
-                                width: mediaWidth*0.2,
-                                height: mediaWidth*0.2,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    "assets/images/runningbgi.png",    // *사용자 프로필 이미지
-                                    height: mediaWidth*0.2,
-                                    width: mediaWidth*0.2,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                            ),
-                            Text("닉네임", style: TextStyle(fontSize: mediaWidth*0.04)),
-                            SizedBox(width: mediaWidth*0.1),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              )
+        if(SphericalUtils.computeSignedArea(points) > 0){
+          final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
+          _polygon = Polygon(
+            polygonId: polygonId,
+            points: _currentPoints,
+            fillColor: Colors.red.withOpacity(0.5),
+            strokeWidth: 2,
+            strokeColor: Colors.red,
           );
+        } else {
+          print('Polygon is not filled with color.');
+          _onCustomAnimationAlertPressed(context);
+        }
+        setState(() {
+          if(SphericalUtils.computeSignedArea(points) > 0) {
+            _polygonSets.add(_polygon!);
+            _markers.add(
+                Marker(
+                  markerId: MarkerId("marker-id"),
+                  position: center,
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SizedBox(
+                          height: mediaHeight * 0.2,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(width: mediaWidth * 0.1),
+                              Container(
+                                  width: mediaWidth * 0.2,
+                                  height: mediaWidth * 0.2,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      "assets/images/runningbgi.png",
+                                      // *사용자 프로필 이미지
+                                      height: mediaWidth * 0.2,
+                                      width: mediaWidth * 0.2,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                              ),
+                              Text("닉네임", style: TextStyle(
+                                  fontSize: mediaWidth * 0.04)),
+                              SizedBox(width: mediaWidth * 0.1),
+                            ],
+                          ),
+                        );
+                      },
+
+                    );
+                  },
+
+                )
+            );
+          }
         });
+
         final polygonArea = SphericalUtils.computeArea(points);
+        print('면적테스트');
+        print('${polygonArea}');
         print('점들 : ${points}');
         print('면적 : ${_polygon}');
         area = area + polygonArea;
@@ -272,7 +326,6 @@ class _DrawPolygonState extends State<DrawPolygon> {
         LatLng lastLatLng = _polygonSets.last.points.first;
         print(_polygonSets.length);
         print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
-
       }
       _points = [];
       _currentPoints = [];
@@ -280,9 +333,10 @@ class _DrawPolygonState extends State<DrawPolygon> {
 
     } else {
       print('영역이 생성되지 않았습니다.');
-    }
-  }
 
+    }
+
+    }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -371,9 +425,6 @@ class _DrawPolygonState extends State<DrawPolygon> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${area}'),
-      ),
       body: currentLocation == null
           ? Center(
         child: CircularProgressIndicator(),
@@ -391,11 +442,11 @@ class _DrawPolygonState extends State<DrawPolygon> {
         markers: _markers,
         polylines: _currentPolylines,
         polygons: _polygonSets,
+        tiltGesturesEnabled: false,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            isWalking = !isWalking;
           });
           calculate();
           // if (_polygonSets.isNotEmpty) {
@@ -408,7 +459,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
           //     polygonList[0] = polygonList[0].copyWith(pointsParam: clippedPoints);
           //   }
           // }
-          if (isWalking) {
+          if (widget.isWalking) {
             // 현재 경로를 다시 그리기
             _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
             _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
@@ -423,7 +474,8 @@ class _DrawPolygonState extends State<DrawPolygon> {
             };
             }
         },
-        child: Icon(isWalking ? Icons.pause : Icons.play_arrow),
+        child: Icon(Icons.play_arrow),
       ),
     );
-  }}
+  }
+}
