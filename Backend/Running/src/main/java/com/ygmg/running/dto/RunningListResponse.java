@@ -29,6 +29,10 @@ public class RunningListResponse {
 
         private Long runningId;
 
+        private String runningType;
+
+        private double runningDistance;
+
         @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
         private LocalDate runningDate;
     }
