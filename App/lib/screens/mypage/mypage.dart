@@ -16,7 +16,7 @@ class Mypage extends StatefulWidget {
   State<Mypage> createState() => _MypageState();
 }
 class _MypageState extends State<Mypage> {
-  List<dynamic> runningList = [];
+  List<Map<String, dynamic>> runningList = [];
   var profileImg;
   var _tokenInfo;
 
@@ -229,9 +229,8 @@ class _MypageState extends State<Mypage> {
                   Positioned(
                       right: mediaWidth*0.05,
                       top: mediaHeight*0.125,
-                      child: Container(
-                        child: Image.asset('assets/images/Gear.png'),
-                      )),
+                      child: Image.asset('assets/images/Gear.png'),
+                  ),
                   Positioned(
                     left: mediaWidth*0.05,
                     top: mediaHeight*0.04,
@@ -284,15 +283,13 @@ class _MypageState extends State<Mypage> {
                         ),
                       ),
                     ),
-                    Container(
-                      child: Column(
-                        children: [
-                          // MyWeeklyGame(),
-                          // MyWeeklyGame(),
-                          // MyWeeklyGame(),
-                        ],
-                      ),
-                    )
+                    Column(
+                      children: [
+                        MyWeeklyGame(),
+                        // MyWeeklyGame(),
+                        // MyWeeklyGame(),
+                      ],
+                    ),
                   ],
                 ),
               )
