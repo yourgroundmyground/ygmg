@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_utils/google_maps_utils.dart';
-import 'package:sensors/sensors.dart';
 import 'dart:math';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class DrawPolygon extends StatefulWidget {
   const DrawPolygon({Key? key}) : super(key: key);
@@ -110,6 +111,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
         setState(() {
           _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
           _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
+          _savePoints();
         });
         LatLng newLocation = LatLng(location.latitude!, location.longitude!);
         Polyline route = Polyline(
@@ -128,8 +130,8 @@ class _DrawPolygonState extends State<DrawPolygon> {
               position: newLocation,
             ),
           };
-          }
-        );
+        });
+        _loadPoints();
       }
     });
   }
@@ -158,8 +160,46 @@ class _DrawPolygonState extends State<DrawPolygon> {
     });
   }
 
+  void _savePoints() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String pointsJson = json.encode(_points);
+    await prefs.setString('points', pointsJson);
+  }
+
+  void _loadPoints() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? pointsJson = prefs.getString('points');
+    if (pointsJson != null) {
+      List<dynamic> loadedPoints = json.decode(pointsJson);
+      List<LatLng> parsedPoints = loadedPoints
+          .map((point) => LatLng(point[0] as double, point[1] as double))
+          .toList();
+      print('가져와용');
+      print(parsedPoints);
+    }
+  }
+
+  // 다각형의 중심점 구하기
+  LatLng findPolygonCenter(List<LatLng> points) {
+    double latitude = 0;
+    double longitude = 0;
+
+    for (LatLng point in points) {
+      latitude += point.latitude;
+      longitude += point.longitude;
+    }
+
+    latitude /= points.length;
+    longitude /= points.length;
+
+    return LatLng(latitude, longitude);
+  }
   // 폴리곤 면적 계산
   void calculate() {
+    LatLng center = findPolygonCenter(_points);
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
+
     final points = _points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
     if (points.isNotEmpty) {
       final distance = _distanceBetweenFirstAndLastPoint();
@@ -174,8 +214,9 @@ class _DrawPolygonState extends State<DrawPolygon> {
           _polylines.add(polyline);
           _pointsSets.add(_points);
         });
+        final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
         _polygon = Polygon(
-          polygonId: PolygonId('myPolygon'),
+          polygonId: polygonId,
           points: _currentPoints,
           fillColor: Colors.red.withOpacity(0.5),
           strokeWidth: 2,
@@ -183,6 +224,45 @@ class _DrawPolygonState extends State<DrawPolygon> {
         );
         setState(() {
           _polygonSets.add(_polygon!);
+          _markers.add(
+              Marker(
+                markerId: MarkerId("marker-id"),
+                position: center,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SizedBox(
+                        height: mediaHeight*0.2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(width: mediaWidth*0.1),
+                            Container(
+                                width: mediaWidth*0.2,
+                                height: mediaWidth*0.2,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    "assets/images/runningbgi.png",    // *사용자 프로필 이미지
+                                    height: mediaWidth*0.2,
+                                    width: mediaWidth*0.2,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                            ),
+                            Text("닉네임", style: TextStyle(fontSize: mediaWidth*0.04)),
+                            SizedBox(width: mediaWidth*0.1),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              )
+          );
         });
         final polygonArea = SphericalUtils.computeArea(points);
         print('점들 : ${points}');
