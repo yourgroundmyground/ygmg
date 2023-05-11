@@ -289,7 +289,7 @@ class _MypageState extends State<Mypage> {
                     ),
                     Column(
                       children: [
-                        MyWeeklyGame(),
+                        // MyWeeklyGame(),
                         // MyWeeklyGame(),
                         // MyWeeklyGame(),
                       ],

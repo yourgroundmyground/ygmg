@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:dio/dio.dart';
 
 class DrawPolygon extends StatefulWidget {
   final bool isWalking;
@@ -20,13 +21,13 @@ class DrawPolygon extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<DrawPolygon> createState() => _DrawPolygonState();
+  State<DrawPolygon> createState() => DrawPolygonState();
 }
 Future<String> loadMapStyle() async {
   return await rootBundle.loadString('assets/style/map_style.txt');
 }
 
-class _DrawPolygonState extends State<DrawPolygon> {
+class DrawPolygonState extends State<DrawPolygon> {
   late GoogleMapController mapController;
   LocationData? currentLocation;
   Set<Marker> _markers = {};
@@ -48,6 +49,9 @@ class _DrawPolygonState extends State<DrawPolygon> {
   Polygon? _polygon;
   var area = 0.0;
 
+  // 달리기 기록
+  List<Map<String, dynamic>> runninglocationList = [];
+
   // 실시간 나의 위치 보여주는 프로필사진 마커
   void setCustomMarkerIcon() {
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(100, 100)), "assets/images/testProfile.png")
@@ -61,6 +65,19 @@ class _DrawPolygonState extends State<DrawPolygon> {
     );
   }
 
+  Future<void> _loadRunningData(double runningDist) async {
+    SharedPreferences runningResult = await SharedPreferences.getInstance();
+    SharedPreferences myTodayGoal = await SharedPreferences.getInstance();
+    await myTodayGoal.setDouble('now', runningDist);  // 달린 거리 로컬에 저장
+    final locationListJson = runningResult.getString('locationList');
+    if (locationListJson != null) {
+      final locationList = jsonDecode(locationListJson);
+      setState(() {
+        runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}));
+      });
+    }
+  }
+
   @override
   void initState() {
     loadMapStyle().then((value) {
@@ -72,6 +89,18 @@ class _DrawPolygonState extends State<DrawPolygon> {
     getLocation();
     setCustomMarkerIcon();
     super.initState();
+
+    // 달리기
+    // _loadRunningData(widget.runningDist);
+    // sendRunningData(
+    //   runninglocationList,
+    //   widget.runningStart,
+    //   widget.runningEnd,
+    //   widget.runningPace,
+    //   widget.runningDist,
+    //   widget.runningDuration,
+    //   widget.runningKcal,
+    // );
   }
 
   @override
@@ -80,6 +109,44 @@ class _DrawPolygonState extends State<DrawPolygon> {
     _calculate?.cancel();
     super.dispose();
   }
+
+  //dio 요청
+  void sendGameData(
+      List<Map<String, dynamic>> runninglocationList,
+      String runningStart,
+      String runningEnd,
+      double runningPace,
+      double runningDist,
+      String runningDuration,
+      double runningKcal) async {
+    try {
+      var dio = Dio();
+      print('백에 보낸당!');
+      var response = await dio.post('http://k8c107.p.ssafy.io:8082/api/game/coordinate/',
+          data: {
+            "coordinateList": runninglocationList,
+            "memberId": 6,   // *회원 아이디 넣기
+            'runningDistance': runningDist,
+            "runningEnd": runningEnd,
+            'runningKcal': runningKcal,
+            'runningPace': runningPace,
+            'runningStart': runningStart,
+            'runningTime': runningDuration,
+          },
+          options: Options(
+            headers: {
+              // 'Authorization': 'Bearer $token',    // *토큰 넣어주기
+            },
+          ));
+      print(response.data);
+      // dio 통신이 성공하면 SharedPreferences에서 데이터 제거
+      SharedPreferences gameResult = await SharedPreferences.getInstance();
+      await gameResult.clear();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
 
   // 위치 가져오기
   void getLocation() async {
@@ -236,6 +303,7 @@ class _DrawPolygonState extends State<DrawPolygon> {
   }
   // 폴리곤 면적 계산
   void calculate() {
+    print('면적만들기 실행');
     LatLng center = findPolygonCenter(_points);
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
@@ -266,6 +334,10 @@ class _DrawPolygonState extends State<DrawPolygon> {
         } else {
           print('Polygon is not filled with color.');
           _onCustomAnimationAlertPressed(context);
+          _points = [];
+          _currentPoints = [];
+          _currentPolylines = {};
+
         }
         setState(() {
           if(SphericalUtils.computeSignedArea(points) > 0) {
