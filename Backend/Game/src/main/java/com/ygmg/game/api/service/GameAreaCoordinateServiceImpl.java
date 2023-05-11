@@ -113,18 +113,28 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
         rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
 
     }
+
+    // 수정 Entity를 그대로 보내면 안됨!!!!!!!
     @Override
     public List<CoordinateRes> getCoordinateByAreaId(Long areaId) {
         List<AreaCoordinate>  coordinates = areaCoordinateRepository.findByArea_Id(areaId);
         List<CoordinateRes> coordinateResList = new ArrayList<>();
+        log.info(coordinates.get(0).getAreaCoordinateTime() + "" );
 
         for(AreaCoordinate coordinate : coordinates){
-            CoordinateRes res = CoordinateRes.of(coordinate);
-            coordinateResList.add(res);
+            coordinateResList.add(
+                    CoordinateRes.builder()
+                            .areaCoordinateId(coordinate.getId())
+                            .areaCoordinateLat(coordinate.getAreaCoordinateLat())
+                            .areaCoordinateLng(coordinate.getAreaCoordinateLng())
+                            .areaCoordinateTime(coordinate.getAreaCoordinateTime())
+                            .build()
+            );
         }
         return coordinateResList;
     }
 
+    // 수정 Entity를 그대로 보내면 안됨!!!!!!!
     @Override
     public AreaCoordinate getCoordinateByCoordinateId(Long areaCoordinateId) {
             AreaCoordinate coordinate = areaCoordinateRepository.findById(areaCoordinateId).get();
