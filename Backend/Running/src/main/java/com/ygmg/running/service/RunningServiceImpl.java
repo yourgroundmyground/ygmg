@@ -99,6 +99,8 @@ public class RunningServiceImpl implements RunningService{
 
             RunningListResponse.RunningDto runningDto = RunningListResponse.RunningDto.builder()
                     .runningDate(running.getRunningDate())
+                    .runningType(running.getRunningDetail().getRunningMode().toString())
+                    .runningDistance(running.getRunningDetail().getRunningDistance())
                     .runningId(running.getId())
                     .build();
 

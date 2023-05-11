@@ -1,8 +1,8 @@
+import 'package:app/screens/running/running_start.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:app/screens/running/daily_running.dart';
 import 'package:app/const/colors.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_utils/google_maps_utils.dart';
 import 'dart:math';
 import 'package:sensors/sensors.dart';
@@ -10,7 +10,7 @@ import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../const/state_provider_token.dart';
 
 class RunningInfo extends StatefulWidget {
   const RunningInfo({Key? key}) : super(key: key);
@@ -20,6 +20,7 @@ class RunningInfo extends StatefulWidget {
 }
 
 class _RunningInfoState extends State<RunningInfo> {
+  var _tokenInfo;
   bool isStarted = true;
   bool isPlaying = true;
   double gyrorunningPace = 0.0;
@@ -54,6 +55,14 @@ class _RunningInfoState extends State<RunningInfo> {
   double _currentSpeed = 0.0;
   double _distance = 0.0;
 
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
+
   // 칼로리 계산
   double calculateRunningKcal(double weight, Duration duration) {
     double runningMinutes = duration.inMinutes.toDouble();
@@ -63,8 +72,7 @@ class _RunningInfoState extends State<RunningInfo> {
       return 0;
     }
 
-    runningKcal = (47.6 * 3.5 * runningMinutes * 4 / 1000) * 5;
-    // runningKcal = (weight * 3.5 * runningMinutes * 4 / 1000) * 5;    // *사용자 몸무게로 칼로리 측정
+    runningKcal = (weight * 3.5 * runningMinutes * 4 / 1000) * 5;    // *사용자 몸무게로 칼로리 측정
     print(runningKcal);
     return runningKcal;
     // if (gender == 'M') {
@@ -78,6 +86,7 @@ class _RunningInfoState extends State<RunningInfo> {
 
   @override
   void initState() {
+    _loadTokenInfo();
     super.initState();
     runningStart = DateTime.now();
     gyroscopeEvents.listen((GyroscopeEvent event) {
@@ -166,7 +175,7 @@ class _RunningInfoState extends State<RunningInfo> {
       if (_currentSpeed >= 2.0) {
         runningDist = _distance;
         runningPace = _currentSpeed;
-        runningKcal = calculateRunningKcal(47.6, runningDuration);
+        runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
         // 위치 좌표 리스트에 추가
         _locationList.add({
           'coordinateTime': locationData.time!,
@@ -259,7 +268,7 @@ class _RunningInfoState extends State<RunningInfo> {
   }
 
   Future<void> saveRunningData() async {
-    runningPaceKm = runningDist / runningDuration.inHours;
+    runningPaceKm = runningDist * 1000 / runningDuration.inSeconds * 3.6;
     SharedPreferences runningResult = await SharedPreferences.getInstance();
     // 위치 좌표 리스트를 로컬에 저장
     await runningResult.setString('locationList', jsonEncode(_locationList));
@@ -353,24 +362,37 @@ class _RunningInfoState extends State<RunningInfo> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            DateTime runningEnd = DateTime.now();
-                            saveRunningData();
-                            Navigator.push(
+                            _timer.cancel();
+                            _locationSubscription.cancel();
+                            gyroscopeEvents.drain();
+                            if (runningPaceKm != 0 && runningDist != 0) {
+                              DateTime runningEnd = DateTime.now();
+                              saveRunningData();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DailyRunning(
+                                        runningStart:
+                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                            .format(runningStart),
+                                        runningEnd:
+                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                            .format(runningEnd),
+                                        runningPace: runningPaceKm,
+                                        runningDist: runningDist,
+                                        runningDuration:
+                                          formatDuration(runningDuration),
+                                        runningKcal: runningKcal,
+                                      )),
+                                (route) => route.settings.name == 'InRunning',
+                              );
+                            } else {
+                              Navigator.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => DailyRunning(
-                                          runningStart:
-                                              DateFormat('yyyy-MM-dd HH:mm:ss')
-                                                  .format(runningStart),
-                                          runningEnd:
-                                              DateFormat('yyyy-MM-dd HH:mm:ss')
-                                                  .format(runningEnd),
-                                          runningPace: runningPaceKm,
-                                          runningDist: runningDist,
-                                          runningDuration:
-                                              formatDuration(runningDuration),
-                                          runningKcal: runningKcal,
-                                        )));
+                                MaterialPageRoute(builder: (context) => RunningStart()),
+                                (route) => route.settings.name == 'InRunning',
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
