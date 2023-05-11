@@ -9,16 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResultRes {
-    int resultId;
+    Long resultId;
     int resultRanking;
     double resultArea;
-    int memberId;
+    Long memberId;
     Game game;
 
     public static ResultRes of(Result result){
         ResultRes res = new ResultRes();
 
-        res.setResultId(result.getResultId());
+        res.setResultId(result.getId());
         res.setResultRanking(result.getResultRanking());
         res.setResultArea(result.getResultArea());
         res.setMemberId(result.getMemberId());

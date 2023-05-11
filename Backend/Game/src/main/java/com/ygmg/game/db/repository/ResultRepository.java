@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ResultRepository extends JpaRepository<Result, Integer> {
+public interface ResultRepository extends JpaRepository<Result, Long> {
 
-    Optional<Result> findByResultId(Integer integer);
+    Optional<Result> findById(Long resultId);
 
     Result save(Result result);
 
-    Optional<Result> findByGameGameIdAndMemberId(int gameId, int memberId);
+    Optional<Result> findByGame_IdAndMemberId(Long gameId, Long memberId);
 }

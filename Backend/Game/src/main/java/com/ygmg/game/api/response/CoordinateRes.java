@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CoordinateRes {
-    int areaCoordinateId;
+    Long areaCoordinateId;
     double areaCoordinateLat;
     double areaCoordinateLng;
     LocalDateTime areaCoordinateTime;
@@ -21,7 +21,7 @@ public class CoordinateRes {
     public static CoordinateRes of(AreaCoordinate areaCoordinate){
         CoordinateRes res = new CoordinateRes();
 
-        res.setAreaCoordinateId(areaCoordinate.getAreaCoordinateId());
+        res.setAreaCoordinateId(areaCoordinate.getId());
         res.setAreaCoordinateLat(areaCoordinate.getAreaCoordinateLat());
         res.setAreaCoordinateLng(areaCoordinate.getAreaCoordinateLng());
         res.setAreaCoordinateTime(areaCoordinate.getAreaCoordinateTime());

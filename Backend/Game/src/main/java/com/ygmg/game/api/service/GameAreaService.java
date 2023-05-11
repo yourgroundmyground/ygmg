@@ -9,15 +9,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface GameAreaService {
-    List<AreaRes> getArea(int gameId);
+    List<AreaRes> getArea(Long gameId);
 
-    Area getAreaByAreaId(int areaId);
+    Area getAreaByAreaId(Long areaId);
 
-    List<AreaRes> getAreaByMemberId(int memberId);
+    List<AreaRes> getAreaByMemberId(Long memberId);
 
     Area createArea(AreaRegisterPostReq areaInfo);
 
     void modifyArea(AreaModifyPutReq areaInfo);
 
-    List<AreaRes> getAreaByMemberIdAndAreaDate(int memberId, LocalDate areaDate);
+    List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate);
 }

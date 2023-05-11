@@ -23,10 +23,6 @@ public class GameController {
 
 //    private final GameAreaService areaService;
     private final GameService gameService;
-    private final RabbitTemplate rabbitTemplate;
-
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
 
 
     @PostMapping("/")
@@ -39,16 +35,5 @@ public class GameController {
     public ResponseEntity<List<GameRes>> getGame() throws Exception {
         List<GameRes> games = gameService.getGame();
         return ResponseEntity.status(200).body(games);
-    }
-    @PostMapping("/running")
-    public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
-
-        log.debug("런닝 데이터 요청 아이디 : " + runningDataReq.getMemberId());
-
-        String message = objectMapper.writeValueAsString(runningDataReq);
-
-        rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
-
-        return ResponseEntity.status(200).body("저장되었습니다.");
     }
 }
