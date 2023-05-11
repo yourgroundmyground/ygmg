@@ -143,6 +143,10 @@ class _RunningMapState extends State<RunningMap> {
         _controller.complete(controller);
         controller.setMapStyle(customMapStyle);
       },
+      myLocationButtonEnabled: false,
+      rotateGesturesEnabled: false,
+      zoomControlsEnabled: false,
+      tiltGesturesEnabled: false,
     );
   }
 }
