@@ -29,7 +29,7 @@ public class RunningDetail {
 
     private Time runningTime;
 
-    private Long runningKcal;
+    private Double runningKcal;
 
     private Double runningDistance;
 
