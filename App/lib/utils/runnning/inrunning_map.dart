@@ -26,8 +26,22 @@ class _InRunningMapState extends State<InRunningMap> {
       setState(() {
         currentPosition = position;
       });
+      _updateCameraPosition();
     } catch (e) {
       print('Error: ${e.toString()}');
+    }
+  }
+
+  void _updateCameraPosition() {
+    if (_controller.isCompleted && currentPosition != null) {
+      _controller.future.then((GoogleMapController controller) {
+        controller.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(currentPosition!.latitude!, currentPosition!.longitude!),
+            zoom: 18.0,
+          ),
+        ));
+      });
     }
   }
 
@@ -60,6 +74,7 @@ class _InRunningMapState extends State<InRunningMap> {
       myLocationButtonEnabled: false,
       rotateGesturesEnabled: false,
       zoomControlsEnabled: false,
+      tiltGesturesEnabled: false,
     );
   }
 }
