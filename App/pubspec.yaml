@@ -54,6 +54,7 @@ dependencies:
   flutter_riverpod: ^1.0.0
   http_parser: ^4.0.0
   intl: ^0.18.1
+  rflutter_alert: ^2.0.4
 
 
 
