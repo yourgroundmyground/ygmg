@@ -50,7 +50,7 @@ public class OAuthController {
         TokenInfo tokenInfo = memberService.login(joinMemberPostReq);
 
         // 200과 함께 토큰 보내줌
-        return ResponseEntity.ok(new UserAuthPostRes().of(200, "비회원", tokenInfo));
+        return ResponseEntity.ok(new UserAuthPostRes().of(200, "회원가입 완료", tokenInfo));
     }
 
     @ResponseBody
@@ -68,9 +68,10 @@ public class OAuthController {
 
         // 비회원이라면?
         if(member.equals(Optional.empty())){
-            System.out.println("비회원");
+            log.info("비회원으로 로그인 시도");
             // 카카오 로그인 한 정보를 userInfoRes에 담아서 front에 보냄
             UserInfoRes userInfoRes = memberService.sendMemberInfo(userInfo);
+            userInfoRes.setMessage("비회원");
             return ResponseEntity.status(200).body(userInfoRes);
         }
         // 회원이라면? -> 로그인 처리

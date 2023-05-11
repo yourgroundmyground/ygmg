@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
-    private static final String SCORES_KEY = "scores";
+    private static final String SCORES_KEY = "1";
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final DataSource dataSource;
@@ -97,6 +97,7 @@ public class BatchConfig {
 
         @Override
         public RankingData read() {
+            System.out.println(redisTemplate.hasKey(SCORES_KEY));
             if(cursor.hasNext()){
                 Entry<String, Double> entry = (Entry<String, Double>) cursor.next();
                 return new RankingData(entry.getKey(), entry.getValue());
@@ -111,10 +112,10 @@ public class BatchConfig {
     }
 
     // ! 아직 구현 안됨
-    // 결과 테이블로 옮기기 : gameId, memberId, resultArea, resultRanking,
-    //
+    // 결과 테이블로 옮기기 : gameId, memberId, resultArea, resultRanking
     @Bean
     public ItemWriter<RankingData> rankingDataWriter() {
+        System.out.println("writer 실행");
 
         return new JdbcBatchItemWriterBuilder<RankingData>()
                 .beanMapped()
@@ -128,7 +129,7 @@ public class BatchConfig {
                         parameterSource.addValue("memberId", item.getMemberId());
                         parameterSource.addValue("resultArea", item.getAreaSize());
                         // Redis에서 rank를 얻어와 resultRanking에 저장합니다.  item.getId()?? 이 부분을 고쳐야함
-                        Long rank = redisTemplate.opsForZSet().reverseRank("1", item.getMemberId());
+                        Long rank = redisTemplate.opsForZSet().reverseRank(SCORES_KEY, item.getMemberId());
                         parameterSource.addValue("resultRanking", rank == null ? null : rank.intValue() + 1);
 
                         return parameterSource;

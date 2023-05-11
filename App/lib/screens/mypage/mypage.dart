@@ -1,36 +1,103 @@
-import 'package:app/const/colors.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:app/widgets/runningchart.dart';
 import 'package:app/widgets/chart.dart';
 import 'package:app/widgets/my_weekly_game.dart';
-import 'package:app/utils/map.dart';
-import 'package:app/utils/area.dart';
-import 'package:location/location.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../const/state_provider_token.dart';
+
 
 class Mypage extends StatefulWidget {
   const Mypage({Key? key}) : super(key: key);
+
   @override
-  _MypageState createState() => _MypageState();
+  State<Mypage> createState() => _MypageState();
 }
 class _MypageState extends State<Mypage> {
+  List<dynamic> runningList = [];
+  var profileImg;
+  var _tokenInfo;
+
+  // 마이페이지 회원정보 조회 요청
+  void getMyPageMember() async {
+    var dio = Dio();
+    try {
+      print('백에서 마이페이지 회원정보 가져오기!');
+      print(_tokenInfo.accessToken);
+      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
+      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
+      print(response.data);
+      // 데이터 형식
+      // {
+      //   "kakaoEmail": "suasdfa1@naver.com",
+      //   "memberBirth": "0512",
+      //   "memberName": "adf",
+      //   "memberNickname": "asdf",
+      //   "memberWeight": 23,
+      //   "profileImg": "https://asdfasdf.jpg"
+      // }
+      setState(() {
+        profileImg = response.data['profileImg'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 마이페이지 회원 전체러닝정보 조회 요청
+  void getMyPageRunning() async {
+    var dio = Dio();
+    try {
+      print('백에서 회원 전체러닝정보 가져오기!');
+      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/${_tokenInfo.memberId}',
+        options: Options(
+          // headers: {
+          //   'Authorization': 'Bearer ${tokenInfo.accessToken}',    // *토큰 넣어주기
+          // }
+        )
+      );
+      print(response.data);
+      // 데이터 형식
+      //     {
+      //       "memberId": 0,
+      //       "runningList": [
+      //         {
+      //           "runningDate": "yyyy-MM-dd",
+      //           "runningId": 0
+      //         }
+      //       ]
+      //     }
+      setState(() {
+        runningList = response.data['runningList'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _loadTokenInfo().then((_) {
+      getMyPageMember();
+      getMyPageRunning();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-
-    // 닉네임
-    final nickname = ${context.read(nicknameProvider)}
-    final image = ${context.read(nicknameProvider)}
     // 결과
     void main() async {
       await initializeDateFormatting('ko_KR', null);
@@ -87,7 +154,7 @@ class _MypageState extends State<Mypage> {
                     width: double.infinity,
                     height: mediaWidth*0.5,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(mediaWidth*0.05), bottomRight: Radius.circular(mediaWidth*0.05)),
                       gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -105,7 +172,7 @@ class _MypageState extends State<Mypage> {
                       child: TextButton(
                           onPressed: () {},
                           child: Text(
-                            '안녕하세요, ${nickname} 님!',
+                            '안녕하세요, ${_tokenInfo?.memberNickname} 님!',      // *로컬에 저장되어 있는 닉네임 불러오기
                             style: TextStyle(
                                 fontSize: mediaWidth*0.045,
                                 fontWeight: FontWeight.w700,
@@ -117,30 +184,48 @@ class _MypageState extends State<Mypage> {
                   Positioned(
                       left: mediaWidth*0.05,
                       top: mediaHeight*0.1,
-                      child: Container(
-                        width: mediaWidth*0.2,
-                        height: mediaWidth*0.2,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xFFFBCA92),
-                                  Color(0xFFEF7EC2)
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: mediaWidth*0.2,
+                            height: mediaWidth*0.2,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xFFFBCA92),
+                                      Color(0xFFEF7EC2)
+                                    ]
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.7),
+                                    blurRadius: 2.0,
+                                    spreadRadius: 0.0,
+                                    offset: const Offset(0,4),
+                                  )
                                 ]
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.7),
-                                blurRadius: 2.0,
-                                spreadRadius: 0.0,
-                                offset: const Offset(0,4),
+                            )
+                          ),
+                          Positioned(
+                            left: mediaWidth*0.01,
+                            top: mediaWidth*0.01,
+                            child: Container(
+                              width: mediaWidth*0.18,
+                              height: mediaWidth*0.18,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: NetworkImage('$profileImg'),
+                                  fit: BoxFit.cover,
+                                ),
                               )
-                            ]
-                        ),
-                        child: Image.asset('assets/images/testProfile.png'),
-                      )),
+                            )
+                          )
+                        ])
+                      ),
                   Positioned(
                       right: mediaWidth*0.05,
                       top: mediaHeight*0.125,
@@ -192,9 +277,9 @@ class _MypageState extends State<Mypage> {
                                 ),
                                 textAlign: TextAlign.start
                             ),
-                            Container(
-                              child: RunningChart(),
-                            )
+                            RunningChart(
+                              runningList: runningList,
+                            ),
                           ],
                         ),
                       ),
@@ -202,9 +287,9 @@ class _MypageState extends State<Mypage> {
                     Container(
                       child: Column(
                         children: [
-                          MyWeeklyGame(),
-                          MyWeeklyGame(),
-                          MyWeeklyGame(),
+                          // MyWeeklyGame(),
+                          // MyWeeklyGame(),
+                          // MyWeeklyGame(),
                         ],
                       ),
                     )

@@ -4,10 +4,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class RunningChart extends StatefulWidget {
-  RunningChart({super.key});
+  final List<dynamic> runningList;
 
-  final Color dark = YGMG_BEIGE;
-  final Color normal = YGMG_ORANGE;
+  const RunningChart({
+    required this.runningList,
+    Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => RunningChartState();
@@ -211,8 +212,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 12,
             rodStackItems: [
-              BarChartRodStackItem(0, 2, widget.dark),
-              BarChartRodStackItem(2, 12, widget.normal),
+              BarChartRodStackItem(0, 2, YGMG_BEIGE),
+              BarChartRodStackItem(2, 12, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -226,8 +227,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 14,
             rodStackItems: [
-              BarChartRodStackItem(0, 13, widget.dark),
-              BarChartRodStackItem(13, 14, widget.normal),
+              BarChartRodStackItem(0, 13, YGMG_BEIGE),
+              BarChartRodStackItem(13, 14, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -241,8 +242,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 10,
             rodStackItems: [
-              BarChartRodStackItem(0, 3, widget.dark),
-              BarChartRodStackItem(3, 10, widget.normal),
+              BarChartRodStackItem(0, 3, YGMG_BEIGE),
+              BarChartRodStackItem(3, 10, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -256,8 +257,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 5,
             rodStackItems: [
-              BarChartRodStackItem(0, 3, widget.dark),
-              BarChartRodStackItem(3, 5, widget.normal),
+              BarChartRodStackItem(0, 3, YGMG_BEIGE),
+              BarChartRodStackItem(3, 5, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -271,8 +272,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 17,
             rodStackItems: [
-              BarChartRodStackItem(0, 15, widget.dark),
-              BarChartRodStackItem(15, 17, widget.normal),
+              BarChartRodStackItem(0, 15, YGMG_BEIGE),
+              BarChartRodStackItem(15, 17, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -286,8 +287,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 20,
             rodStackItems: [
-              BarChartRodStackItem(0, 11, widget.dark),
-              BarChartRodStackItem(11, 20, widget.normal),
+              BarChartRodStackItem(0, 11, YGMG_BEIGE),
+              BarChartRodStackItem(11, 20, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -301,8 +302,8 @@ class RunningChartState extends State<RunningChart> {
           BarChartRodData(
             toY: 30,
             rodStackItems: [
-              BarChartRodStackItem(0, 10, widget.dark),
-              BarChartRodStackItem(10, 30, widget.normal),
+              BarChartRodStackItem(0, 10, YGMG_BEIGE),
+              BarChartRodStackItem(10, 30, YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,

@@ -18,11 +18,21 @@ void main() async {
   TokenInfo tokenInfo = await loadTokenFromSecureStorage();
 
   //토큰 값 확인
-  print('Loaded accessToken: ${tokenInfo.accessToken}');
-  print('Loaded refreshToken: ${tokenInfo.refreshToken}');
-  print('Loaded memberId: ${tokenInfo.memberId}');
-  print('Loaded memberNickname: ${tokenInfo.memberNickname}');
-  print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+  if (tokenInfo.accessToken.isNotEmpty && tokenInfo.refreshToken.isNotEmpty) {
+    print('Loaded accessToken: ${tokenInfo.accessToken}');
+    print('Loaded refreshToken: ${tokenInfo.refreshToken}');
+    print('Loaded memberId: ${tokenInfo.memberId}');
+    print('Loaded memberNickname: ${tokenInfo.memberNickname}');
+    print('Loaded memberWeight: ${tokenInfo.memberWeight}');
+  } else {
+    tokenInfo = TokenInfo(
+        memberId: 0,
+        memberNickname: '',
+        memberWeight: 0,
+        accessToken: '',
+        refreshToken: ''
+    );
+  }
 
   //토큰 인터셉터
   final container = ProviderContainer(
