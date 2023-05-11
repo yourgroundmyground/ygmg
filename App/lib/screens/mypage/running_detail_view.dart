@@ -7,7 +7,11 @@ import 'package:intl/intl.dart';
 
 
 class RunningDetailView1 extends StatefulWidget {
-  const RunningDetailView1({Key? key}) : super(key: key);
+  final int runningId;
+
+  const RunningDetailView1({
+    required this.runningId,
+    Key? key}) : super(key: key);
 
   @override
   State<RunningDetailView1> createState() => _RunningDetailView1State();
@@ -23,11 +27,11 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
   String formattedDate = '';
 
   // 러닝 상세정보 조회 요청
-  void getRunningDetail() async {
+  void getRunningDetail(int runningId) async {
     var dio = Dio();
     try {
       print('백에서 러닝상세정보 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/{runningId}',
+      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/$runningId',    // *차트에서 인자로 받은 러닝 아이디 넣기
         options: Options(
           headers: {
             // 'Authorization': 'Bearer $token',    // *토큰 넣어주기
@@ -65,7 +69,9 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
 
   @override
   void initState() {
-    getRunningDetail();
+    print('러닝상세정보 조회');
+    print(widget.runningId);
+    getRunningDetail(widget.runningId);
     super.initState();
   }
 
