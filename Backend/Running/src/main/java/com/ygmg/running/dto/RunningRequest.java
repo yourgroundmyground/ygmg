@@ -28,7 +28,7 @@ public class RunningRequest {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
     private LocalTime runningTime;
 
-    private Long runningKcal;
+    private Double runningKcal;
 
     private Double runningDistance;
 

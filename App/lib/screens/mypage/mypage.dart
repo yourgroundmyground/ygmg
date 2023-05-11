@@ -1,9 +1,7 @@
+import 'package:app/const/state_provider_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:app/widgets/bottomnavbar.dart';
-import 'package:app/widgets/runningchart.dart';
 import 'package:app/widgets/chart.dart';
-import 'package:app/widgets/my_weekly_game.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../../const/state_provider_token.dart';
@@ -16,19 +14,23 @@ class Mypage extends StatefulWidget {
   State<Mypage> createState() => _MypageState();
 }
 class _MypageState extends State<Mypage> {
-  List<dynamic> runningList = [];
+  List<Map<String, dynamic>> runningList = [];
   var profileImg;
   var _tokenInfo;
 
   // 마이페이지 회원정보 조회 요청
   void getMyPageMember() async {
     var dio = Dio();
+    dio.interceptors.add(
+        TokenInterceptor(_tokenInfo)
+    );
+
     try {
       print('백에서 마이페이지 회원정보 가져오기!');
       print(_tokenInfo.accessToken);
       dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
       var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
-      print(response.data);
+      print('api 요청 데이터 ${response.data}');
       // 데이터 형식
       // {
       //   "kakaoEmail": "suasdfa1@naver.com",
@@ -49,16 +51,18 @@ class _MypageState extends State<Mypage> {
   // 마이페이지 회원 전체러닝정보 조회 요청
   void getMyPageRunning() async {
     var dio = Dio();
+    dio.interceptors.add(TokenInterceptor(_tokenInfo));
+
     try {
       print('백에서 회원 전체러닝정보 가져오기!');
       var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/${_tokenInfo.memberId}',
-        options: Options(
+        // options: Options(
           // headers: {
-          //   'Authorization': 'Bearer ${tokenInfo.accessToken}',    // *토큰 넣어주기
+          //   'Authorization': 'Bearer ${_tokenInfo.accessToken}',    // *토큰 넣어주기
           // }
-        )
+        // )
       );
-      print(response.data);
+      print('러닝정보 가져오기 ${response.data}');
       // 데이터 형식
       //     {
       //       "memberId": 0,
@@ -229,9 +233,8 @@ class _MypageState extends State<Mypage> {
                   Positioned(
                       right: mediaWidth*0.05,
                       top: mediaHeight*0.125,
-                      child: Container(
-                        child: Image.asset('assets/images/Gear.png'),
-                      )),
+                      child: Image.asset('assets/images/Gear.png'),
+                  ),
                   Positioned(
                     left: mediaWidth*0.05,
                     top: mediaHeight*0.04,
@@ -284,15 +287,13 @@ class _MypageState extends State<Mypage> {
                         ),
                       ),
                     ),
-                    Container(
-                      child: Column(
-                        children: [
-                          // MyWeeklyGame(),
-                          // MyWeeklyGame(),
-                          // MyWeeklyGame(),
-                        ],
-                      ),
-                    )
+                    Column(
+                      children: [
+                        MyWeeklyGame(),
+                        // MyWeeklyGame(),
+                        // MyWeeklyGame(),
+                      ],
+                    ),
                   ],
                 ),
               )

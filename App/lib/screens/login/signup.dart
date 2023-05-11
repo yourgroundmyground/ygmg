@@ -43,7 +43,7 @@ Future<String> checkNickname(String nickname) async {
   try {
     var encodedNickname = Uri.encodeComponent(nickname);
     var response = await dio.get(
-        "http://k8c107.p.ssafy.io:8080/api/member/$nickname",
+        "http://k8c107.p.ssafy.io:8080/api/member/check/$nickname",
         queryParameters: {"memberNickname": encodedNickname});
 
     if (response.statusCode == 200) {
