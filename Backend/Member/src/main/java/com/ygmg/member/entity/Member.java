@@ -30,5 +30,6 @@ public class Member {
 
     private String profileUrl;
 
+    @Enumerated(value = EnumType.STRING)
     private Role role;
 }
