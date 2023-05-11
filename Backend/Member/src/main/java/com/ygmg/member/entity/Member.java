@@ -29,4 +29,6 @@ public class Member {
     private Long memberWeight;
 
     private String profileUrl;
+
+    private Role role;
 }
