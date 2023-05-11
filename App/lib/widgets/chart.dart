@@ -2,9 +2,10 @@ import 'package:app/const/colors.dart';
 import 'package:app/screens/mypage/running_detail.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class RunningChart extends StatefulWidget {
-  final List<dynamic> runningList;
+  final List<Map<String, dynamic>> runningList;
 
   const RunningChart({
     required this.runningList,
@@ -15,7 +16,94 @@ class RunningChart extends StatefulWidget {
 }
 
 class RunningChartState extends State<RunningChart> {
+  Map<String, List<int>> groupingDay = {};
   int touchedIndex = -1;
+  String weekDay = '';
+
+
+  // 요일을 가져오는 함수
+  String getDayOfWeek(String dateString) {
+    DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
+    return DateFormat('EEEE').format(dateTime);
+  }
+
+  // 요일별로 그룹핑하는 함수
+  void groupRunningIdsByDayOfWeek(List<Map<String, dynamic>> runningList) {
+    Map<String, List<int>> result = {};
+
+    for (Map<String, dynamic> item in runningList) {
+      String dayOfWeek = getDayOfWeek(item['runningDate']);
+
+      if (!result.containsKey(dayOfWeek)) {
+        result[dayOfWeek] = [];
+      }
+
+      result[dayOfWeek]!.add(item['runningId']);
+    }
+
+    setState(() {
+      groupingDay = result;
+    });
+  }
+
+  final testList = [
+    {
+      "runningDate": "2023-05-08",
+      "runningDistance": 1.2,
+      "runningId": 0,
+      "runningType": "RUNNING"
+    },
+    {
+      "runningDate": "2023-05-09",
+      "runningDistance": 3,
+      "runningId": 1,
+      "runningType": "RUNNING"
+    },
+    {
+      "runningDate": "2023-05-10",
+      "runningDistance": 2,
+      "runningId": 2,
+      "runningType": "RUNNING"
+    },
+    {
+      "runningDate": "2023-05-08",
+      "runningDistance": 1.5,
+      "runningId": 3,
+      "runningType": "RUNNING"
+    },
+    {
+      "runningDate": "2023-05-08",
+      "runningDistance": 4,
+      "runningId": 4,
+      "runningType": "GAME"
+    },
+    {
+      "runningDate": "2023-05-09",
+      "runningDistance": 3.2,
+      "runningId": 5,
+      "runningType": "GAME"
+    },
+    {
+      "runningDate": "2023-05-10",
+      "runningDistance": 4,
+      "runningId": 6,
+      "runningType": "RUNNING"
+    },
+    {
+      "runningDate": "2023-05-11",
+      "runningDistance": 5,
+      "runningId": 7,
+      "runningType": "GAME"
+    },
+  ];
+
+  @override
+  void initState() {
+    // groupRunningIdsByDayOfWeek(widget.runningList);
+    groupRunningIdsByDayOfWeek(testList);
+    super.initState();
+  }
+
   Widget bottomTitles(double value, TitleMeta meta) {
     const style = TextStyle(fontSize: 10);
     String text;
@@ -49,18 +137,22 @@ class RunningChartState extends State<RunningChart> {
   @override
   Widget build(BuildContext context) {
 
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
+
     return AspectRatio(
       aspectRatio: 1.2,
       child: Padding(
         padding: const EdgeInsets.only(top: 16),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final barsSpace = 10.0 * constraints.maxWidth / 400;
+            final barsSpace = 25.0 * constraints.maxWidth / 400;
             final barsWidth = 30.0 * constraints.maxWidth / 400;
             return BarChart(
               BarChartData(
                 alignment: BarChartAlignment.center,
                 barTouchData: BarTouchData(
+                  touchExtraThreshold: EdgeInsets.symmetric(vertical: 100),
                   touchTooltipData: BarTouchTooltipData(
                     tooltipBgColor: Colors.blueGrey,
                     tooltipHorizontalAlignment: FLHorizontalAlignment.center,
@@ -112,15 +204,8 @@ class RunningChartState extends State<RunningChart> {
                       );
                     },
                   ),
-                  touchCallback: (FlTouchEvent event, barTouchResponse) {
-                    setState(() {
-                      if (!event.isInterestedForInteractions ||
-                          barTouchResponse == null ||
-                          barTouchResponse.spot == null) {
-                        touchedIndex = -1;
-                        return;
-                      }
-                      String weekDay;
+                  touchCallback: (FlTouchEvent event, BarTouchResponse? barTouchResponse) {
+                    if (event is FlLongPressEnd && barTouchResponse != null && barTouchResponse.spot != null) {
                       switch (barTouchResponse.spot!.touchedBarGroupIndex) {
                         case 0:
                           weekDay = 'Monday';
@@ -146,17 +231,20 @@ class RunningChartState extends State<RunningChart> {
                         default:
                           throw Error();
                       }
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
+                      if (groupingDay[weekDay]!.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
                               RunningDetail(
-                                // weekDay: weekDay,
-                                // value: (barTouchResponse.spot!.y - 1).toString(),
+                                weekDay: weekDay,
+                                runningIds: groupingDay[weekDay]!,
+                                // value: (barTouchResponse.spot.y - 1).toString(),
                               ),
-                        ),
-                      );
-                    });
+                          ),
+                        );
+                      }
+                    }
                   },
                 ),
                 titlesData: FlTitlesData(
@@ -170,7 +258,7 @@ class RunningChartState extends State<RunningChart> {
                   ),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
-                      showTitles: true,
+                      showTitles: false,
                       reservedSize: 40,
                       getTitlesWidget: leftTitles,
                     ),
@@ -312,34 +400,35 @@ class RunningChartState extends State<RunningChart> {
       ),
     ];
   }
+
   Widget getTitles(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Colors.black,
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 12,
     );
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = const Text('M', style: style);
+        text = const Text('Mon', style: style);
         break;
       case 1:
-        text = const Text('T', style: style);
+        text = const Text('Tue', style: style);
         break;
       case 2:
-        text = const Text('W', style: style);
+        text = const Text('Wed', style: style);
         break;
       case 3:
-        text = const Text('T', style: style);
+        text = const Text('Thr', style: style);
         break;
       case 4:
-        text = const Text('F', style: style);
+        text = const Text('Fri', style: style);
         break;
       case 5:
-        text = const Text('S', style: style);
+        text = const Text('Sat', style: style);
         break;
       case 6:
-        text = const Text('S', style: style);
+        text = const Text('Sun', style: style);
         break;
       default:
         text = const Text('', style: style);
