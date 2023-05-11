@@ -1,17 +1,39 @@
-import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
 import 'package:app/screens/mypage/running_detail_view.dart';
 
 class RunningDetail extends StatefulWidget {
-  const RunningDetail({Key? key}) : super(key: key);
+  final String weekDay;
+  final List<int> runningIds;
+
+  const RunningDetail({
+    required this.weekDay,
+    required this.runningIds,
+    Key? key
+  }) : super(key: key);
+
   @override
-  _RunningDetailState createState() => _RunningDetailState();
+  State<StatefulWidget> createState() => _RunningDetailState();
 }
 // 페이지뷰
 class _RunningDetailState extends State<RunningDetail> {
-  int _seletedItem = 0;
-  var _pages = [RunningDetailView1()];
-  var _pageController = PageController();
+  List<Widget> _pages = [];
+  final _pageController = PageController();
+
+  @override
+  void initState() {
+    // print(widget.weekDay);
+    // print(widget.runningIds);
+    // 러닝 기록 개수만큼 페이지 생성
+    setState(() {
+      _pages = List.generate(
+        widget.runningIds.length,
+        (index) => RunningDetailView1(
+          runningId: widget.runningIds[index],
+        ),
+      );
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +43,8 @@ class _RunningDetailState extends State<RunningDetail> {
         top: true,
         bottom: false,
         child: PageView(
-          children: _pages,
-          onPageChanged: (index) {
-            setState(() {
-              _seletedItem = index;
-            });
-          },
           controller: _pageController,
+          children: _pages,
         ),
       ),
     );
