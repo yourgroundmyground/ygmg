@@ -31,27 +31,16 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
     var dio = Dio();
     try {
       print('백에서 러닝상세정보 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/$runningId',    // *차트에서 인자로 받은 러닝 아이디 넣기
-        options: Options(
-          headers: {
-            // 'Authorization': 'Bearer $token',    // *토큰 넣어주기
-          }
-        )
-      );
+      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/$runningId');
       print(response.data);
-      // 데이터 형식
-      // {
-      //   "runningDetailId": 0,
-      //   "runningDistance": 0,
-      //   "runningEnd": "yyyy-MM-dd HH:mm:ss",
-      //   "runningKcal": 0,
-      //   "runningMode": "string",
-      //   "runningPace": 0,
-      //   "runningStart": "yyyy-MM-dd HH:mm:ss",
-      //   "runningTime": "HH:mm:ss"
-      // }
       setState(() {
-
+        runningDetailId = response.data['runningDetailId'];
+        runningDistance = response.data['runningDistance'];
+        runningEnd = response.data['runningEnd'];
+        runningKcal = response.data['runningKcal'];
+        runningPace = response.data['runningPace'];
+        runningTime = response.data['runningTime'];
+        formattedDate = formatDate(runningEnd);
       });
     } catch (e) {
       print(e.toString());
@@ -104,8 +93,7 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      // formatDate(runningEnd),          // *러닝 종료 시간 넣어주기
-                      formatDate('2023-04-20 11:02:00'),
+                      formattedDate != '' ? formattedDate : '',
                       style: TextStyle(
                           fontSize: mediaWidth*0.075,
                           fontWeight: FontWeight.w700,
@@ -137,11 +125,12 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
                       ),
                     ],
                   ),
-                  child: ClipRRect(
+                  child:
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(mediaWidth * 0.02),
-                    child: RunningMap(
-                      // runningDetailId: runningDetailId
-                      runningDetailId: 0, // *테스트용 아이디
+                    child: runningDetailId == 0 ? SizedBox() :
+                    RunningMap(
+                      runningDetailId: runningDetailId,
                     ),
                   ),
                 ),

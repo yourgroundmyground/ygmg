@@ -8,6 +8,8 @@ public interface GameRankingService {
 
     void updateAreaSize(String gameId, String memberId, double areaSize);
 
+    void modifyAreaSize(String gameId, String memberId, double areaSize);
+
     //    List<RankingRes> getRanking();
     Set<ZSetOperations.TypedTuple<String>> getTopScores(String gameId);
 

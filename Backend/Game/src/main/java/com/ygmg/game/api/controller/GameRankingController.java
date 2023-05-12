@@ -7,6 +7,8 @@ import com.ygmg.game.api.response.AreaRes;
 import com.ygmg.game.api.response.RankingRes;
 import com.ygmg.game.api.service.GameAreaService;
 import com.ygmg.game.api.service.GameRankingService;
+import com.ygmg.game.api.service.GameService;
+import com.ygmg.game.api.service.GameServiceImpl;
 import com.ygmg.game.db.model.Area;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -23,12 +25,15 @@ import java.util.stream.Collectors;
 public class GameRankingController {
 
     private final GameRankingService rankingService;
-    public GameRankingController(GameRankingService rankingService){
+    private final GameService gameService;
+    public GameRankingController(GameRankingService rankingService, GameService gameService){
         this.rankingService = rankingService;
+        this.gameService = gameService;
     }
-    @GetMapping("/top/{gameId}")
-    public ResponseEntity<List<RankingRes>> getRanking(@PathVariable int gameId) throws Exception {
-        String gid = Integer.toString(gameId);
+    @GetMapping("/top")
+    public ResponseEntity<List<RankingRes>> getRanking() throws Exception {
+        long gameId = gameService.getGameId();
+        String gid = Long.toString(gameId);
         Set<ZSetOperations.TypedTuple<String>> topRankings = rankingService.getTopScores(gid);
 
         List<RankingRes> rankingInfoList = topRankings.stream()
@@ -37,19 +42,27 @@ public class GameRankingController {
         return ResponseEntity.status(200).body(rankingInfoList);
     }
 
-    @GetMapping("/{gameId}/{memberId}")
-    public ResponseEntity<Integer> getRankingByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
-        String gid = Integer.toString(gameId);
+    @GetMapping("/{memberId}")
+    public ResponseEntity<Integer> getRankingByMemberId( @PathVariable int memberId) throws Exception {
+        long gameId = gameService.getGameId();
+        String gid = Long.toString(gameId);
         String mid = Integer.toString(memberId);
         int rank = rankingService.getRank(gid, mid);
         return ResponseEntity.status(200).body(rank);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/")
     public ResponseEntity<String> addRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
+        rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
         rankingService.updateAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
         return ResponseEntity.status(200).body("Member area size has been added successfully.");
     }
 
+    @PutMapping("/")
+    public ResponseEntity<String> modifyRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
+        rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
+        rankingService.modifyAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
+        return ResponseEntity.status(200).body("Member area size has been added successfully.");
+    }
 
 }
