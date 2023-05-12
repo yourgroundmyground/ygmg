@@ -11,7 +11,9 @@ import com.ygmg.game.db.model.Game;
 import java.util.List;
 
 public interface GameService {
-    Game createGame(GameRegisterPostReq gameInfo);
+//    Game createGame(GameRegisterPostReq gameInfo);
+
+    Game createGame();
 
     List<GameRes> getGame();
 

@@ -9,8 +9,11 @@ import com.ygmg.game.db.model.Area;
 import com.ygmg.game.db.model.Game;
 import com.ygmg.game.db.repository.AreaRepository;
 import com.ygmg.game.db.repository.GameRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +25,34 @@ public class GameServiceImpl implements GameService {
         this.gameRepository = gameRepository;
     }
 
+
+//    @Override
+//    public Game createGame(GameRegisterPostReq gameInfo) {
+//
+//        Game game = Game.builder()
+//                .gameStart(gameInfo.getGameStart())
+//                .gameEnd(gameInfo.getGameEnd())
+//                .gamePlace(gameInfo.getGamePlace())
+//                .build();
+//
+//        return gameRepository.save(game);
+//    }
+
+
     @Override
-    public Game createGame(GameRegisterPostReq gameInfo) {
+    @Transactional
+    @Scheduled(cron = "0 0 0 ? * TUE")
+    public Game createGame() {
+
         Game game = Game.builder()
-                .gameStart(gameInfo.getGameStart())
-                .gameEnd(gameInfo.getGameEnd())
-                .gamePlace(gameInfo.getGamePlace())
+                .gameStart(LocalDateTime.now())
+                .gameEnd(LocalDateTime.now().plusDays(6))
+                .gamePlace("광주")
                 .build();
 
-        return gameRepository.save(game);
+        gameRepository.save(game);
+
+        return null;
     }
 
     @Override
