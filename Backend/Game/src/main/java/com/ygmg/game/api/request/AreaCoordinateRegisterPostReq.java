@@ -33,8 +33,6 @@ public class AreaCoordinateRegisterPostReq {
 
     private Double runningPace;
 
-    private Long gameId;
-
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime areaDate;
 
@@ -43,7 +41,7 @@ public class AreaCoordinateRegisterPostReq {
 
     List<AreaCoordinateDto> areaCoordinateDtoList = new ArrayList<>();
 
-
+    List<Long> defeatAreaIdList = new ArrayList<>();
 
 
 
@@ -58,7 +56,6 @@ public class AreaCoordinateRegisterPostReq {
         @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
         LocalDateTime areaCoordinateTime;
 
-        Long areaId;
     }
 
 }

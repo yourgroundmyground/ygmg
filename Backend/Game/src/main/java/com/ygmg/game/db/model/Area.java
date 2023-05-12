@@ -31,7 +31,7 @@ public class Area {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="game_id")
-    private Game game; // DB는 오브젝트를 저장할 수 없다. FK, 자바는 오브젝트를 저장할 수 있다.
+    private Game game;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "area")
     private List<AreaCoordinate> areaCoordinateList = new ArrayList<>();

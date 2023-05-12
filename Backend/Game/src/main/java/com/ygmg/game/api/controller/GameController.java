@@ -21,19 +21,27 @@ import java.util.List;
 @RequestMapping("/api/game")
 public class GameController {
 
-//    private final GameAreaService areaService;
     private final GameService gameService;
 
+    /**
+     * 게임 생성 Scheduled 어노테이션을 통해 자동 생성 되도록 수정함
+     */
 
-    @PostMapping("/")
-    public ResponseEntity<String> createGame(@RequestBody GameRegisterPostReq gameInfo) throws Exception {
-        gameService.createGame(gameInfo);
-        return ResponseEntity.status(200).body("게임이 생성되었습니다.");
-    }
+//    @PostMapping("/")
+//    public ResponseEntity<String> createGame(@RequestBody GameRegisterPostReq gameInfo) throws Exception {
+//        gameService.createGame(gameInfo);
+//        return ResponseEntity.status(200).body("게임이 생성되었습니다.");
+//    }
 
     @GetMapping("/")
     public ResponseEntity<List<GameRes>> getGame() throws Exception {
         List<GameRes> games = gameService.getGame();
         return ResponseEntity.status(200).body(games);
+    }
+
+    @GetMapping("/gameId")
+    public ResponseEntity<Long> getGameId() throws Exception {
+        Long gameId = gameService.getGameId();
+        return ResponseEntity.status(200).body(gameId);
     }
 }

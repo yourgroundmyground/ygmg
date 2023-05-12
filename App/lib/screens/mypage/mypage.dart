@@ -1,3 +1,4 @@
+import 'package:app/const/colors.dart';
 import 'package:app/const/state_provider_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class Mypage extends StatefulWidget {
   State<Mypage> createState() => _MypageState();
 }
 class _MypageState extends State<Mypage> {
-  List<Map<String, dynamic>> runningList = [];
+  List<dynamic> runningList = [];
   var profileImg;
   var _tokenInfo;
 
@@ -30,7 +31,7 @@ class _MypageState extends State<Mypage> {
       print(_tokenInfo.accessToken);
       dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
       var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
-      print('api 요청 데이터 ${response.data}');
+      print(response.data);
       // 데이터 형식
       // {
       //   "kakaoEmail": "suasdfa1@naver.com",
@@ -64,15 +65,12 @@ class _MypageState extends State<Mypage> {
       );
       print('러닝정보 가져오기 ${response.data}');
       // 데이터 형식
-      //     {
-      //       "memberId": 0,
-      //       "runningList": [
-      //         {
-      //           "runningDate": "yyyy-MM-dd",
-      //           "runningId": 0
-      //         }
-      //       ]
-      //     }
+      // {
+      //   "runningDate": "2023-05-08",
+      //   "runningDistance": 1.2,
+      //   "runningId": 0,
+      //   "runningType": "RUNNING"
+      // },
       setState(() {
         runningList = response.data['runningList'];
       });
@@ -176,7 +174,7 @@ class _MypageState extends State<Mypage> {
                       child: TextButton(
                           onPressed: () {},
                           child: Text(
-                            '안녕하세요, ${_tokenInfo?.memberNickname} 님!',      // *로컬에 저장되어 있는 닉네임 불러오기
+                            '안녕하세요, ${_tokenInfo?.memberNickname ?? ''} 님!',
                             style: TextStyle(
                                 fontSize: mediaWidth*0.045,
                                 fontWeight: FontWeight.w700,
@@ -280,6 +278,16 @@ class _MypageState extends State<Mypage> {
                                 ),
                                 textAlign: TextAlign.start
                             ),
+                            runningList.isEmpty ?
+                              SizedBox(
+                                width: mediaWidth*0.8,
+                                height: mediaHeight*0.3,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: YGMG_ORANGE,
+                                  )
+                                ),
+                              ) :
                             RunningChart(
                               runningList: runningList,
                             ),

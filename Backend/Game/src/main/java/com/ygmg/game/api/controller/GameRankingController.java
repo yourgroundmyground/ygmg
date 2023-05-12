@@ -7,6 +7,8 @@ import com.ygmg.game.api.response.AreaRes;
 import com.ygmg.game.api.response.RankingRes;
 import com.ygmg.game.api.service.GameAreaService;
 import com.ygmg.game.api.service.GameRankingService;
+import com.ygmg.game.api.service.GameService;
+import com.ygmg.game.api.service.GameServiceImpl;
 import com.ygmg.game.db.model.Area;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -23,8 +25,10 @@ import java.util.stream.Collectors;
 public class GameRankingController {
 
     private final GameRankingService rankingService;
-    public GameRankingController(GameRankingService rankingService){
+    private final GameService gameService;
+    public GameRankingController(GameRankingService rankingService, GameService gameService){
         this.rankingService = rankingService;
+        this.gameService = gameService;
     }
     @GetMapping("/top/{gameId}")
     public ResponseEntity<List<RankingRes>> getRanking(@PathVariable int gameId) throws Exception {
@@ -47,6 +51,7 @@ public class GameRankingController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
+        rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
         rankingService.updateAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
         return ResponseEntity.status(200).body("Member area size has been added successfully.");
     }
