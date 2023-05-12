@@ -9,12 +9,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:dio/dio.dart';
+import 'package:dart_jts/dart_jts.dart' as jts_package;
 
 class DrawPolygon extends StatefulWidget {
-  final bool isWalking;
+  late bool isWalking;
   final bool drawGround;
 
-  const DrawPolygon(
+  DrawPolygon(
       {required this.isWalking,
         required this.drawGround,
         Key? key})
@@ -32,9 +33,11 @@ class DrawPolygonState extends State<DrawPolygon> {
   LocationData? currentLocation;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+
   // 실시간 위치를 표시할 좌표 리스트와 폴리라인
   List<LatLng> _currentPoints = [];
   Set<Polyline> _currentPolylines = {};
+
   // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
   List<List> _pointsSets = [];
@@ -48,6 +51,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   var customMapStyle;
   Polygon? _polygon;
   var area = 0.0;
+  var computedArea = 0.0;
 
   // 달리기 기록
   List<Map<String, dynamic>> runninglocationList = [];
@@ -301,6 +305,33 @@ class DrawPolygonState extends State<DrawPolygon> {
       }
     });
   }
+
+  bool _createPolygonAndCheckSelfIntersection() {
+    if (_currentPoints.isEmpty) {
+      return false; // 좌표가 없을 경우 자기겹침이 없다고 가정
+    }
+
+    List<jts_package.Coordinate> coordinates = _currentPoints
+        .map((latLng) => jts_package.Coordinate(latLng.latitude, latLng.longitude))
+        .toList();
+
+    // 첫 번째 좌표를 마지막에 추가하여 닫힌 라인스트링 형태로 만듦
+    if (coordinates.isNotEmpty) {
+      coordinates.add(coordinates.first);
+    }
+
+    // Coordinate 리스트로 LinearRing 생성
+    jts_package.LinearRing shell = jts_package.GeometryFactory.defaultPrecision().createLinearRing(coordinates);
+
+    // LinearRing으로 Polygon 생성
+    jts_package.Polygon polygon = jts_package.GeometryFactory.defaultPrecision().createPolygonFromRing(shell);
+
+    // Polygon의 자기겹침 여부 확인
+    bool isSimple = !polygon.isSimple();
+    print('Is Polygon Simple? $isSimple');
+    return isSimple;
+  }
+
   // 폴리곤 면적 계산
   void calculate() {
     print('면적만들기 실행');
@@ -322,7 +353,8 @@ class DrawPolygonState extends State<DrawPolygon> {
           _polylines.add(polyline);
           _pointsSets.add(_points);
         });
-        if(SphericalUtils.computeSignedArea(points) > 0){
+        computedArea = SphericalUtils.computeSignedArea(points);
+        // if(SphericalUtils.computeSignedArea(points) > 0){
           final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
           _polygon = Polygon(
             polygonId: polygonId,
@@ -331,17 +363,20 @@ class DrawPolygonState extends State<DrawPolygon> {
             strokeWidth: 2,
             strokeColor: Colors.red,
           );
-        } else {
-          print('Polygon is not filled with color.');
-          _onCustomAnimationAlertPressed(context);
-          _points = [];
-          _currentPoints = [];
-          _currentPolylines = {};
+        // } else {
+        //   print('Polygon is not filled with color.');
+        //   _onCustomAnimationAlertPressed(context);
+        //   _points = [];
+        //   _currentPoints = [];
+        //   _currentPolylines = {};
+        //   widget.isWalking = false;
 
-        }
-        setState(() {
-          if(SphericalUtils.computeSignedArea(points) > 0) {
+        // }
+          if (!_createPolygonAndCheckSelfIntersection()) {
+            print('영역 생성 실패');
+          } else {
             _polygonSets.add(_polygon!);
+            print('성공');
             _markers.add(
                 Marker(
                   markerId: MarkerId("marker-id"),
@@ -385,19 +420,22 @@ class DrawPolygonState extends State<DrawPolygon> {
 
                 )
             );
-          }
-        });
+            final polygonArea = SphericalUtils.computeArea(points);
+            print('면적테스트');
+            print('${polygonArea}');
+            print('점들 : ${points}');
+            print('면적 : ${_polygon}');
+            area = area + polygonArea;
+            print(area);
+            LatLng lastLatLng = _polygonSets.last.points.first;
+            print(_polygonSets.length);
+            print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
 
-        final polygonArea = SphericalUtils.computeArea(points);
-        print('면적테스트');
-        print('${polygonArea}');
-        print('점들 : ${points}');
-        print('면적 : ${_polygon}');
-        area = area + polygonArea;
-        print(area);
-        LatLng lastLatLng = _polygonSets.last.points.first;
-        print(_polygonSets.length);
-        print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
+          }
+
+
+
+
       }
       _points = [];
       _currentPoints = [];
@@ -409,7 +447,13 @@ class DrawPolygonState extends State<DrawPolygon> {
     }
 
     }
-
+  void resetPoints() {
+    setState(() {
+      _points = []; // points 변수 초기화
+      _currentPoints = [];
+      _currentPolylines = {};
+    });
+  }
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     // _polygonSets에 있는 모든 폴리곤을 지도에 추가합니다.
@@ -497,6 +541,9 @@ class DrawPolygonState extends State<DrawPolygon> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('${computedArea}'),
+      ),
       body: currentLocation == null
           ? Center(
         child: CircularProgressIndicator(),
@@ -520,7 +567,7 @@ class DrawPolygonState extends State<DrawPolygon> {
         onPressed: () {
           setState(() {
           });
-          calculate();
+          // calculate();
           // if (_polygonSets.isNotEmpty) {
           //   var polygonList = _polygonSets.toList();
           //   // 첫번째 폴리곤과 두번째 폴리곤이 겹치는지 검사

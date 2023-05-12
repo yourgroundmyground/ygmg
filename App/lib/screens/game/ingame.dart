@@ -142,7 +142,7 @@ class InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
-
+                          drawPolygonStateKey.currentState?.resetPoints();
                         }, child: Icon(Icons.stop_rounded, size: 45)),
                   ),
                   Container(
@@ -192,12 +192,11 @@ class InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
-                          executeCalculate();
-                          setState(() {
-                            isWalking = !isWalking;
-                            drawGround = !drawGround;
-                            print(drawGround);
-                          });
+                          drawPolygonStateKey.currentState?.calculate();
+                          isWalking = !isWalking;
+                          drawGround = !drawGround;
+                          print(drawGround);
+
                         }, child: Icon(Icons.star_border_rounded, size: 45)),
                   ),
                 ],
