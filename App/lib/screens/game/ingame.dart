@@ -6,11 +6,18 @@ import 'package:flutter/material.dart';
 class InGame extends StatefulWidget {
   const InGame({Key? key}) : super(key: key);
   @override
-  State<InGame> createState() => _InGameState();
+  State<InGame> createState() => InGameState();
 }
-class _InGameState extends State<InGame> {
+class InGameState extends State<InGame> {
+  GlobalKey<DrawPolygonState> drawPolygonStateKey = GlobalKey();
+
   bool isWalking = false;
   bool drawGround = false;
+
+  void executeCalculate() {
+    drawPolygonStateKey.currentState?.calculate();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
@@ -20,6 +27,7 @@ class _InGameState extends State<InGame> {
       children: [
         Container(
           child: DrawPolygon(
+              key: drawPolygonStateKey,
               isWalking: isWalking,
               drawGround: drawGround,
           ),
@@ -134,7 +142,7 @@ class _InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
-
+                          drawPolygonStateKey.currentState?.resetPoints();
                         }, child: Icon(Icons.stop_rounded, size: 45)),
                   ),
                   Container(
@@ -184,11 +192,11 @@ class _InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
-                          setState(() {
-                            isWalking = !isWalking;
-                            drawGround = !drawGround;
-                            print(drawGround);
-                          });
+                          drawPolygonStateKey.currentState?.calculate();
+                          isWalking = !isWalking;
+                          drawGround = !drawGround;
+                          print(drawGround);
+
                         }, child: Icon(Icons.star_border_rounded, size: 45)),
                   ),
                 ],
