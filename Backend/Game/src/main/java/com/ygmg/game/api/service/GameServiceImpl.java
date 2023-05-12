@@ -45,4 +45,10 @@ public class GameServiceImpl implements GameService {
         return gameResList;
     }
 
+    @Override
+    public String getGameId() {
+        String gameId = gameRepository.findGameId();
+        return gameId;
+    }
+
 }

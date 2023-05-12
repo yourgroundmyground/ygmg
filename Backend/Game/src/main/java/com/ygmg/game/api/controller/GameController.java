@@ -51,4 +51,10 @@ public class GameController {
 
         return ResponseEntity.status(200).body("저장되었습니다.");
     }
+
+    @GetMapping("/gameId")
+    public ResponseEntity<String> getGameId() throws Exception {
+        String gameId = gameService.getGameId();
+        return ResponseEntity.status(200).body(gameId);
+    }
 }

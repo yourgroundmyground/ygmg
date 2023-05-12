@@ -14,4 +14,6 @@ public interface GameService {
     Game createGame(GameRegisterPostReq gameInfo);
 
     List<GameRes> getGame();
+
+    String getGameId();
 }
