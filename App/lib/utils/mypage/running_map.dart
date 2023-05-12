@@ -127,7 +127,7 @@ class _RunningMapState extends State<RunningMap> {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: latLngList[0],
+        target: latLngList[latLngList.length ~/ 2],
         zoom: 16
       ),
       polylines: {
