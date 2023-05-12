@@ -31,6 +31,6 @@ public class Game {
     private String gamePlace;
 
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "game")
     private List<Area> areaList = new ArrayList<>();
 }

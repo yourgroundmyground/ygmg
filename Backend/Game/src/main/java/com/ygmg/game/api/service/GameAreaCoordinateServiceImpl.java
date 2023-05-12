@@ -34,22 +34,33 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
     private final RabbitTemplate rabbitTemplate;
 
+    private final AreaUtil areaUtil;
+
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
 
     @Override
     public void createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo) throws JsonProcessingException {
 
+        List<Game> gameList = gameRepository.findAll();
+        Game game = gameList.get(gameList.size() - 1);
+        for(Area area : game.getAreaList()){
+            areaUtil.defeatCoordinates(area, coordinateInfo.getAreaCoordinateDtoList());
+        }
+
+        coordinateInfo.setAreaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()));
 
         saveAreaCoordinateList(coordinateInfo);
 
         RunningDataSend(coordinateInfo);
 
+
     }
 
     public void saveAreaCoordinateList(AreaCoordinateRegisterPostReq coordinateInfo){
 
-        Game game = gameRepository.findById(coordinateInfo.getGameId()).get();
+        List<Game> gameList = gameRepository.findAll();
+        Game game = gameList.get(gameList.size() - 1);
 
         List<AreaCoordinate> list = new ArrayList<>();
 
