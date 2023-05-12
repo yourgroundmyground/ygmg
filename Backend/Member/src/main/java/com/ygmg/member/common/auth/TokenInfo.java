@@ -13,6 +13,7 @@ public class TokenInfo {
     private Long memberId;
     private String memberNickname;
     private Long memberWeight;
+    private String role;
 
     private String grantType;
     private String authorization;

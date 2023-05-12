@@ -1,10 +1,16 @@
 import 'package:app/utils/polygonmap.dart';
+import 'package:app/utils/area.dart';
 import 'package:app/widgets/profile_img.dart';
 import 'package:flutter/material.dart';
 
-class InGame extends StatelessWidget {
+class InGame extends StatefulWidget {
   const InGame({Key? key}) : super(key: key);
-
+  @override
+  State<InGame> createState() => _InGameState();
+}
+class _InGameState extends State<InGame> {
+  bool isWalking = false;
+  bool drawGround = false;
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
@@ -13,7 +19,10 @@ class InGame extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          child: PolygonMap(),
+          child: DrawPolygon(
+              isWalking: isWalking,
+              drawGround: drawGround,
+          ),
         ),
         Positioned(
           left: mediaWidth*0.03,
@@ -98,31 +107,93 @@ class InGame extends StatelessWidget {
               ),
             )
         ),
-        Positioned(
-            bottom: mediaHeight*0.04,
-            left: mediaWidth / 2 - 40,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFDD987),
-                        Color(0xFFF79CC3),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFDD987),
+                              Color(0xFFF79CC3),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter
+                        ),
+                        border: Border.all(
+                            color: Colors.white,
+                            width: 3
+                        )
+                    ),
+                    child: FloatingActionButton(
+                        backgroundColor: Colors.transparent,
+                        onPressed: (){
+
+                        }, child: Icon(Icons.stop_rounded, size: 45)),
                   ),
-                  border: Border.all(
-                      color: Colors.white,
-                      width: 3
-                  )
-              ),
-              child: FloatingActionButton(
-                  backgroundColor: Colors.transparent,
-                  onPressed: (){}, child: Icon(Icons.stop_rounded, size: 45)),
-            )
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFDD987),
+                              Color(0xFFF79CC3),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter
+                        ),
+                        border: Border.all(
+                            color: Colors.white,
+                            width: 3
+                        )
+                    ),
+                    child: FloatingActionButton(
+                        backgroundColor: Colors.transparent,
+                        onPressed: (){
+                          setState(() {
+                            isWalking = !isWalking;
+                          });
+                        }, child: Icon(isWalking ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 45)),
+                  ),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFDD987),
+                              Color(0xFFF79CC3),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter
+                        ),
+                        border: Border.all(
+                            color: Colors.white,
+                            width: 3
+                        )
+                    ),
+                    child: FloatingActionButton(
+                        backgroundColor: Colors.transparent,
+                        onPressed: (){
+                          setState(() {
+                            isWalking = !isWalking;
+                            drawGround = !drawGround;
+                            print(drawGround);
+                          });
+                        }, child: Icon(Icons.star_border_rounded, size: 45)),
+                  ),
+                ],
+              )
+          ),
         ),
 
       ],

@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class AreaRegisterPostReq {
-    int memberId;
+    Long gameId;
+    Long memberId;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     LocalDateTime areaDate;
 
     double areaSize;
-    Game game;
 }

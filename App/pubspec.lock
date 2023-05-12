@@ -600,6 +600,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
+  rflutter_alert:
+    dependency: "direct main"
+    description:
+      name: rflutter_alert
+      sha256: a77c8c937fad29e70565388c5934f678b92325047663367b985570ba101929fa
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.4"
   riverpod:
     dependency: transitive
     description:
@@ -769,10 +777,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: daadc9baabec998b062c9091525aa95786508b1c48e9c30f1f891b8bf6ff2e64
+      sha256: eb6ac1540b26de412b3403a163d919ba86f6a973fe6cc50ae3541b80092fdcfb
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.1"
   typed_data:
     dependency: transitive
     description:

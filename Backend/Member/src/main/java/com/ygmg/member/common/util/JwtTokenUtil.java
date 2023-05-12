@@ -52,12 +52,13 @@ public class JwtTokenUtil {
     }
 
     // 첫 회원가입 한 사람 토큰 생성
-    public TokenInfo generateToken(String memberNickname, Long memberId, Long memberWeight, String accessToken, String refreshToken){
+    public TokenInfo generateToken(String memberNickname, Long memberId, Long memberWeight, String role, String accessToken, String refreshToken){
 
         return TokenInfo.builder()
                 .memberNickname(memberNickname)
                 .memberId(memberId)
                 .memberWeight(memberWeight)
+                .role(role)
                 .grantType(TOKEN_PREFIX)
                 .authorization(accessToken)
                 .refreshToken(refreshToken)

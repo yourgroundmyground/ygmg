@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class MemberController {
     /**
      * 1. 닉네임 중복체크
      */
-    @GetMapping("/{nickname}")
+    @GetMapping("/check/{nickname}")
     public ResponseEntity<?> nicknameCheck(@PathVariable String nickname){
         Member member = memberService.getMemberByMemberNickname(nickname);
         if (member == null)
@@ -30,7 +32,7 @@ public class MemberController {
     }
 
     /**
-     * 2. 닉네임 불러오기
+     * 2. 이미지, 닉네임 불러오기
      */
     @GetMapping("/me/{memberId}")
     public ResponseEntity<?> nicknameCheck(@PathVariable Long memberId) {
@@ -49,5 +51,16 @@ public class MemberController {
         UserMypageInfoRes userMypageInfoRes = memberService.mypageInfo(member);
 
         return ResponseEntity.status(200).body(userMypageInfoRes);
+    }
+
+    /**
+     * 4. 이미지, 닉네임 불러오기(멤버 리스트)
+     */
+    @GetMapping("/profiles")
+    public ResponseEntity<?> selectMembersProfile(@RequestBody List<Long> memberList){
+
+        List<UserNickImgRes> userNickImgRes = memberService.showMemberProfileList(memberList);
+
+        return ResponseEntity.ok(userNickImgRes);
     }
 }

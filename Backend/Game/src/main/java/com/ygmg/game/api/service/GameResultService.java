@@ -5,9 +5,9 @@ import com.ygmg.game.api.response.ResultRes;
 import com.ygmg.game.db.model.Result;
 
 public interface GameResultService {
-    Result getResultByResultId(int resultId);
+    Result getResultByResultId(Long resultId);
 
     Result createResult(ResultRegisterPostReq resultInfo);
 
-    Result getResultByGameIdAndMemberId(int gameId, int memberId);
+    Result getResultByGameIdAndMemberId(Long gameId, Long memberId);
 }
