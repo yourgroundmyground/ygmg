@@ -62,7 +62,7 @@ public class GameAreaServiceImpl implements GameAreaService {
         Game game = gameRepository.findById(areaInfo.getGameId()).get();
 
         Area area = Area.builder()
-                .areaDate(areaInfo.getAreaDate())
+                .areaDate(LocalDateTime.now())
                 .areaSize(areaInfo.getAreaSize())
                 .memberId(areaInfo.getMemberId())
                 .game(game)
