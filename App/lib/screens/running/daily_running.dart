@@ -44,7 +44,10 @@ class _DailyRunningState extends State<DailyRunning> {
   Future<void> _loadRunningData(double runningDist) async {
     SharedPreferences runningResult = await SharedPreferences.getInstance();
     SharedPreferences myTodayGoal = await SharedPreferences.getInstance();
-    await myTodayGoal.setDouble('now', runningDist);  // 달린 거리 로컬에 저장
+    double? changeDist = myTodayGoal.getDouble('now');
+    changeDist ??= 0;
+    changeDist += runningDist;
+    await myTodayGoal.setDouble('now', changeDist);  // 달린 거리 로컬에 저장
     final locationListJson = runningResult.getString('locationList');
     if (locationListJson != null) {
       final locationList = jsonDecode(locationListJson);

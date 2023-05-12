@@ -43,10 +43,12 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Scheduled(cron = "0 0 0 ? * TUE")
     public Game createGame() {
+        LocalDateTime gameStart = LocalDateTime.now();
+        LocalDateTime gameEnd = gameStart.plusDays(5).plusHours(23).plusMinutes(50);
 
         Game game = Game.builder()
-                .gameStart(LocalDateTime.now())
-                .gameEnd(LocalDateTime.now().plusDays(6))
+                .gameStart(gameStart)
+                .gameEnd(gameEnd)
                 .gamePlace("광주")
                 .build();
 

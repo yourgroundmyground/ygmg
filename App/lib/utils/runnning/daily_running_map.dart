@@ -77,7 +77,8 @@ class _DailyRunningMapState extends State<DailyRunningMap> {
   @override
   Widget build(BuildContext context) {
 
-    return GoogleMap(
+    return latLngList.isEmpty ? Center(child: CircularProgressIndicator()) :
+      GoogleMap(
       initialCameraPosition: CameraPosition(
           target: latLngList[latLngList.length ~/ 2],
           zoom: 16
