@@ -40,8 +40,8 @@ public class GameController {
     }
 
     @GetMapping("/gameId")
-    public ResponseEntity<String> getGameId() throws Exception {
-        String gameId = gameService.getGameId();
+    public ResponseEntity<Long> getGameId() throws Exception {
+        Long gameId = gameService.getGameId();
         return ResponseEntity.status(200).body(gameId);
     }
 }

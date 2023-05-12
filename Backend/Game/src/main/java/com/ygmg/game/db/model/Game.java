@@ -31,6 +31,6 @@ public class Game {
     private String gamePlace;
 
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Area> areaList = new ArrayList<>();
 }
