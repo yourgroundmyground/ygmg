@@ -1,9 +1,20 @@
 import 'package:app/const/colors.dart';
+import 'package:app/utils/game/daily_game_result_map.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../const/state_provider_token.dart';
 
 class DailyGame extends StatefulWidget {
-  const DailyGame({Key? key}) : super(key: key);
+  // double gameArea;
+  // double runningPace;
+  // double runningDist;
+
+  const DailyGame({
+    // required this.gameArea,
+    // required this.runningPace,
+    // required this.runningDist,
+    Key? key}) : super(key: key);
 
   @override
   State<DailyGame> createState() => _DailyGameState();
@@ -11,15 +22,41 @@ class DailyGame extends StatefulWidget {
 
 class _DailyGameState extends State<DailyGame> {
   bool showSvg = false;
+  int nowRanking = 103;
+
+  // 현재랭킹 가져오기
+  void getNowRanking() async {
+    var dio = Dio();
+    try {
+      print('백에서 현재랭킹 가져오기!');
+      var response = await dio.get('............');     // *요청 API 주소 넣기
+      print(response.data);
+      // 데이터 형식
+      // {
+      //   "kakaoEmail": "suasdfa1@naver.com",
+      //   "memberBirth": "0512",
+      //   "memberName": "adf",
+      //   "memberNickname": "asdf",
+      //   "memberWeight": 23,
+      //   "profileImg": "https://asdfasdf.jpg"
+      // }
+      setState(() {
+        nowRanking = response.data['nowRanking'];         // *받는 데이터 확인 후 현재랭킹 변경
+        Future.delayed(Duration(seconds: 2), () {
+          setState(() {
+            showSvg = true;
+          });
+        });
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   @override
   void initState() {
+    getNowRanking();
     super.initState();
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        showSvg = true;
-      });
-    });
   }
 
   @override
@@ -28,8 +65,7 @@ class _DailyGameState extends State<DailyGame> {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // 혅재 랭킹 값
-    var nowRanking = 103;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -70,11 +106,15 @@ class _DailyGameState extends State<DailyGame> {
                       ),
                       Stack(
                         children: [
-                          DailyMap(),
+                          SizedBox(
+                            width: double.infinity,
+                            height: mediaHeight*0.55,
+                          ),
                           Positioned(child: Container(
                             width: double.infinity,
                             height: mediaHeight*0.35,
                             color: Colors.blue,         // *나중에 지도 맵 넣기
+                            child: DailyGameResultMap(),
                           )),
                           Positioned(
                               top: mediaHeight*0.01,
@@ -124,25 +164,63 @@ class _DailyGameState extends State<DailyGame> {
 }
 
 
-
-class DailyMap extends StatelessWidget {
-  const DailyMap({Key? key}) : super(key: key);
+class DailyGameResult extends StatefulWidget {
+  const DailyGameResult({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // 미디어 사이즈
-    final mediaHeight = MediaQuery.of(context).size.height;
-    return Container(
-      child: Container(
-        width: double.infinity,
-        height: mediaHeight*0.55,
-      ),
-    );
-  }
+  State<DailyGameResult> createState() => _DailyGameResultState();
 }
 
-class DailyGameResult extends StatelessWidget {
-  const DailyGameResult({Key? key}) : super(key: key);
+class _DailyGameResultState extends State<DailyGameResult> {
+  var profileImg;
+  var _tokenInfo;
+  // *게임참여시간, 면적크기, 평균속도, 달린 거리
+  String gameTime = '58:25';
+  double gameArea = 1.44;
+  String runningPace = '4\'99\'\'';
+  double runningDist = 4.8;
+
+  // 마이페이지 회원정보 조회 요청
+  void getGameOverMember() async {
+    var dio = Dio();
+    try {
+      print('백에서 마이페이지 회원정보 가져오기!');
+      print(_tokenInfo.accessToken);
+      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
+      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
+      print(response.data);
+      // 데이터 형식
+      // {
+      //   "kakaoEmail": "suasdfa1@naver.com",
+      //   "memberBirth": "0512",
+      //   "memberName": "adf",
+      //   "memberNickname": "asdf",
+      //   "memberWeight": 23,
+      //   "profileImg": "https://asdfasdf.jpg"
+      // }
+      setState(() {
+        profileImg = response.data['profileImg'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
+
+  @override
+  void initState() {
+    _loadTokenInfo().then((_) {
+      getGameOverMember();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,12 +228,7 @@ class DailyGameResult extends StatelessWidget {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // *게임결과 먹은 내 땅 면적
-    var myGround = 1.44;
-    // *게임결과 내 평균 속도
-    var myPace = '4\'99\'\'';
-    // *게임결과 달린 거리
-    var myDist = 4.8;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(mediaWidth*0.05),
@@ -185,12 +258,30 @@ class DailyGameResult extends StatelessWidget {
                   )
                 ]
             ),
-            child: Image.asset('assets/images/testProfile.png'),      // *프로필 사진 넣어주기
+            child: Stack(
+              children: [
+                Positioned(
+                  top: (mediaWidth * 0.16 - mediaWidth * 0.13) / 2,
+                  left: (mediaWidth * 0.16 - mediaWidth * 0.13) / 2,
+                  child: Container(
+                    width: mediaWidth * 0.13,
+                    height: mediaWidth * 0.13,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage('$profileImg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           SizedBox(
               height: mediaHeight*0.02
           ),
-          Text('58:25', style: TextStyle(
+          Text(gameTime, style: TextStyle(
               fontSize: mediaWidth*0.12,
               fontWeight: FontWeight.w900
           )),
@@ -212,7 +303,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${myGround}km²', style: TextStyle(       // *크기 변수설정
+                    Text('${gameArea}km²', style: TextStyle(
                       fontSize: mediaWidth*0.045,
                       fontWeight: FontWeight.w900
                     ),)
@@ -230,7 +321,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text(myPace, style: TextStyle(              // *평균 속도 변경하기
+                    Text(runningPace, style: TextStyle(              // *평균 속도 변경하기
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
@@ -248,7 +339,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${myDist}km', style: TextStyle(
+                    Text('${runningDist}km', style: TextStyle(
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
