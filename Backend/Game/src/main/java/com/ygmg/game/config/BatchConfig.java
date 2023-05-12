@@ -108,9 +108,6 @@ public class BatchConfig {
         private boolean cursorOpened = false;
         @PostConstruct
         private void openCursor() {
-
-            System.out.println("hasKey " + redisTemplate.hasKey(scoresKey()));
-            System.out.println("커서 스코어 : " + scoresKey());
             this.cursor = redisTemplate.opsForZSet().scan(scoresKey(), ScanOptions.NONE);
         }
 
@@ -133,7 +130,6 @@ public class BatchConfig {
     }
     @Bean
     public ItemProcessor<RankingData, RankingData> rankingDataProcessor() {
-        System.out.println("Processor 실행");
         return item -> item;
     }
 

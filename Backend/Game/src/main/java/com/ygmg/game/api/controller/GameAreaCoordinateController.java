@@ -12,6 +12,7 @@ import com.ygmg.game.db.model.AreaCoordinate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,7 +24,7 @@ public class GameAreaCoordinateController {
     }
     @PostMapping("/")
     public ResponseEntity<String> createCoordinate(@RequestBody AreaCoordinateRegisterPostReq areaCoordinateRegisterPostReq) throws Exception {
-
+        areaCoordinateRegisterPostReq.setAreaDate(LocalDateTime.now());
         coordinateService.createAreaCoordinate(areaCoordinateRegisterPostReq);
 
         return ResponseEntity.status(200).body("면적이 생성되었습니다.");

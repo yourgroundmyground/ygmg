@@ -30,9 +30,10 @@ public class GameRankingController {
         this.rankingService = rankingService;
         this.gameService = gameService;
     }
-    @GetMapping("/top/{gameId}")
-    public ResponseEntity<List<RankingRes>> getRanking(@PathVariable int gameId) throws Exception {
-        String gid = Integer.toString(gameId);
+    @GetMapping("/top")
+    public ResponseEntity<List<RankingRes>> getRanking() throws Exception {
+        long gameId = gameService.getGameId();
+        String gid = Long.toString(gameId);
         Set<ZSetOperations.TypedTuple<String>> topRankings = rankingService.getTopScores(gid);
 
         List<RankingRes> rankingInfoList = topRankings.stream()
@@ -41,9 +42,10 @@ public class GameRankingController {
         return ResponseEntity.status(200).body(rankingInfoList);
     }
 
-    @GetMapping("/{gameId}/{memberId}")
-    public ResponseEntity<Integer> getRankingByMemberId(@PathVariable int gameId, @PathVariable int memberId) throws Exception {
-        String gid = Integer.toString(gameId);
+    @GetMapping("/{memberId}")
+    public ResponseEntity<Integer> getRankingByMemberId( @PathVariable int memberId) throws Exception {
+        long gameId = gameService.getGameId();
+        String gid = Long.toString(gameId);
         String mid = Integer.toString(memberId);
         int rank = rankingService.getRank(gid, mid);
         return ResponseEntity.status(200).body(rank);
@@ -55,6 +57,7 @@ public class GameRankingController {
         rankingService.updateAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
         return ResponseEntity.status(200).body("Member area size has been added successfully.");
     }
+    
 
 
 }
