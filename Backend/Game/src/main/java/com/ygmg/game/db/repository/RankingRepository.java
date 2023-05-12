@@ -13,4 +13,6 @@ public interface RankingRepository {
     int getRank(String gameId, String memberId);
 
     void updateAreaSize(String gameId, String memberId, double areaSize);
+
+    void modifyAreaSize(String gameId, String memberId, double areaSize);
 }

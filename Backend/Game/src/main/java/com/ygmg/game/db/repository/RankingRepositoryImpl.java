@@ -44,4 +44,9 @@ public class RankingRepositoryImpl implements RankingRepository{
             redisTemplate.opsForZSet().add(gameId, memberId, newScore);
         }
     }
+
+    @Override
+    public void modifyAreaSize(String gameId, String memberId, double areaSize) {
+        redisTemplate.opsForZSet().add(gameId, memberId, areaSize);
+    }
 }
