@@ -15,7 +15,7 @@ public class AreaRes {
     Long areaId;
     Long memberId;
     LocalDateTime areaDate;
-    Game game;
+    Long gameId;
 
     public static AreaRes of(Area area){
         AreaRes res = new AreaRes();
@@ -23,7 +23,7 @@ public class AreaRes {
         res.setAreaId(area.getId());
         res.setAreaDate(area.getAreaDate());
         res.setMemberId(area.getMemberId());
-        res.setGame(area.getGame());
+        res.setGameId(area.getGame().getId());
 
         return res;
     }

@@ -13,7 +13,7 @@ public class ResultRes {
     int resultRanking;
     double resultArea;
     Long memberId;
-    Game game;
+    Long gameId;
 
     public static ResultRes of(Result result){
         ResultRes res = new ResultRes();
@@ -22,7 +22,7 @@ public class ResultRes {
         res.setResultRanking(result.getResultRanking());
         res.setResultArea(result.getResultArea());
         res.setMemberId(result.getMemberId());
-        res.setGame(result.getGame());
+        res.setGameId(result.getGame().getId());
 
         return res;
     }
