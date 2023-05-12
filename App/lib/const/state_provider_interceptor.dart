@@ -69,7 +69,7 @@ class TokenInterceptor extends Interceptor {
         print('토큰 재발급 에러 $e');
       }
     } else {
-      print('토큰 재발급 시도 에러');
+      print('401 에러가 아닐 때. 토큰 재발급 시도 에러 $err');
       handler.next(err);
     }
   }

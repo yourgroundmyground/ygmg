@@ -1,5 +1,5 @@
 import 'package:app/const/state_provider_token.dart';
-import 'package:app/screens/game/game_start.dart';
+import 'package:app/main.dart';
 import 'package:app/screens/login/login.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +38,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
           ), (route) => false);
     } else {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => GameStart()
+          MaterialPageRoute(builder: (_) => Home()
           ), (route) => false);
     }
 

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:async';
 import 'dart:math';
 
+
 class PolygonMap extends StatefulWidget {
   const PolygonMap({Key? key}) : super(key: key);
 
@@ -71,10 +72,27 @@ class PolygonMapState extends State<PolygonMap> {
 
   static final Polygon _kPolygon = Polygon(
       polygonId: PolygonId('_kPolygon'),
-      points: [LatLng(35.2051205, 126.8116811), LatLng(35.2051147, 126.8116459), LatLng(35.2051522, 126.8116607), LatLng(35.2051534, 126.8116587), LatLng(35.2051526, 126.8116458), LatLng(35.2051459, 126.8116281), LatLng(35.2051564, 126.8115957), LatLng(35.2051682, 126.8115753), LatLng(35.2051978, 126.81154), LatLng(35.2052461, 126.8114945), LatLng(35.2052722, 126.8114794), LatLng(35.205295, 126.8114691), LatLng(35.2053052, 126.8114564), LatLng(35.2053247, 126.8114475), LatLng(35.2053539, 126.8114448), LatLng(35.2053727, 126.8114486), LatLng(35.205395, 126.8114547), LatLng(35.2054234, 126.8114613), LatLng(35.2054932, 126.8115306), LatLng(35.2055264, 126.8116026), LatLng(35.2054981, 126.8115984), LatLng(35.2054439, 126.8116201), LatLng(35.2053836, 126.8116399), LatLng(35.2053173, 126.8116604), LatLng(35.2052645, 126.8116918), LatLng(35.2052134, 126.8117058), LatLng(35.2051926, 126.8117058), LatLng(35.205178, 126.8117015), LatLng(35.2051708, 126.811692), LatLng(35.2051968, 126.8115868), LatLng(35.2051205, 126.8116811)],
+      points: [LatLng(35.218635,126.813250),LatLng(35.217200,126.812903),LatLng(35.218217,126.812091)],
       strokeWidth: 5,
-      fillColor: Colors.amber
+      fillColor: Colors.amber.withOpacity(0.5)
   );
+
+  static final Polygon _kPolygon2 = Polygon(
+      polygonId: PolygonId('_kPolygon2'),
+      points: [LatLng(35.218024,126.812971),LatLng(35.219321,126.812198),LatLng(35.218410,126.810868)],
+      strokeWidth: 5,
+      fillColor: Colors.redAccent.withOpacity(0.5)
+  );
+
+  static final Polygon _kPolygon3 = Polygon(
+      polygonId: PolygonId('_kPolygon3'),
+      points: [LatLng(35.217428,126.810632),LatLng(35.215783,126.810876),LatLng(35.218596,126.815315)],
+      strokeWidth: 5,
+      fillColor: Colors.blue.withOpacity(0.5)
+  );
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +148,20 @@ class PolygonMapState extends State<PolygonMap> {
     final points = _kPolygon.points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
     final polygonArea = SphericalUtils.computeArea(points);
     // final polygonArea = SphericalUtils.computeArea(_kPolygon.points);
-    print(' 폴리곤 에어리어 : ${polygonArea}');
+    print(' 폴리곤 에어리어1 : ${polygonArea}');
+
+    final points2 = _kPolygon2.points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
+    final polygonArea2 = SphericalUtils.computeArea(points2);
+    print(' 폴리곤 에어리어2 : ${polygonArea2}');
+
+    final points3 = _kPolygon3.points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
+    final polygonArea3 = SphericalUtils.computeArea(points3);
+    print(' 폴리곤 에어리어2 : ${polygonArea3}');
+
+
+
+
+
 
     return Scaffold(
       body: GoogleMap(
@@ -140,7 +171,9 @@ class PolygonMapState extends State<PolygonMap> {
         //   _kPolyline
         // },
         polygons: {
-          _kPolygon
+          _kPolygon,
+          _kPolygon2,
+          _kPolygon3
         },
         initialCameraPosition: CameraPosition(
           bearing: 0,
