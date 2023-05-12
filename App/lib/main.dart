@@ -1,7 +1,6 @@
 import 'package:app/const/state_provider_interceptor.dart';
 import 'package:app/const/state_provider_token.dart';
 import 'package:app/screens/login/loading.dart';
-import 'package:app/screens/game/ingame.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +60,7 @@ class MyApp extends StatelessWidget{
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: InGame(),
+      home: LoadingScreen(),
     );
   }
 }

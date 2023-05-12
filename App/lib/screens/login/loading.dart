@@ -59,10 +59,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: Container(
-                margin: EdgeInsets.only(top: mediaHeight*0.05),
-                child: Image.asset('assets/images/mainlogo.png')),
-        ),
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: mediaHeight*0.45),
+              Container(
+                      // margin: EdgeInsets.only(bottom: mediaHeight*0.03),
+                      child: Image.asset('assets/images/mainlogo.png')),
+              // SizedBox(height: mediaHeight*0.1)
+            ],
+          ),
+        )
       ),
     );
   }
