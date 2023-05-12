@@ -16,7 +16,8 @@ class RunningChart extends StatefulWidget {
 }
 
 class RunningChartState extends State<RunningChart> {
-  Map<String, List<int>> groupingDay = {};
+  Map<String, Map<String, double>> chartGrouping = {};
+  Map<String, List<int>> detailGrouping = {};
   int touchedIndex = -1;
   String weekDay = '';
 
@@ -25,6 +26,43 @@ class RunningChartState extends State<RunningChart> {
   String getDayOfWeek(String dateString) {
     DateTime dateTime = DateFormat('yyyy-MM-dd').parse(dateString);
     return DateFormat('EEEE').format(dateTime);
+  }
+
+  // 이번 주에 포함되는 데이터 필터링
+  List<Map<String, dynamic>> filterDataByCurrentWeek(List<Map<String, dynamic>> runningList) {
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - DateTime.monday +1));
+    DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+
+    return runningList.where((item) {
+      DateTime runningDate = DateFormat('yyyy-MM-dd').parse(item['runningDate']);
+      return runningDate.isAfter(startOfWeek) &&
+          runningDate.isBefore(endOfWeek) &&
+          runningDate.year == now.year && // 추가: 같은 연도인지 확인
+          runningDate.month == now.month; // 추가: 같은 월인지 확인
+    }).toList();
+  }
+
+  // 데이터 그룹화
+  void groupData(List<Map<String, dynamic>> runningList) {
+    Map<String, Map<String, double>> result = {};
+
+    for (Map<String, dynamic> item in runningList) {
+      String dayOfWeek = getDayOfWeek(item['runningDate']);
+      String runningType = item['runningType'];
+      double runningDistance = item['runningDistance'].toDouble();
+
+      if (!result.containsKey(dayOfWeek)) {
+        result[dayOfWeek] = {};
+      }
+
+      result[dayOfWeek]![runningType] ??= 0.0;
+      result[dayOfWeek]![runningType] = (result[dayOfWeek]![runningType] ?? 0.0) + runningDistance;
+    }
+
+    setState(() {
+      chartGrouping = result;
+    });
   }
 
   // 요일별로 그룹핑하는 함수
@@ -42,65 +80,71 @@ class RunningChartState extends State<RunningChart> {
     }
 
     setState(() {
-      groupingDay = result;
+      detailGrouping = result;
     });
   }
 
-  final testList = [
-    {
-      "runningDate": "2023-05-08",
-      "runningDistance": 1.2,
-      "runningId": 0,
-      "runningType": "RUNNING"
-    },
-    {
-      "runningDate": "2023-05-09",
-      "runningDistance": 3,
-      "runningId": 1,
-      "runningType": "RUNNING"
-    },
-    {
-      "runningDate": "2023-05-10",
-      "runningDistance": 2,
-      "runningId": 2,
-      "runningType": "RUNNING"
-    },
-    {
-      "runningDate": "2023-05-08",
-      "runningDistance": 1.5,
-      "runningId": 3,
-      "runningType": "RUNNING"
-    },
-    {
-      "runningDate": "2023-05-08",
-      "runningDistance": 4,
-      "runningId": 4,
-      "runningType": "GAME"
-    },
-    {
-      "runningDate": "2023-05-09",
-      "runningDistance": 3.2,
-      "runningId": 5,
-      "runningType": "GAME"
-    },
-    {
-      "runningDate": "2023-05-10",
-      "runningDistance": 4,
-      "runningId": 6,
-      "runningType": "RUNNING"
-    },
-    {
-      "runningDate": "2023-05-11",
-      "runningDistance": 5,
-      "runningId": 7,
-      "runningType": "GAME"
-    },
-  ];
-
   @override
   void initState() {
-    // groupRunningIdsByDayOfWeek(widget.runningList);
-    groupRunningIdsByDayOfWeek(testList);
+    // final testList = [
+    //   {
+    //     "runningDate": "2023-05-05",
+    //     "runningDistance": 1.2,
+    //     "runningId": 1,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-08",
+    //     "runningDistance": 1.2,
+    //     "runningId": 1,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-09",
+    //     "runningDistance": 3,
+    //     "runningId": 2,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-10",
+    //     "runningDistance": 2,
+    //     "runningId": 3,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-08",
+    //     "runningDistance": 1.5,
+    //     "runningId": 4,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-08",
+    //     "runningDistance": 4,
+    //     "runningId": 5,
+    //     "runningType": "GAME"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-09",
+    //     "runningDistance": 3.2,
+    //     "runningId": 6,
+    //     "runningType": "GAME"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-10",
+    //     "runningDistance": 4,
+    //     "runningId": 7,
+    //     "runningType": "RUNNING"
+    //   },
+    //   {
+    //     "runningDate": "2023-05-11",
+    //     "runningDistance": 5,
+    //     "runningId": 8,
+    //     "runningType": "GAME"
+    //   },
+    // ];
+    List<Map<String, dynamic>> filteredList = filterDataByCurrentWeek(widget.runningList);
+    groupData(filteredList);
+    groupRunningIdsByDayOfWeek(filteredList);
     super.initState();
   }
 
@@ -136,9 +180,6 @@ class RunningChartState extends State<RunningChart> {
 
   @override
   Widget build(BuildContext context) {
-
-    final mediaWidth = MediaQuery.of(context).size.width;
-    final mediaHeight = MediaQuery.of(context).size.height;
 
     return AspectRatio(
       aspectRatio: 1.2,
@@ -231,15 +272,14 @@ class RunningChartState extends State<RunningChart> {
                         default:
                           throw Error();
                       }
-                      if (groupingDay[weekDay]!.isNotEmpty) {
+                      if (detailGrouping[weekDay]!.isNotEmpty) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
                               RunningDetail(
                                 weekDay: weekDay,
-                                runningIds: groupingDay[weekDay]!,
-                                // value: (barTouchResponse.spot.y - 1).toString(),
+                                runningIds: detailGrouping[weekDay]!,
                               ),
                           ),
                         );
@@ -298,10 +338,10 @@ class RunningChartState extends State<RunningChart> {
         barsSpace: barsSpace,
         barRods: [
           BarChartRodData(
-            toY: 12,
+            toY: (chartGrouping['Monday']?['RUNNING'] ?? 0) + (chartGrouping['Monday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 2, YGMG_BEIGE),
-              BarChartRodStackItem(2, 12, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Monday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Monday']?['RUNNING'] ?? 0, (chartGrouping['Monday']?['RUNNING'] ?? 0) + (chartGrouping['Monday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -313,10 +353,10 @@ class RunningChartState extends State<RunningChart> {
           barsSpace: barsSpace,
           barRods: [
           BarChartRodData(
-            toY: 14,
+            toY: (chartGrouping['Tuesday']?['RUNNING'] ?? 0) + (chartGrouping['Tuesday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 13, YGMG_BEIGE),
-              BarChartRodStackItem(13, 14, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Tuesday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Tuesday']?['RUNNING'] ?? 0, (chartGrouping['Tuesday']?['RUNNING'] ?? 0) + (chartGrouping['Tuesday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -328,10 +368,10 @@ class RunningChartState extends State<RunningChart> {
         barsSpace: barsSpace,
         barRods: [
           BarChartRodData(
-            toY: 10,
+            toY: (chartGrouping['Wednesday']?['RUNNING'] ?? 0) + (chartGrouping['Wednesday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 3, YGMG_BEIGE),
-              BarChartRodStackItem(3, 10, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Wednesday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Wednesday']?['RUNNING'] ?? 0, (chartGrouping['Wednesday']?['RUNNING'] ?? 0) + (chartGrouping['Wednesday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -342,15 +382,15 @@ class RunningChartState extends State<RunningChart> {
           x: 3,
           barsSpace: barsSpace,
           barRods: [
-          BarChartRodData(
-            toY: 5,
-            rodStackItems: [
-              BarChartRodStackItem(0, 3, YGMG_BEIGE),
-              BarChartRodStackItem(3, 5, YGMG_ORANGE),
-            ],
-            borderRadius: BorderRadius.zero,
-            width: barsWidth,
-          ),
+            BarChartRodData(
+              toY: (chartGrouping['Thursday']?['RUNNING'] ?? 0) + (chartGrouping['Thursday']?['GAME'] ?? 0),
+              rodStackItems: [
+                BarChartRodStackItem(0, chartGrouping['Thursday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+                BarChartRodStackItem(chartGrouping['Thursday']?['RUNNING'] ?? 0, (chartGrouping['Thursday']?['RUNNING'] ?? 0) + (chartGrouping['Thursday']?['GAME'] ?? 0), YGMG_ORANGE),
+              ],
+              borderRadius: BorderRadius.zero,
+              width: barsWidth,
+            ),
           ]
       ),
       BarChartGroupData(
@@ -358,10 +398,10 @@ class RunningChartState extends State<RunningChart> {
         barsSpace: barsSpace,
         barRods: [
           BarChartRodData(
-            toY: 17,
+            toY: (chartGrouping['Friday']?['RUNNING'] ?? 0) + (chartGrouping['Friday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 15, YGMG_BEIGE),
-              BarChartRodStackItem(15, 17, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Friday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Friday']?['RUNNING'] ?? 0, (chartGrouping['Friday']?['RUNNING'] ?? 0) + (chartGrouping['Friday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -373,10 +413,10 @@ class RunningChartState extends State<RunningChart> {
           barsSpace: barsSpace,
           barRods: [
           BarChartRodData(
-            toY: 20,
+            toY: (chartGrouping['Saturday']?['RUNNING'] ?? 0) + (chartGrouping['Saturday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 11, YGMG_BEIGE),
-              BarChartRodStackItem(11, 20, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Saturday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Saturday']?['RUNNING'] ?? 0, (chartGrouping['Saturday']?['RUNNING'] ?? 0) + (chartGrouping['Saturday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
@@ -388,10 +428,10 @@ class RunningChartState extends State<RunningChart> {
           barsSpace: barsSpace,
           barRods: [
           BarChartRodData(
-            toY: 30,
+            toY: (chartGrouping['Sunday']?['RUNNING'] ?? 0) + (chartGrouping['Sunday']?['GAME'] ?? 0),
             rodStackItems: [
-              BarChartRodStackItem(0, 10, YGMG_BEIGE),
-              BarChartRodStackItem(10, 30, YGMG_ORANGE),
+              BarChartRodStackItem(0, chartGrouping['Sunday']?['RUNNING'] ?? 0, YGMG_BEIGE),
+              BarChartRodStackItem(chartGrouping['Sunday']?['RUNNING'] ?? 0, (chartGrouping['Sunday']?['RUNNING'] ?? 0) + (chartGrouping['Sunday']?['GAME'] ?? 0), YGMG_ORANGE),
             ],
             borderRadius: BorderRadius.zero,
             width: barsWidth,
