@@ -54,7 +54,7 @@ public class GameRankingController {
     @PostMapping("/")
     public ResponseEntity<String> addRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
         rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
-        rankingService.updateAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
+        rankingService.addAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
         return ResponseEntity.status(200).body("Member area size has been added successfully.");
     }
 
