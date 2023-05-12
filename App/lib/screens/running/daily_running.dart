@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:app/screens/running/running_start.dart';
+import 'package:app/utils/runnning/daily_running_map.dart';
 import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../const/state_provider_token.dart';
 
 class DailyRunning extends StatefulWidget {
   final String runningStart;
@@ -29,6 +31,15 @@ class DailyRunning extends StatefulWidget {
 
 class _DailyRunningState extends State<DailyRunning> {
   List<Map<String, dynamic>> runninglocationList = [];
+  var _tokenInfo;
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
 
   Future<void> _loadRunningData(double runningDist) async {
     SharedPreferences runningResult = await SharedPreferences.getInstance();
@@ -46,6 +57,7 @@ class _DailyRunningState extends State<DailyRunning> {
 
   @override
   void initState() {
+    _loadTokenInfo();
     super.initState();
     _loadRunningData(widget.runningDist);
     sendRunningData(
@@ -85,7 +97,7 @@ class _DailyRunningState extends State<DailyRunning> {
             //   },
             // ],
             "coordinateList": runninglocationList,
-            "memberId": 6,   // *회원 아이디 넣기
+            "memberId": _tokenInfo.memberId,
             'runningDistance': runningDist,
             "runningEnd": runningEnd,
             'runningKcal': runningKcal,
@@ -93,11 +105,7 @@ class _DailyRunningState extends State<DailyRunning> {
             'runningStart': runningStart,
             'runningTime': runningDuration,
           },
-          options: Options(
-            headers: {
-              // 'Authorization': 'Bearer $token',    // *토큰 넣어주기
-            },
-          ));
+        );
       print(response.data);
       // dio 통신이 성공하면 SharedPreferences에서 데이터 제거
       SharedPreferences runningResult = await SharedPreferences.getInstance();
@@ -165,12 +173,19 @@ class _DailyRunningState extends State<DailyRunning> {
                           blurRadius: 28,
                         ),
                       ],
-                      image: DecorationImage(
-                          // 저장한 경로 이미지? 지도?
-                          image: AssetImage('assets/images/running-gif.gif'),
-                          fit: BoxFit.fitWidth,
-                          alignment: Alignment.topLeft,
-                          repeat: ImageRepeat.noRepeat)),
+                  ),
+                      // image: DecorationImage(
+                      //     // 저장한 경로 이미지? 지도?
+                      //     image: AssetImage('assets/images/running-gif.gif'),
+                      //     fit: BoxFit.fitWidth,
+                      //     alignment: Alignment.topLeft,
+                      //     repeat: ImageRepeat.noRepeat)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(mediaWidth * 0.02),
+                    child: DailyRunningMap(
+                      runninglocationList: runninglocationList
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: mediaHeight * 0.05,
