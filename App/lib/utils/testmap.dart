@@ -12,10 +12,10 @@ class _MapPageState extends State<MapPage> {
   final Set<Polygon> _polygons = {};
   void addPolygon() {
     List<LatLng> polygonLatLng1 = [
-      LatLng(37.7849, -122.4293),
-      LatLng(37.7869, -122.4193),
-      LatLng(37.7748, -122.4194),
-      LatLng(37.7748, -122.4294),
+      LatLng(33.4502143361292,	126.57104991347728),
+      LatLng(33.44947676224537,	126.57129104971551),
+      LatLng(33.45030613108559,	126.57152151454649),
+      LatLng(33.4502143361292,	126.57104991347728),
     ];
     Polygon polygon2 = Polygon(
       polygonId: PolygonId("1"),
@@ -41,7 +41,7 @@ class _MapPageState extends State<MapPage> {
         onMapCreated: _onMapCreated,
         polygons: _polygons,
         initialCameraPosition: CameraPosition(
-          target: LatLng(37.77483, -122.41942),
+          target: LatLng(33.4502143361292,	126.57104991347728),
           zoom: 12,
         ),
       ),
@@ -60,10 +60,11 @@ class _MapPageState extends State<MapPage> {
 
   void _addPolygons() {
     List<LatLng> polygonLatLngs = [
-      LatLng(37.78493, -122.42932),
-      LatLng(37.78693, -122.41932),
-      LatLng(37.77483, -122.41942),
-      LatLng(37.77483, -122.42942),
+      LatLng(33.45113076336205, 126.57175066318219),
+      LatLng(33.45213904262599,	126.57203084360238),
+      LatLng(33.45211546918497,	126.57042837293268),
+      LatLng(33.45126460137033,	126.57070654854132),
+      LatLng(33.45113076336205,	126.57175066318219),
     ];
 
     Polygon polygon = Polygon(

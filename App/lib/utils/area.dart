@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_utils/google_maps_utils.dart';
 import 'dart:math';
@@ -9,7 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:dio/dio.dart';
-import 'package:dart_jts/dart_jts.dart' as jts_package;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../const/state_provider_token.dart';
 
 class DrawPolygon extends StatefulWidget {
   late bool isWalking;
@@ -29,6 +31,15 @@ Future<String> loadMapStyle() async {
 }
 
 class DrawPolygonState extends State<DrawPolygon> {
+  var _tokenInfo;
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
   late GoogleMapController mapController;
   LocationData? currentLocation;
   Set<Marker> _markers = {};
@@ -44,7 +55,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   Set<Polygon> _polygonSets = {};
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
-  StreamSubscription<bool>? _calculate;
+  // StreamSubscription<bool>? _calculate;
   Stream<bool> drawGroundStream = StreamController<bool>().stream;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
   final _gyroscopeValues = <double>[0, 0, 0];
@@ -53,8 +64,31 @@ class DrawPolygonState extends State<DrawPolygon> {
   var area = 0.0;
   var computedArea = 0.0;
 
+
+  // dio.post 요청
+
+  // 땅따먹기 기록
+  final List<Map<String, dynamic>> _polygonList = [];
+
   // 달리기 기록
-  List<Map<String, dynamic>> runninglocationList = [];
+  bool _isLocationServiceEnabled = false;
+  late PermissionStatus _permissionStatus;
+  LocationData? _previousLocationData;
+  late DateTime runningStart;
+  // *달린 속도 변경
+  double runningPace = 0.0;
+  double runningPaceKm = 0.0;
+
+  // *달린 거리 변경
+  double runningDist = 0.0;
+
+  // *달린 시간 변경
+  Duration runningDuration = Duration.zero;
+
+  // *태운 칼로리 변경
+  double runningKcal = 0.0;
+  double _distance = 0.0;
+  double _currentSpeed = 0.0;
 
   // 실시간 나의 위치 보여주는 프로필사진 마커
   void setCustomMarkerIcon() {
@@ -77,7 +111,7 @@ class DrawPolygonState extends State<DrawPolygon> {
     if (locationListJson != null) {
       final locationList = jsonDecode(locationListJson);
       setState(() {
-        runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}));
+        // runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}));
       });
     }
   }
@@ -89,28 +123,16 @@ class DrawPolygonState extends State<DrawPolygon> {
         customMapStyle = value;
       });
     });
-    setupSubscription(widget.drawGround);
+    // setupSubscription(widget.drawGround);
     getLocation();
     setCustomMarkerIcon();
     super.initState();
-
-    // 달리기
-    // _loadRunningData(widget.runningDist);
-    // sendRunningData(
-    //   runninglocationList,
-    //   widget.runningStart,
-    //   widget.runningEnd,
-    //   widget.runningPace,
-    //   widget.runningDist,
-    //   widget.runningDuration,
-    //   widget.runningKcal,
-    // );
   }
 
   @override
   void dispose() {
     _locationSubscription?.cancel();
-    _calculate?.cancel();
+    // _calculate?.cancel();
     super.dispose();
   }
 
@@ -131,7 +153,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             "coordinateList": runninglocationList,
             "memberId": 6,   // *회원 아이디 넣기
             'runningDistance': runningDist,
-            "runningEnd": runningEnd,
+            "runningEnd": DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
             'runningKcal': runningKcal,
             'runningPace': runningPace,
             'runningStart': runningStart,
@@ -213,7 +235,6 @@ class DrawPolygonState extends State<DrawPolygon> {
             ),
           };
         });
-        _loadPoints();
       }
     });
   }
@@ -246,19 +267,6 @@ class DrawPolygonState extends State<DrawPolygon> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String pointsJson = json.encode(_points);
     await prefs.setString('points', pointsJson);
-  }
-
-  void _loadPoints() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? pointsJson = prefs.getString('points');
-    if (pointsJson != null) {
-      List<dynamic> loadedPoints = json.decode(pointsJson);
-      List<LatLng> parsedPoints = loadedPoints
-          .map((point) => LatLng(point[0] as double, point[1] as double))
-          .toList();
-      print('가져와용');
-      print(parsedPoints);
-    }
   }
 
   // 다각형의 중심점 구하기
@@ -298,38 +306,71 @@ class DrawPolygonState extends State<DrawPolygon> {
       ),
     );
   }
-  void setupSubscription(bool drawGround) {
-    _calculate = drawGroundStream.listen((drawGround) {
-      if (drawGround) {
-        calculate();
+  // void setupSubscription(bool drawGround) {
+  //   _calculate = drawGroundStream.listen((drawGround) {
+  //     if (drawGround) {
+  //       calculate();
+  //     }
+  //   });
+  // }
+
+  // 폴리곤의 자기교차 여부 판단
+  bool isNotSimplePolygon(List<LatLng> polygon){
+    if(polygon.length <= 3)
+      return false;
+
+    for(int i = 0; i < polygon.length - 2; i++){
+      double x1 = polygon[i].latitude;
+      double y1 = polygon[i].longitude;
+      double x2 = polygon[i + 1].latitude;
+      double y2 = polygon[i + 1].longitude;
+
+      double maxx1 = max(x1, x2), maxy1 = max(y1, y2);
+      double minx1 = min(x1, x2), miny1 = min(y1, y2);
+
+      for (int j = i + 2; j < polygon.length; j++) {
+        double x21 = polygon[j].latitude;
+        double y21 = polygon[j].longitude;
+        double x22 = polygon[(j + 1) == polygon.length ? 0 : (j + 1)].latitude;
+        double y22 = polygon[(j + 1) == polygon.length ? 0 : (j + 1)].longitude;
+
+        double maxx2 = max(x21, x22), maxy2 = max(y21, y22);
+        double minx2 = min(x21, x22), miny2 = min(y21, y22);
+
+        if ((x1 == x21 && y1 == y21) || (x2 == x22 && y2 == y22) || (x1 == x22 && y1 == y22) || (x2 == x21 && y2 == y21))
+          continue;
+
+        if (minx1 > maxx2 || maxx1 < minx2 || miny1 > maxy2 || maxy1 < miny2)
+          continue;  // The moment when the lines have one common vertex...
+
+
+        double dx1 = x2-x1, dy1 = y2-y1; // The length of the projections of the first line on the x and y axes
+        double dx2 = x22-x21, dy2 = y22-y21; // The length of the projections of the second line on the x and y axes
+        double dxx = x1-x21, dyy = y1-y21;
+
+        double div = dy2 * dx1 - dx2 * dy1;
+        double mul1 = dx1 * dyy - dy1 * dxx;
+        double mul2 = dx2 * dyy - dy2 * dxx;
+
+        if (div == 0)
+          continue; // Lines are parallel...
+
+        if (div > 0) {
+          if (mul1 < 0 || mul1 > div)
+            continue; // The first segment intersects beyond its boundaries...
+          if (mul2 < 0 || mul2 > div)
+            continue; // // The second segment intersects beyond its borders...
+        }
+        else{
+          if (-mul1 < 0 || -mul1 > -div)
+            continue; // The first segment intersects beyond its boundaries...
+          if (-mul2 < 0 || -mul2 > -div)
+            continue; // The second segment intersects beyond its borders...
+        }
+        return true;
       }
-    });
-  }
-
-  bool _createPolygonAndCheckSelfIntersection() {
-    if (_currentPoints.isEmpty) {
-      return false; // 좌표가 없을 경우 자기겹침이 없다고 가정
     }
-
-    List<jts_package.Coordinate> coordinates = _currentPoints
-        .map((latLng) => jts_package.Coordinate(latLng.latitude, latLng.longitude))
-        .toList();
-
-    // 첫 번째 좌표를 마지막에 추가하여 닫힌 라인스트링 형태로 만듦
-    if (coordinates.isNotEmpty) {
-      coordinates.add(coordinates.first);
-    }
-
-    // Coordinate 리스트로 LinearRing 생성
-    jts_package.LinearRing shell = jts_package.GeometryFactory.defaultPrecision().createLinearRing(coordinates);
-
-    // LinearRing으로 Polygon 생성
-    jts_package.Polygon polygon = jts_package.GeometryFactory.defaultPrecision().createPolygonFromRing(shell);
-
-    // Polygon의 자기겹침 여부 확인
-    bool isSimple = !polygon.isSimple();
-    print('Is Polygon Simple? $isSimple');
-    return isSimple;
+    return false;
   }
 
   // 폴리곤 면적 계산
@@ -351,7 +392,8 @@ class DrawPolygonState extends State<DrawPolygon> {
         );
         setState(() {
           _polylines.add(polyline);
-          _pointsSets.add(_points);
+          // List<dynamic> convertPoints = List<Map<String, dynamic>>.from(_points.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}))
+          // _polygonList.add(convertPoints);
         });
         computedArea = SphericalUtils.computeSignedArea(points);
         // if(SphericalUtils.computeSignedArea(points) > 0){
@@ -363,23 +405,19 @@ class DrawPolygonState extends State<DrawPolygon> {
             strokeWidth: 2,
             strokeColor: Colors.red,
           );
-        // } else {
-        //   print('Polygon is not filled with color.');
-        //   _onCustomAnimationAlertPressed(context);
-        //   _points = [];
-        //   _currentPoints = [];
-        //   _currentPolylines = {};
-        //   widget.isWalking = false;
-
-        // }
-          if (!_createPolygonAndCheckSelfIntersection()) {
+        if (!isNotSimplePolygon(_currentPoints)) {
+            _onCustomAnimationAlertPressed(context);
+            _points = [];
+            _currentPoints = [];
+            _currentPolylines = {};
+            widget.isWalking = false;
             print('영역 생성 실패');
           } else {
             _polygonSets.add(_polygon!);
             print('성공');
             _markers.add(
                 Marker(
-                  markerId: MarkerId("marker-id"),
+                  markerId: MarkerId('marker${_markers.length + 1}'),
                   position: center,
                   onTap: () {
                     showModalBottomSheet(
@@ -430,12 +468,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             LatLng lastLatLng = _polygonSets.last.points.first;
             print(_polygonSets.length);
             print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
-
           }
-
-
-
-
       }
       _points = [];
       _currentPoints = [];
@@ -443,7 +476,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
     } else {
       print('영역이 생성되지 않았습니다.');
-
+      _onCustomAnimationAlertPressed(context);
     }
 
     }
@@ -456,10 +489,6 @@ class DrawPolygonState extends State<DrawPolygon> {
   }
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    // _polygonSets에 있는 모든 폴리곤을 지도에 추가합니다.
-    // for (var polygon in _polygonSets) {
-    //   _addPolygonToMap(polygon);
-    // }
     setState(() {
       _markers = {
         Marker(
@@ -536,6 +565,106 @@ class DrawPolygonState extends State<DrawPolygon> {
     return intersections % 2 == 1;
   }
 
+  // 러닝 데이터 수집 함수
+
+  // gps 측정으로 변경
+  Future<void> _checkLocationService() async {
+    _isLocationServiceEnabled = await location.serviceEnabled();
+    if (!_isLocationServiceEnabled) {
+      _isLocationServiceEnabled = await location.requestService();
+      if (!_isLocationServiceEnabled) {
+        return;
+      }
+    }
+
+    _permissionStatus = await location.hasPermission();
+    if (_permissionStatus == PermissionStatus.denied) {
+      _permissionStatus = await location.requestPermission();
+      if (_permissionStatus != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationSubscription =
+        location.onLocationChanged.listen((LocationData locationData) {
+          _updateRunningInfo(locationData);
+        });
+  }
+
+  void _updateRunningInfo(LocationData locationData) {
+    if (_previousLocationData == null) {
+      _previousLocationData = locationData;
+      return;
+    }
+
+    Point<num> previousPoint = Point(
+      _previousLocationData!.latitude!,
+      _previousLocationData!.longitude!,
+    );
+    Point<num> currentPoint = Point(
+      locationData.latitude!,
+      locationData.longitude!,
+    );
+    double distanceInMeters = SphericalUtils.computeDistanceBetween(
+      previousPoint,
+      currentPoint,
+    );
+
+    // 위치 보정 전
+    _distance += distanceInMeters / 1000; // 단위: km
+
+    double timeInSeconds =
+        (locationData.time! - _previousLocationData!.time!) / 1000.0;
+    _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
+
+    double calculateRunningKcal(double weight, Duration duration) {
+      double runningMinutes = duration.inMinutes.toDouble();
+      double runningKcal;
+
+      if (runningDist == 0) {
+        return 0;
+      }
+
+      runningKcal =
+          (weight * 3.5 * runningMinutes * 4 / 1000) * 5; // *사용자 몸무게로 칼로리 측정
+      print(runningKcal);
+      return runningKcal;
+    }
+    setState(() {
+      if (_currentSpeed >= 2.0) {
+        runningDist = _distance;
+        runningPace = _currentSpeed;
+        runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
+        // 위치 좌표 리스트에 추가
+        _polygonList.add({
+          'coordinateTime': locationData.time!,
+          'lat': locationData.latitude!,
+          'lng': locationData.longitude!
+        });
+      } else {
+        runningPace = 0.0;
+      }
+
+    });
+    // print(_locationList);
+    _previousLocationData = locationData;
+  }
+
+  void _updateRunningTime(Timer timer) {
+    if (widget.isWalking) {
+      setState(() {
+        runningDuration += Duration(seconds: 1);
+      });
+    }
+  }
+
+  String formatDuration(Duration duration) {
+    var hours = duration.inHours.toString().padLeft(2, '0');
+    var minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    var seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
+  }
+
   @override
 
   Widget build(BuildContext context) {
@@ -567,17 +696,6 @@ class DrawPolygonState extends State<DrawPolygon> {
         onPressed: () {
           setState(() {
           });
-          // calculate();
-          // if (_polygonSets.isNotEmpty) {
-          //   var polygonList = _polygonSets.toList();
-          //   // 첫번째 폴리곤과 두번째 폴리곤이 겹치는지 검사
-          //   if (isPointInsidePolygon(polygonList[0].points, polygonList[1].points[0])) {
-          //     // 겹치는 영역을 클리핑
-          //     final clippedPoints = clipPolygon(polygonList[0].points, polygonList[1].points);
-          //     // 첫번째 폴리곤 업데이트
-          //     polygonList[0] = polygonList[0].copyWith(pointsParam: clippedPoints);
-          //   }
-          // }
           if (widget.isWalking) {
             // 현재 경로를 다시 그리기
             _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
@@ -591,7 +709,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             _currentPolylines = {
               route,
             };
-            }
+          }
         },
         child: Icon(Icons.play_arrow),
       ),
