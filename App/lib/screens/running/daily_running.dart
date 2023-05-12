@@ -60,18 +60,19 @@ class _DailyRunningState extends State<DailyRunning> {
 
   @override
   void initState() {
-    _loadTokenInfo();
-    super.initState();
-    _loadRunningData(widget.runningDist);
-    sendRunningData(
-      runninglocationList,
-      widget.runningStart,
-      widget.runningEnd,
-      widget.runningPace,
-      widget.runningDist,
-      widget.runningDuration,
-      widget.runningKcal,
+    _loadTokenInfo().then((_) => {
+      _loadRunningData(widget.runningDist),
+      sendRunningData(
+        runninglocationList,
+        widget.runningStart,
+        widget.runningEnd,
+        widget.runningPace,
+        widget.runningDist,
+        widget.runningDuration,
+        widget.runningKcal,
+      )}
     );
+    super.initState();
   }
 
   void sendRunningData(
@@ -87,18 +88,6 @@ class _DailyRunningState extends State<DailyRunning> {
       print('백에 보낸당!');
       var response = await dio.post('http://k8c107.p.ssafy.io:8081/api/running',
           data: {
-            // "coordinateList": [
-            //   {
-            //     "coordinateTime": "15:40:10",
-            //     "lat": 35.2051205,
-            //     "lng": 126.8116811
-            //   },
-            //   {
-            //     "coordinateTime": "15:40:30",
-            //     "lat": 35.2051147,
-            //     "lng": 126.8116459
-            //   },
-            // ],
             "coordinateList": runninglocationList,
             "memberId": _tokenInfo.memberId,
             'runningDistance': runningDist,
