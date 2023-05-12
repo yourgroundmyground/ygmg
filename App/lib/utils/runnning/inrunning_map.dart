@@ -59,7 +59,11 @@ class _InRunningMapState extends State<InRunningMap> {
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
+    return currentPosition == null ?
+      Center(
+        child: CircularProgressIndicator(),
+      )
+      : GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: CameraPosition(
         bearing: 0,
