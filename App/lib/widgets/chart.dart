@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class RunningChart extends StatefulWidget {
-  final List<Map<String, dynamic>> runningList;
+  final List<dynamic> runningList;
 
   const RunningChart({
     required this.runningList,
@@ -16,6 +16,7 @@ class RunningChart extends StatefulWidget {
 }
 
 class RunningChartState extends State<RunningChart> {
+  List<Map<String, dynamic>> receiveRunningList = [];
   Map<String, Map<String, double>> chartGrouping = {};
   Map<String, List<int>> detailGrouping = {};
   int touchedIndex = -1;
@@ -29,7 +30,7 @@ class RunningChartState extends State<RunningChart> {
   }
 
   // 이번 주에 포함되는 데이터 필터링
-  List<Map<String, dynamic>> filterDataByCurrentWeek(List<Map<String, dynamic>> runningList) {
+  List<dynamic> filterDataByCurrentWeek(List<dynamic> runningList) {
     DateTime now = DateTime.now();
     DateTime startOfWeek = now.subtract(Duration(days: now.weekday - DateTime.monday +1));
     DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
@@ -44,7 +45,7 @@ class RunningChartState extends State<RunningChart> {
   }
 
   // 데이터 그룹화
-  void groupData(List<Map<String, dynamic>> runningList) {
+  void groupData(List<dynamic> runningList) {
     Map<String, Map<String, double>> result = {};
 
     for (Map<String, dynamic> item in runningList) {
@@ -66,7 +67,7 @@ class RunningChartState extends State<RunningChart> {
   }
 
   // 요일별로 그룹핑하는 함수
-  void groupRunningIdsByDayOfWeek(List<Map<String, dynamic>> runningList) {
+  void groupRunningIdsByDayOfWeek(List<dynamic> runningList) {
     Map<String, List<int>> result = {};
 
     for (Map<String, dynamic> item in runningList) {
@@ -142,7 +143,7 @@ class RunningChartState extends State<RunningChart> {
     //     "runningType": "GAME"
     //   },
     // ];
-    List<Map<String, dynamic>> filteredList = filterDataByCurrentWeek(widget.runningList);
+    List<dynamic> filteredList = filterDataByCurrentWeek(widget.runningList);
     groupData(filteredList);
     groupRunningIdsByDayOfWeek(filteredList);
     super.initState();
@@ -234,7 +235,7 @@ class RunningChartState extends State<RunningChart> {
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: (rod.toY - 1).toString(),
+                            text: (rod.toY).toString(),
                             style: TextStyle(
                               color: YGMG_YELLOW,
                               fontSize: 16,
