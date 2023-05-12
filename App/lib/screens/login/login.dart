@@ -62,7 +62,7 @@ void sendCode(BuildContext context, var accessToken) async {
         final String memberBirth = response.data['memberBirth'];
         final String memberName = response.data['memberName'];
 
-        Navigator.of(context).push(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) =>
                 SignUpScreen(
@@ -70,7 +70,7 @@ void sendCode(BuildContext context, var accessToken) async {
                   memberBirth: memberBirth,
                   memberName: memberName,
                 ),
-          ),
+          ), (Route<dynamic> route) => false,
         );
       } else { //회원일때 token
 
@@ -94,11 +94,11 @@ void sendCode(BuildContext context, var accessToken) async {
 
 
 
-        await Navigator.of(context).push(
+        await Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) =>
-                Home()
-          ),
+                Home()),
+              (Route<dynamic> route) => false,
         );
       }
       print('Response body: ${response.data}');
@@ -127,9 +127,8 @@ class LoginScreen extends StatelessWidget {
     final mediaHeight = MediaQuery.of(context).size.height;
 
 
-
     return Container(
-        width: double.infinity,
+        width: mediaWidth,
         decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.cover,
@@ -138,43 +137,47 @@ class LoginScreen extends StatelessWidget {
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                  margin: EdgeInsets.only(top: mediaHeight*0.05),
-                  child: Image.asset('assets/images/mainlogo.png')),
-              Container(
-                margin: EdgeInsets.only(top: mediaHeight*0.02),
-                child: GestureDetector(
-                  onTap: () async {
-                    //이미지 클릭시 실행할 코드
-                    fetchData(context);
-
-                    print('터치터치');
-                  },
-                  child: Image.asset('assets/images/kakao_login_medium_wide.png'),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+          body: Center(
+            child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: (){
-                      //이미지 클릭시 실행할 코드
+                  SizedBox(height: mediaHeight*0.45),
+                  SizedBox(
+                      // margin: EdgeInsets.only(top: mediaHeight*0.05),
+                      child: Image.asset('assets/images/mainlogo.png')),
+                  Container(
+                    margin: EdgeInsets.only(top: mediaHeight*0.02),
+                    child: GestureDetector(
+                      onTap: () async {
+                        //이미지 클릭시 실행할 코드
+                        fetchData(context);
 
-                    },
-                    child: Container(
-                      padding: EdgeInsets.only(left: mediaWidth*0.4),
-                      margin: EdgeInsets.only(top: mediaHeight*0.01),
-                      child: Text('니땅내땅이 처음이세요?',
-                          style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
-                    )),
-                ]),
-              ]
-            ),
-          ),
-        );
+                        print('터치터치');
+                      },
+                      child: Image.asset('assets/images/kakao_login_medium_narrow.png'),
+                    ),
+                  ),
+                ],
+
+                // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     GestureDetector(
+                  //       onTap: (){
+                  //         //이미지 클릭시 실행할 코드
+                  //
+                  //       },
+                  //       child: Container(
+                  //         padding: EdgeInsets.only(left: mediaWidth*0.4),
+                  //         margin: EdgeInsets.only(top: mediaHeight*0.01),
+                  //         child: Text('니땅내땅이 처음이세요?',
+                  //             style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
+                  //       )
+                  //
+                  //     ),
+                  //   ]),
+              ),
+          )
+              ),
+          );
   }
 }
