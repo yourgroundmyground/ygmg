@@ -13,6 +13,6 @@ import java.util.List;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-    @Query(value = "SELECT id FROM Game ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT id FROM game ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Long findGameId();
 }
