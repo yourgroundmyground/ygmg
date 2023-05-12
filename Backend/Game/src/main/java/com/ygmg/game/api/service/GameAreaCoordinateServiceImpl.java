@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +41,18 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
 
     @Override
+    @Transactional
     public void createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo) throws JsonProcessingException {
 
         List<Game> gameList = gameRepository.findAll();
         Game game = gameList.get(gameList.size() - 1);
-        for(Area area : game.getAreaList()){
-            areaUtil.defeatCoordinates(area, coordinateInfo.getAreaCoordinateDtoList());
+        System.out.println();
+        List<Area> areaList = areaRepository.findByGame_Id(game.getId());
+        for(Area area : areaList){
+            if(areaUtil.defeatCoordinates(area, coordinateInfo.getAreaCoordinateDtoList())){
+                areaRepository.delete(area);
+
+            }
         }
 
         coordinateInfo.setAreaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()));

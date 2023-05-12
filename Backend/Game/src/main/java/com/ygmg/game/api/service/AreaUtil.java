@@ -23,8 +23,9 @@ public class AreaUtil {
     GeometryFactory factory = new GeometryFactory();
     private final AreaRepository areaRepository;
 
+
     @Transactional
-    public void defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
+    public boolean defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
         Long memberId = area.getMemberId();
@@ -46,8 +47,6 @@ public class AreaUtil {
         Polygon winPolygon = factory.createPolygon(winRing);
 
         if(winPolygon.intersects(defeatPolygon)) {
-
-            areaRepository.delete(area);
 
             Geometry difference = defeatPolygon.difference(winPolygon);
 
@@ -78,8 +77,8 @@ public class AreaUtil {
                             .game(area.getGame())
                             .build();
 
-                    areaRepository.save(newArea);
 
+                    areaRepository.save(newArea);
                 }
             }
             else if(difference instanceof Polygon){
@@ -109,12 +108,12 @@ public class AreaUtil {
                 log.info("기존 폴리곤 사이즈는 : " + area.getAreaSize());
                 log.info("패배한 폴리곤 사이즈는 : " + newArea.getAreaSize());
 
-
                 areaRepository.save(newArea);
 
             }
-
+            return true;
         }
+        return false;
     }
 
     public double getAreaSize(List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){

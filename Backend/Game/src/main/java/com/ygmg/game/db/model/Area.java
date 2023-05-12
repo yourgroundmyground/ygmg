@@ -33,7 +33,7 @@ public class Area {
     @JoinColumn(name="game_id")
     private Game game;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "area")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "area")
     private List<AreaCoordinate> areaCoordinateList = new ArrayList<>();
 
     public void updateAreaSize(double areaSize){

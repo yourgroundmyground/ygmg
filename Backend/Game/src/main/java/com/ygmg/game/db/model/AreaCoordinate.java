@@ -28,7 +28,7 @@ AreaCoordinate {
     @Column(nullable = false)
     private LocalDateTime areaCoordinateTime;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="area_id")
     private Area area; // DB는 오브젝트를 저장할 수 없다. FK, 자바는 오브젝트를 저장할 수 있다.
 
