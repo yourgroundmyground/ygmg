@@ -15,5 +15,5 @@ public interface GameService {
 
     List<GameRes> getGame();
 
-    String getGameId();
+    Long getGameId();
 }

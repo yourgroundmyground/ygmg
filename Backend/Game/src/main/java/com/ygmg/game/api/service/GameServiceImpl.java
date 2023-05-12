@@ -46,8 +46,8 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public String getGameId() {
-        String gameId = gameRepository.findGameId();
+    public Long getGameId() {
+        Long gameId = gameRepository.findGameId();
         return gameId;
     }
 
