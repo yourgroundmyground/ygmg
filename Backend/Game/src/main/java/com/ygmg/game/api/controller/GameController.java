@@ -39,18 +39,6 @@ public class GameController {
         return ResponseEntity.status(200).body(games);
     }
 
-    @PostMapping("/running")
-    public ResponseEntity<String> sendRunningData(@RequestBody RunningDataReq runningDataReq) throws JsonProcessingException {
-
-        log.debug("런닝 데이터 요청 아이디 : " + runningDataReq.getMemberId());
-
-        String message = objectMapper.writeValueAsString(runningDataReq);
-
-        rabbitTemplate.convertAndSend("ygmg.exchange", "ygmg.game.#",message);
-
-        return ResponseEntity.status(200).body("저장되었습니다.");
-    }
-
     @GetMapping("/gameId")
     public ResponseEntity<String> getGameId() throws Exception {
         String gameId = gameService.getGameId();
