@@ -63,9 +63,9 @@ class DrawPolygonState extends State<DrawPolygon> {
   Polygon? _polygon;
   var area = 0.0;
   var computedArea = 0.0;
+  var isCompleted = false;
 
-
-  // dio.post 요청
+  // 영역 보내기 post 요청
 
   // 땅따먹기 기록
   final List<Map<String, dynamic>> _polygonList = [];
@@ -123,7 +123,7 @@ class DrawPolygonState extends State<DrawPolygon> {
         customMapStyle = value;
       });
     });
-    // setupSubscription(widget.drawGround);
+    setupTimer();
     getLocation();
     setCustomMarkerIcon();
     super.initState();
@@ -173,6 +173,37 @@ class DrawPolygonState extends State<DrawPolygon> {
     }
   }
 
+  // 영역 정보 가져오기 get 요청
+
+  void getPolygons() async {
+    var dio = Dio();
+    try {
+      print('영역들 정보 가져오기');
+      var response = await dio.get('............');
+      print(response.data);
+      setState(() {
+
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 멤버아이디로 사진 조회 get 요청
+
+  void getMarker() async {
+    var dio = Dio();
+    try {
+      print('이미지 가져오기');
+      var response = await dio.get('............');
+      print(response.data);
+      setState(() {
+        // _markers.add()
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   // 위치 가져오기
   void getLocation() async {
@@ -372,31 +403,53 @@ class DrawPolygonState extends State<DrawPolygon> {
     }
     return false;
   }
+  // 매일 달리기 한 번 제한
+  void setupTimer() {
+    // 현재 시간과 자정 사이의 지연 시간 계산
+    final now = DateTime.now();
+    final midnight = DateTime(now.year, now.month, now.day + 1);
+    final duration = midnight.difference(now);
+
+    // 자정에 작업 수행
+    Timer(duration, () {
+      // 변수의 값을 변경
+      isCompleted = false;
+      print('변수가 변경되었습니다!');
+    });
+  }
 
   // 폴리곤 면적 계산
   void calculate() {
-    print('면적만들기 실행');
-    LatLng center = findPolygonCenter(_points);
-    final mediaWidth = MediaQuery.of(context).size.width;
-    final mediaHeight = MediaQuery.of(context).size.height;
+    if (isCompleted) {
+      print('면적만들기 실행');
+      LatLng center = findPolygonCenter(_points);
+      final mediaWidth = MediaQuery
+          .of(context)
+          .size
+          .width;
+      final mediaHeight = MediaQuery
+          .of(context)
+          .size
+          .height;
 
-    final points = _points.map((latLng) => Point(latLng.latitude, latLng.longitude)).toList();
-    if (points.isNotEmpty) {
-      final distance = _distanceBetweenFirstAndLastPoint();
-      if (distance <= 50) {
-        final polyline = Polyline(
-          polylineId: PolylineId('myPolyline${_polylines.length}'),
-          points: _points,
-          width: 2,
-          color: Colors.red,
-        );
-        setState(() {
-          _polylines.add(polyline);
-          // List<dynamic> convertPoints = List<Map<String, dynamic>>.from(_points.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}))
-          // _polygonList.add(convertPoints);
-        });
-        computedArea = SphericalUtils.computeSignedArea(points);
-        // if(SphericalUtils.computeSignedArea(points) > 0){
+      final points = _points.map((latLng) =>
+          Point(latLng.latitude, latLng.longitude)).toList();
+      if (points.isNotEmpty) {
+        final distance = _distanceBetweenFirstAndLastPoint();
+        if (distance <= 50) {
+          final polyline = Polyline(
+            polylineId: PolylineId('myPolyline${_polylines.length}'),
+            points: _points,
+            width: 2,
+            color: Colors.red,
+          );
+          setState(() {
+            _polylines.add(polyline);
+            // List<dynamic> convertPoints = List<Map<String, dynamic>>.from(_points.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}))
+            // _polygonList.add(convertPoints);
+          });
+          computedArea = SphericalUtils.computeSignedArea(points);
+          // if(SphericalUtils.computeSignedArea(points) > 0){
           final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
           _polygon = Polygon(
             polygonId: polygonId,
@@ -405,7 +458,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             strokeWidth: 2,
             strokeColor: Colors.red,
           );
-        if (!isNotSimplePolygon(_currentPoints)) {
+          if (!isNotSimplePolygon(_currentPoints)) {
             _onCustomAnimationAlertPressed(context);
             _points = [];
             _currentPoints = [];
@@ -467,18 +520,21 @@ class DrawPolygonState extends State<DrawPolygon> {
             print(area);
             LatLng lastLatLng = _polygonSets.last.points.first;
             print(_polygonSets.length);
-            print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
+            print('last polygon, first point - latitude: ${lastLatLng
+                .latitude}, longitude: ${lastLatLng.longitude}');
+            isCompleted = true;
           }
+        }
+        _points = [];
+        _currentPoints = [];
+        _currentPolylines = {};
+      } else {
+        print('영역이 생성되지 않았습니다.');
+        _onCustomAnimationAlertPressed(context);
       }
-      _points = [];
-      _currentPoints = [];
-      _currentPolylines = {};
-
     } else {
-      print('영역이 생성되지 않았습니다.');
-      _onCustomAnimationAlertPressed(context);
-    }
-
+      print('오늘 영역 생성 끝');
+      }
     }
   void resetPoints() {
     setState(() {
