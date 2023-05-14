@@ -30,11 +30,11 @@ public class GameAreaCoordinateController {
         return ResponseEntity.status(200).body("면적이 생성되었습니다.");
     }
 
-    @GetMapping("/{areaCoordinateId}")
-    public ResponseEntity<AreaCoordinate> getCoordinate(@PathVariable Long areaCoordinateId) throws Exception {
-        AreaCoordinate coordinate = coordinateService.getCoordinateByCoordinateId(areaCoordinateId);
-        return ResponseEntity.status(200).body(coordinate);
-    }
+//    @GetMapping("/{areaCoordinateId}")
+//    public ResponseEntity<AreaCoordinate> getCoordinate(@PathVariable Long areaCoordinateId) throws Exception {
+//        AreaCoordinate coordinate = coordinateService.getCoordinateByCoordinateId(areaCoordinateId);
+//        return ResponseEntity.status(200).body(coordinate);
+//    }
 
     @GetMapping("/area/{areaId}")
     public ResponseEntity<List<CoordinateRes>> getAreaCoordinate(@PathVariable Long areaId) throws Exception {

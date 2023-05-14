@@ -61,8 +61,9 @@ public class GameAreaController {
     @GetMapping("/{areaId}")
     public ResponseEntity<?> getArea(@PathVariable Long areaId) throws Exception {
         try {
-            Area area = areaService.getAreaByAreaId(areaId);
-            return ResponseEntity.status(200).body(AreaRes.of(area));
+            AreaRes area = AreaRes.of(areaService.getAreaByAreaId(areaId));
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+            return ResponseEntity.status(200).body(area);
         }catch (NoSuchElementException e){
             return ResponseEntity.badRequest().body("Area가 존재 하지 않습니다."); //Default 예외처리
         }
@@ -83,11 +84,19 @@ public class GameAreaController {
     @GetMapping("member/{memberId}")
     public ResponseEntity<List<AreaRes>> getMemberAreaAll(@PathVariable Long memberId) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberId(memberId);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
         return ResponseEntity.status(200).body(areas);
     }
     @GetMapping("member/{memberId}/{areaDate}")
     public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable Long memberId, @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate areaDate) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberIdAndAreaDate(memberId, areaDate);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
         return ResponseEntity.status(200).body(areas);
     }
 
