@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface GameRankingService {
 
-    void updateAreaSize(String gameId, String memberId, double areaSize);
+    void addAreaSize(String gameId, String memberId, double areaSize);
 
     void modifyAreaSize(String gameId, String memberId, double areaSize);
 

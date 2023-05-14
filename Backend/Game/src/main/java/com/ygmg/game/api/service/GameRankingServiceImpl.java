@@ -15,8 +15,8 @@ public class GameRankingServiceImpl implements GameRankingService {
     }
 
     @Override
-    public void updateAreaSize(String gameId, String memberId, double areaSize) {
-        rankingRepository.updateAreaSize(gameId, memberId, areaSize);
+    public void addAreaSize(String gameId, String memberId, double areaSize) {
+        rankingRepository.addAreaSize(gameId, memberId, areaSize);
     }
 
     @Override

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,6 +17,8 @@ public class AreaRes {
     Long memberId;
     LocalDateTime areaDate;
     Long gameId;
+
+    List<CoordinateRes> coordinateList;
 
     public static AreaRes of(Area area){
         AreaRes res = new AreaRes();
@@ -27,5 +30,6 @@ public class AreaRes {
 
         return res;
     }
+
 
 }
