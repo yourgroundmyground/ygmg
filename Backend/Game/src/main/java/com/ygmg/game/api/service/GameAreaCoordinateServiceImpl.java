@@ -41,7 +41,6 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
 
     @Override
-    @Transactional
     public void createAreaCoordinate(AreaCoordinateRegisterPostReq coordinateInfo) throws JsonProcessingException {
 
         List<Game> gameList = gameRepository.findAll();
@@ -51,14 +50,11 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
         for(Area area : areaList){
             if(areaUtil.defeatCoordinates(area, coordinateInfo.getAreaCoordinateDtoList())){
                 areaRepository.delete(area);
-
             }
         }
 
         coordinateInfo.setAreaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()));
-
         saveAreaCoordinateList(coordinateInfo);
-
         RunningDataSend(coordinateInfo);
 
 
