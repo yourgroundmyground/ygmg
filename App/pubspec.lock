@@ -105,14 +105,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  dart_jts:
-    dependency: "direct main"
-    description:
-      name: dart_jts
-      sha256: "21bfc566b63cb55cd6b27547b7a46dc2cc10117b5f72bce9d2f996cb0d023cd4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.2+2"
   dio:
     dependency: "direct main"
     description:
