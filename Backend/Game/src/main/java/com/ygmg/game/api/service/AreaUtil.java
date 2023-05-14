@@ -24,7 +24,7 @@ public class AreaUtil {
     private final AreaRepository areaRepository;
 
 
-    @Transactional
+
     public boolean defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
@@ -58,7 +58,13 @@ public class AreaUtil {
 
                     List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
 
-                    Area newArea = new Area();
+                    Area newArea = Area.builder()
+                            .areaCoordinateList(newAreaCoordinateList)
+                            .areaDate(LocalDateTime.now())
+                            .areaSize(polygon.getArea())
+                            .memberId(memberId)
+                            .game(area.getGame())
+                            .build();
 
                     for (Coordinate coordinate : polygon.getCoordinates()) {
                         newAreaCoordinateList.add(AreaCoordinate.builder()
@@ -68,15 +74,6 @@ public class AreaUtil {
                                 .areaCoordinateTime(LocalDateTime.now())
                                 .build());
                     }
-
-                    newArea = Area.builder()
-                            .areaDate(LocalDateTime.now())
-                            .areaSize(polygon.getArea())
-                            .areaCoordinateList(newAreaCoordinateList)
-                            .memberId(memberId)
-                            .game(area.getGame())
-                            .build();
-
 
                     areaRepository.save(newArea);
                 }
