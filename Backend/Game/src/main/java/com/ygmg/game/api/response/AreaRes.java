@@ -17,6 +17,7 @@ public class AreaRes {
     Long memberId;
     LocalDateTime areaDate;
     Long gameId;
+    Double areaSize;
 
     List<CoordinateRes> coordinateList;
 
@@ -26,6 +27,7 @@ public class AreaRes {
         res.setAreaId(area.getId());
         res.setAreaDate(area.getAreaDate());
         res.setMemberId(area.getMemberId());
+        res.setAreaSize(area.getAreaSize());
         res.setGameId(area.getGame().getId());
 
         return res;
