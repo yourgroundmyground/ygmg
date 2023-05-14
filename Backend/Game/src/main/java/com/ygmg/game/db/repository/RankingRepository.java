@@ -15,4 +15,6 @@ public interface RankingRepository {
     void addAreaSize(String gameId, String memberId, double areaSize);
 
     void modifyAreaSize(String gameId, String memberId, double areaSize);
+
+    void subAreaSize(String gameId, String memberId, double areaSize);
 }

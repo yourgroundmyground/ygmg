@@ -33,4 +33,9 @@ public class GameRankingServiceImpl implements GameRankingService {
     public int getRank(String gameId, String memberId) {
         return rankingRepository.getRank(gameId, memberId);
     }
+
+    @Override
+    public void subAreaSize(String gameId, String memberId, double areaSize) {
+        rankingRepository.subAreaSize(gameId, memberId, areaSize);
+    }
 }

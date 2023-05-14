@@ -23,7 +23,8 @@ public class AreaUtil {
     GeometryFactory factory = new GeometryFactory();
     private final AreaRepository areaRepository;
 
-
+    GameRankingService rankingService;
+    GameService gameService;
 
     public boolean defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
 
@@ -49,6 +50,8 @@ public class AreaUtil {
         if(winPolygon.intersects(defeatPolygon)) {
 
             Geometry difference = defeatPolygon.difference(winPolygon);
+            long gameId = gameService.getGameId();
+            rankingService.subAreaSize(String.valueOf(gameId), String.valueOf(memberId), difference.getArea());
 
             if(difference instanceof MultiPolygon){
                 MultiPolygon multiPolygon = (MultiPolygon) difference;

@@ -49,4 +49,17 @@ public class RankingRepositoryImpl implements RankingRepository{
     public void modifyAreaSize(String gameId, String memberId, double areaSize) {
         redisTemplate.opsForZSet().add(gameId, memberId, areaSize);
     }
+
+    @Override
+    public void subAreaSize(String gameId, String memberId, double areaSize) {
+        Double currentScore = redisTemplate.opsForZSet().score(gameId, memberId);
+        if (currentScore == null) {
+            // If the member does not exist in the ZSet, add it with areaSize as its score.
+            redisTemplate.opsForZSet().add(gameId, memberId, areaSize);
+        } else {
+            // If the member already exists in the ZSet, add areaSize to its current score and update it.
+            double newScore = currentScore - areaSize;
+            redisTemplate.opsForZSet().add(gameId, memberId, newScore);
+        }
+    }
 }
