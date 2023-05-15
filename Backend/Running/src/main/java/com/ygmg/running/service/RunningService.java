@@ -17,9 +17,8 @@ public interface RunningService {
 
     RunningCoordinateResponse selectRunningCoordinate(Long runningDetailId);
 
-    RunningGameRecordResponse selectGameRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate);
+    RunningGameRecordResponse selectSumRunningDetail(Long memberId, String mode ,LocalDate startDate, LocalDate endDate);
 
-    RunningGameRecordResponse selectSumRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate);
 
 
 }
