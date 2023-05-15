@@ -133,7 +133,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
     public List<CoordinateRes> getCoordinateByAreaId(Long areaId) {
         List<AreaCoordinate>  coordinates = areaCoordinateRepository.findByArea_Id(areaId);
         List<CoordinateRes> coordinateResList = new ArrayList<>();
-        log.info(coordinates.get(0).getAreaCoordinateTime() + "" );
+//        log.info(coordinates.get(0).getAreaCoordinateTime() + "" );
 
         for(AreaCoordinate coordinate : coordinates){
             coordinateResList.add(

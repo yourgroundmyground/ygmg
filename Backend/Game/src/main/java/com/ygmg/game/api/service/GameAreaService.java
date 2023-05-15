@@ -19,5 +19,7 @@ public interface GameAreaService {
 
     void modifyArea(AreaModifyPutReq areaInfo);
 
-    List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate);
+//    List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate);
+
+    List<AreaRes> getAreaByMemberIdAndGameId(Long memberId, Long gameId);
 }
