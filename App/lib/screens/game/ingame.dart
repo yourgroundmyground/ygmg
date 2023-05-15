@@ -2,6 +2,7 @@ import 'package:app/utils/polygonmap.dart';
 import 'package:app/utils/area.dart';
 import 'package:app/widgets/profile_img.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class InGame extends StatefulWidget {
   const InGame({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class InGameState extends State<InGame> {
 
   bool isWalking = false;
   bool drawGround = false;
+  String currentTime = '';
 
   void executeCalculate() {
     drawPolygonStateKey.currentState?.calculate();
@@ -30,6 +32,7 @@ class InGameState extends State<InGame> {
               key: drawPolygonStateKey,
               isWalking: isWalking,
               drawGround: drawGround,
+              currentTime: currentTime
           ),
         ),
         Positioned(
