@@ -23,8 +23,9 @@ public class AreaUtil {
     GeometryFactory factory = new GeometryFactory();
     private final AreaRepository areaRepository;
 
+    GameRankingService rankingService;
+    GameService gameService;
 
-    @Transactional
     public boolean defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
@@ -49,6 +50,8 @@ public class AreaUtil {
         if(winPolygon.intersects(defeatPolygon)) {
 
             Geometry difference = defeatPolygon.difference(winPolygon);
+            long gameId = gameService.getGameId();
+            rankingService.subAreaSize(String.valueOf(gameId), String.valueOf(memberId), difference.getArea());
 
             if(difference instanceof MultiPolygon){
                 MultiPolygon multiPolygon = (MultiPolygon) difference;
@@ -58,7 +61,13 @@ public class AreaUtil {
 
                     List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
 
-                    Area newArea = new Area();
+                    Area newArea = Area.builder()
+                            .areaCoordinateList(newAreaCoordinateList)
+                            .areaDate(LocalDateTime.now())
+                            .areaSize(polygon.getArea())
+                            .memberId(memberId)
+                            .game(area.getGame())
+                            .build();
 
                     for (Coordinate coordinate : polygon.getCoordinates()) {
                         newAreaCoordinateList.add(AreaCoordinate.builder()
@@ -68,15 +77,6 @@ public class AreaUtil {
                                 .areaCoordinateTime(LocalDateTime.now())
                                 .build());
                     }
-
-                    newArea = Area.builder()
-                            .areaDate(LocalDateTime.now())
-                            .areaSize(polygon.getArea())
-                            .areaCoordinateList(newAreaCoordinateList)
-                            .memberId(memberId)
-                            .game(area.getGame())
-                            .build();
-
 
                     areaRepository.save(newArea);
                 }

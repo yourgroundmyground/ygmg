@@ -15,8 +15,8 @@ public class GameRankingServiceImpl implements GameRankingService {
     }
 
     @Override
-    public void updateAreaSize(String gameId, String memberId, double areaSize) {
-        rankingRepository.updateAreaSize(gameId, memberId, areaSize);
+    public void addAreaSize(String gameId, String memberId, double areaSize) {
+        rankingRepository.addAreaSize(gameId, memberId, areaSize);
     }
 
     @Override
@@ -32,5 +32,10 @@ public class GameRankingServiceImpl implements GameRankingService {
     @Override
     public int getRank(String gameId, String memberId) {
         return rankingRepository.getRank(gameId, memberId);
+    }
+
+    @Override
+    public void subAreaSize(String gameId, String memberId, double areaSize) {
+        rankingRepository.subAreaSize(gameId, memberId, areaSize);
     }
 }

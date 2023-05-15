@@ -3,6 +3,7 @@ package com.ygmg.game.api.controller;
 import com.ygmg.game.api.request.AreaModifyPutReq;
 import com.ygmg.game.api.request.AreaRegisterPostReq;
 import com.ygmg.game.api.response.AreaRes;
+import com.ygmg.game.api.service.GameAreaCoordinateService;
 import com.ygmg.game.api.service.GameAreaService;
 import com.ygmg.game.db.model.Area;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,8 +24,11 @@ public class GameAreaController {
     private final ConcurrentLinkedQueue<SseEmitter> emitters = new ConcurrentLinkedQueue<>();
 
     private final GameAreaService areaService;
-    public GameAreaController(GameAreaService areaService){
+
+    private final GameAreaCoordinateService coordinateService;
+    public GameAreaController(GameAreaService areaService, GameAreaCoordinateService coordinateService){
         this.areaService = areaService;
+        this.coordinateService = coordinateService;
     }
 
     @PostMapping("/")
@@ -58,8 +61,9 @@ public class GameAreaController {
     @GetMapping("/{areaId}")
     public ResponseEntity<?> getArea(@PathVariable Long areaId) throws Exception {
         try {
-            Area area = areaService.getAreaByAreaId(areaId);
-            return ResponseEntity.status(200).body(AreaRes.of(area));
+            AreaRes area = AreaRes.of(areaService.getAreaByAreaId(areaId));
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+            return ResponseEntity.status(200).body(area);
         }catch (NoSuchElementException e){
             return ResponseEntity.badRequest().body("Area가 존재 하지 않습니다."); //Default 예외처리
         }
@@ -68,6 +72,11 @@ public class GameAreaController {
     @GetMapping("game/{gameId}")
     public ResponseEntity<List<AreaRes>> getGameArea(@PathVariable Long gameId) throws Exception {
         List<AreaRes> areas = areaService.getArea(gameId);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
+
         return ResponseEntity.status(200).body(areas);
     }
 
@@ -75,11 +84,19 @@ public class GameAreaController {
     @GetMapping("member/{memberId}")
     public ResponseEntity<List<AreaRes>> getMemberAreaAll(@PathVariable Long memberId) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberId(memberId);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
         return ResponseEntity.status(200).body(areas);
     }
     @GetMapping("member/{memberId}/{areaDate}")
     public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable Long memberId, @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate areaDate) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberIdAndAreaDate(memberId, areaDate);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
         return ResponseEntity.status(200).body(areas);
     }
 

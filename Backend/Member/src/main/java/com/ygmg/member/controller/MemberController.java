@@ -57,7 +57,7 @@ public class MemberController {
      * 4. 이미지, 닉네임 불러오기(멤버 리스트)
      */
     @GetMapping("/profiles")
-    public ResponseEntity<?> selectMembersProfile(@RequestBody List<Long> memberList){
+    public ResponseEntity<?> selectMembersProfile(@RequestParam("memberList") List<Long> memberList){
 
         List<UserNickImgRes> userNickImgRes = memberService.showMemberProfileList(memberList);
 
