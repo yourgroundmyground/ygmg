@@ -143,27 +143,25 @@ public class RunningServiceImpl implements RunningService{
     @Override
     public RunningGameRecordResponse selectGameRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate) {
         List<Running> runningList = runningRepository.findAllByMemberId(memberId);
-        RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.MIDNIGHT, 0.0, 0.0, 0.0);
+        RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.parse("00:00:00"), 0.0, 0.0, 0.0);
         for(Running running : runningList){
-            //수정 해야 함
-            if(running.getRunningDetail().getRunningMode().equals(Mode.GAME) && isDateWithinRange(running.getRunningDate(), gameStartDate, gameEndDate)){
-
-                log.warn(running.getRunningDetail().getRunningTime().toLocalTime() + "test ");
-
+            if(running.getRunningDetail().getRunningMode().equals(Mode.GAME) &&
+                    isDateWithinRange(running.getRunningDate(), gameStartDate, gameEndDate)){
+                
+                // 멤버의 지정된 기간의 게임 기록 합을 저장
                 runningGameRecordResponse.addRecord(
-                        //여기도 수정이 필요함
                         running.getRunningDetail().getRunningTime().toLocalTime(),
-
                         running.getRunningDetail().getRunningPace(),
                         running.getRunningDetail().getRunningDistance(),
                         running.getRunningDetail().getRunningKcal());
-
             }
         }
         return runningGameRecordResponse;
     }
 
     public static boolean isDateWithinRange(LocalDate targetDate, LocalDate startDate, LocalDate endDate) {
-        return targetDate.isAfter(startDate) && targetDate.isBefore(endDate);
+        return targetDate.isEqual(startDate) ||
+                targetDate.isEqual(endDate) ||
+                (targetDate.isAfter(startDate) && targetDate.isBefore(endDate));
     }
 }
