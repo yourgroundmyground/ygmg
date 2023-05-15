@@ -13,23 +13,6 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../const/state_provider_token.dart';
 
-class DrawPolygon extends StatefulWidget {
-  late bool isWalking;
-  final bool drawGround;
-
-  DrawPolygon(
-      {required this.isWalking,
-        required this.drawGround,
-        Key? key})
-      : super(key: key);
-
-  @override
-  State<DrawPolygon> createState() => DrawPolygonState();
-}
-Future<String> loadMapStyle() async {
-  return await rootBundle.loadString('assets/style/map_style.txt');
-}
-
 class DrawPolygonState extends State<DrawPolygon> {
   var _tokenInfo;
 
@@ -51,11 +34,10 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
-  List<List> _pointsSets = [];
+  // 폴리곤 저장
   Set<Polygon> _polygonSets = {};
   Location location = Location();
   StreamSubscription<LocationData>? _locationSubscription;
-  // StreamSubscription<bool>? _calculate;
   Stream<bool> drawGroundStream = StreamController<bool>().stream;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
   final _gyroscopeValues = <double>[0, 0, 0];
@@ -64,11 +46,46 @@ class DrawPolygonState extends State<DrawPolygon> {
   var area = 0.0;
   var computedArea = 0.0;
   var isCompleted = false;
+  var gameId = '';
 
-  // 영역 보내기 post 요청
+  // 프로필 이미지 가져오기
+  var memberIdString = '';
+
+  // 영역 보내기 post 요청 관련 변수
 
   // 땅따먹기 기록
-  final List<Map<String, dynamic>> _polygonList = [];
+  List<AreaCoordinateDto> areaCoordinateDtoList = [];
+  int areaId = 1;
+  String areaCoordinateTime = '';
+
+  // 좌표를 형식에 맞게 변환하는 함수
+  AreaCoordinateDto convertToAreaCoordinateDto(LatLng coordinate) {
+    return AreaCoordinateDto(
+      areaCoordinateLat: coordinate.latitude,
+      areaCoordinateLng: coordinate.longitude,
+      areaCoordinateTime: areaCoordinateTime,
+      areaId: areaId,
+    );
+  }
+
+  // 좌표 리스트를 형식에 맞게 변환하는 함수
+  List<AreaCoordinateDto> convertToAreaCoordinateDtoList(List<LatLng> coordinates) {
+    List<AreaCoordinateDto> resultList = [];
+    for (LatLng coordinate in coordinates) {
+      resultList.add(convertToAreaCoordinateDto(coordinate));
+    }
+    return resultList;
+  }
+
+  // 예시 함수 호출
+  List coordinateData() {
+    List<LatLng> coordinates = _currentPoints;
+    List<AreaCoordinateDto> areaCoordinateDtoList = convertToAreaCoordinateDtoList(coordinates);
+    return areaCoordinateDtoList;
+  }
+
+
+
 
   // 달리기 기록
   bool _isLocationServiceEnabled = false;
@@ -89,6 +106,8 @@ class DrawPolygonState extends State<DrawPolygon> {
   double runningKcal = 0.0;
   double _distance = 0.0;
   double _currentSpeed = 0.0;
+
+
 
   // 실시간 나의 위치 보여주는 프로필사진 마커
   void setCustomMarkerIcon() {
@@ -123,8 +142,10 @@ class DrawPolygonState extends State<DrawPolygon> {
         customMapStyle = value;
       });
     });
+    _loadTokenInfo();
     setupTimer();
     getLocation();
+    getPolygons();
     setCustomMarkerIcon();
     super.initState();
   }
@@ -132,32 +153,68 @@ class DrawPolygonState extends State<DrawPolygon> {
   @override
   void dispose() {
     _locationSubscription?.cancel();
-    // _calculate?.cancel();
     super.dispose();
   }
 
   //dio 요청
+
+  // 게임아이디 요청
+  void getPolygons() async {
+    var dio = Dio();
+    try {
+      print('gameId 가져오기');
+      var gameid = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/gameId');
+      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/game/${gameid}');
+      print(response.data);
+      List<int> memberIds = [];
+      response.data.forEach((entry) {
+        int memberId = int.parse(entry['memberId'].toString());
+        if (!memberIds.contains(memberId)) {
+          memberIds.add(memberId);
+        }
+      });
+      memberIdString = memberIds.join(',');
+      var profileresponse = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/profiles?memberList=${memberIdString}');
+      print(profileresponse);
+      setState(() {
+        addPolygon(response.data, profileresponse);
+      });
+    } catch (e) {
+      print('왜이럼');
+      print(e.toString());
+    }
+  }
+
+  // post 요청
   void sendGameData(
-      List<Map<String, dynamic>> runninglocationList,
-      String runningStart,
-      String runningEnd,
-      double runningPace,
+      String memberId,
       double runningDist,
+      String runningEnd,
+      double runningKcal,
+      double runningPace,
+      String runningStart,
       String runningDuration,
-      double runningKcal) async {
+      String gameId,
+      String areaDate,
+      double areaSize,
+      List<Map<String, dynamic>> coordinateData())
+       async {
     try {
       var dio = Dio();
       print('백에 보낸당!');
       var response = await dio.post('http://k8c107.p.ssafy.io:8082/api/game/coordinate/',
           data: {
-            "coordinateList": runninglocationList,
-            "memberId": 6,   // *회원 아이디 넣기
+            "memberId": _tokenInfo.memberId,   // *회원 아이디 넣기
             'runningDistance': runningDist,
             "runningEnd": DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
             'runningKcal': runningKcal,
             'runningPace': runningPace,
             'runningStart': runningStart,
             'runningTime': runningDuration,
+            "gameId" : gameId,
+            "areaDate" : DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+            // "areaSize" : 333.3333,
+            "areaCoordinateDtoList" : coordinateData()
           },
           options: Options(
             headers: {
@@ -165,44 +222,101 @@ class DrawPolygonState extends State<DrawPolygon> {
             },
           ));
       print(response.data);
-      // dio 통신이 성공하면 SharedPreferences에서 데이터 제거
-      SharedPreferences gameResult = await SharedPreferences.getInstance();
-      await gameResult.clear();
     } catch (e) {
       print(e.toString());
     }
   }
 
-  // 영역 정보 가져오기 get 요청
+  // 받아온 폴리곤 추가
 
-  void getPolygons() async {
-    var dio = Dio();
-    try {
-      print('영역들 정보 가져오기');
-      var response = await dio.get('............');
-      print(response.data);
-      setState(() {
+  void addPolygon(polygonData, memberData) {
+    final mediaWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final mediaHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    for (var data in polygonData) {
+      List<LatLng> points = [];
 
-      });
-    } catch (e) {
-      print(e.toString());
+      for (var coordinate in data['coordinateList']) {
+        double lat = coordinate['areaCoordinateLat'];
+        double lng = coordinate['areaCoordinateLng'];
+        points.add(LatLng(lat, lng));
+      }
+
+      Polygon polygon = Polygon(
+        polygonId: PolygonId(data['areaId'].toString()),
+        points: points,
+        fillColor: Colors.red.withOpacity(0.5),
+        strokeWidth: 2,
+        strokeColor: Colors.red,
+      );
+
+      _polygonSets.add(polygon);
+
+      String getProfileUrl(int memberId) {
+        final member = data.firstWhere((member) => member['memberId'] == memberId, orElse: () => null);
+        if (member != null) {
+          return member['profileUrl'];
+        }
+        return ''; // memberId에 해당하는 객체를 찾을 수 없는 경우 null을 반환
+      }
+      String getNickname(int memberId) {
+        final member = data.firstWhere((member) => member['memberId'] == memberId, orElse: () => null);
+        if (member != null) {
+          return member['memberNickname'];
+        }
+        return ''; // memberId에 해당하는 객체를 찾을 수 없는 경우 null을 반환
+      }
+      _markers.add(
+          Marker(
+            markerId: MarkerId(data['areaId'].toString()),
+            position: findPolygonCenter(points),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return SizedBox(
+                    height: mediaHeight * 0.2,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: mediaWidth * 0.1),
+                        Container(
+                            width: mediaWidth * 0.2,
+                            height: mediaWidth * 0.2,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: ClipOval(
+                              child: Image.network(
+                                "${getProfileUrl(data['memberId'])}",
+                                // *사용자 프로필 이미지
+                                height: mediaWidth * 0.2,
+                                width: mediaWidth * 0.2,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                        ),
+                        Text("${getNickname(data['memberId'])}", style: TextStyle(
+                            fontSize: mediaWidth * 0.04)),
+                        SizedBox(width: mediaWidth * 0.1),
+                        Text("${data['areaDate']}", style: TextStyle(
+                            fontSize: mediaWidth * 0.04)),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+
+        )
+      );
     }
-  }
-
-  // 멤버아이디로 사진 조회 get 요청
-
-  void getMarker() async {
-    var dio = Dio();
-    try {
-      print('이미지 가져오기');
-      var response = await dio.get('............');
-      print(response.data);
-      setState(() {
-        // _markers.add()
-      });
-    } catch (e) {
-      print(e.toString());
-    }
+    return polygonData;
   }
 
   // 위치 가져오기
@@ -337,13 +451,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       ),
     );
   }
-  // void setupSubscription(bool drawGround) {
-  //   _calculate = drawGroundStream.listen((drawGround) {
-  //     if (drawGround) {
-  //       calculate();
-  //     }
-  //   });
-  // }
+
 
   // 폴리곤의 자기교차 여부 판단
   bool isNotSimplePolygon(List<LatLng> polygon){
@@ -420,6 +528,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 폴리곤 면적 계산
   void calculate() {
+    print(_currentPoints);
     if (isCompleted) {
       print('면적만들기 실행');
       LatLng center = findPolygonCenter(_points);
@@ -522,6 +631,19 @@ class DrawPolygonState extends State<DrawPolygon> {
             print(_polygonSets.length);
             print('last polygon, first point - latitude: ${lastLatLng
                 .latitude}, longitude: ${lastLatLng.longitude}');
+            sendGameData(
+                _tokenInfo.memberId,
+                runningDist,
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                runningKcal,
+                runningPace,
+                runningStart,
+                runningDuration,
+                gameId,
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                area,
+                coordinateData()
+            );
             isCompleted = true;
           }
         }
@@ -542,6 +664,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       _currentPoints = [];
       _currentPolylines = {};
     });
+
   }
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -568,11 +691,6 @@ class DrawPolygonState extends State<DrawPolygon> {
       };
     });
   }
-  // void _addPolygonToMap(Polygon polygon) {
-  //   setState(() {
-  //     _polygonSets.add(polygon);
-  //   });
-  // }
   double _distanceBetweenFirstAndLastPoint() {
     if (_points.length < 2) {
       return double.infinity;
@@ -584,23 +702,6 @@ class DrawPolygonState extends State<DrawPolygon> {
     final lastPoint = Point(last.latitude, last.longitude);
     return SphericalUtils.computeDistanceBetween(firstPoint, lastPoint);
   }
-
-  // // Polygon 클리핑 함수
-  // List<LatLng> clipPolygon(List<LatLng> polygon1, List<LatLng> polygon2) {
-  //   List<LatLng> result = [];
-  //   // polygon1의 좌표를 모두 추가
-  //   for (int i = 0; i < polygon1.length; i++) {
-  //     result.add(polygon1[i]);
-  //   }
-  //   // polygon1과 polygon2를 클리핑하여 중복된 좌표를 제거
-  //   for (int i = 0; i < polygon2.length; i++) {
-  //     if (isPointInsidePolygon(polygon1, polygon2[i])) {
-  //       result.add(polygon2[i]);
-  //     }
-  //   }
-  //   // 결과 polygon 반환
-  //   return result;
-  // }
 
   // Point가 Polygon 내부에 있는지 검사하는 함수
   bool isPointInsidePolygon(List<LatLng> polygon, LatLng point) {
@@ -692,11 +793,11 @@ class DrawPolygonState extends State<DrawPolygon> {
         runningPace = _currentSpeed;
         runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
         // 위치 좌표 리스트에 추가
-        _polygonList.add({
-          'coordinateTime': locationData.time!,
-          'lat': locationData.latitude!,
-          'lng': locationData.longitude!
-        });
+        // _polygonList.add({
+        //   'coordinateTime': locationData.time!,
+        //   'lat': locationData.latitude!,
+        //   'lng': locationData.longitude!
+        // });
       } else {
         runningPace = 0.0;
       }
@@ -770,5 +871,44 @@ class DrawPolygonState extends State<DrawPolygon> {
         child: Icon(Icons.play_arrow),
       ),
     );
+  }
+}
+class DrawPolygon extends StatefulWidget {
+  late bool isWalking;
+  final bool drawGround;
+
+  DrawPolygon(
+      {required this.isWalking,
+        required this.drawGround,
+        Key? key})
+      : super(key: key);
+
+  @override
+  State<DrawPolygon> createState() => DrawPolygonState();
+}
+
+Future<String> loadMapStyle() async {
+  return await rootBundle.loadString('assets/style/map_style.txt');
+}
+class AreaCoordinateDto {
+  double areaCoordinateLat;
+  double areaCoordinateLng;
+  String areaCoordinateTime;
+  int areaId;
+
+  AreaCoordinateDto({
+    required this.areaCoordinateLat,
+    required this.areaCoordinateLng,
+    required this.areaCoordinateTime,
+    required this.areaId,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'areaCoordinateLat': areaCoordinateLat,
+      'areaCoordinateLng': areaCoordinateLng,
+      'areaCoordinateTime': areaCoordinateTime,
+      'areaId': areaId,
+    };
   }
 }
