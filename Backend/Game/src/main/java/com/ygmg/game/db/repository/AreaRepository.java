@@ -28,8 +28,8 @@ public interface AreaRepository extends JpaRepository<Area, Long> {
 //    @Query(value = "UPDATE Area set areaSize = :modifySize WHERE  = :id")
 //    void updateAreaSize(@Param("id") int id, @Param("modifySize") double modifySize);
 
-//    @Query("SELECT a FROM Area a WHERE a.memberId = :memberId AND a.areaDate >= :startDate AND a.areaDate < :endDate")
-//    List<Area> findByMemberIdAndAreaDate(@Param("memberId") Long memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT a FROM Area a WHERE a.memberId = :memberId AND a.areaDate >= :startDate AND a.areaDate < :endDate")
+    List<Area> findByMemberIdAndAreaDate(@Param("memberId") Long memberId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT a FROM Area a WHERE a.memberId = :memberId AND a.game.id = :gameId")
     List<Area> findByMemberIdAndGameId(Long memberId, Long gameId);

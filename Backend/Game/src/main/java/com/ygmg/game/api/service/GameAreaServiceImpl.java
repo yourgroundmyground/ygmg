@@ -93,18 +93,18 @@ public class GameAreaServiceImpl implements GameAreaService {
     }
 
 
-//    @Override
-//    public List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate) {
-//        LocalDateTime startDate = areaDate.atStartOfDay();
-//        LocalDateTime endDate = areaDate.plusDays(1).atStartOfDay();
-//
-//        List<Area> areas = areaRepository.findByMemberIdAndAreaDate(memberId, startDate, endDate);
-//        List<AreaRes> areaResList = new ArrayList<>();
-//
-//        for(Area area : areas){
-//            AreaRes res = AreaRes.of(area);
-//            areaResList.add(res);
-//        }
-//        return areaResList;
-//    }
+    @Override
+    public List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate) {
+        LocalDateTime startDate = areaDate.atStartOfDay();
+        LocalDateTime endDate = areaDate.plusDays(1).atStartOfDay();
+
+        List<Area> areas = areaRepository.findByMemberIdAndAreaDate(memberId, startDate, endDate);
+        List<AreaRes> areaResList = new ArrayList<>();
+
+        for(Area area : areas){
+            AreaRes res = AreaRes.of(area);
+            areaResList.add(res);
+        }
+        return areaResList;
+    }
 }
