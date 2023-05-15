@@ -80,14 +80,9 @@ public class GameAreaServiceImpl implements GameAreaService {
         areaRepository.save(area);
     }
 
-
-
     @Override
-    public List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate) {
-        LocalDateTime startDate = areaDate.atStartOfDay();
-        LocalDateTime endDate = areaDate.plusDays(1).atStartOfDay();
-
-        List<Area> areas = areaRepository.findByMemberIdAndAreaDate(memberId, startDate, endDate);
+    public List<AreaRes> getAreaByMemberIdAndGameId(Long memberId, Long gameId) {
+        List<Area> areas = areaRepository.findByMemberIdAndGameId(memberId, gameId);
         List<AreaRes> areaResList = new ArrayList<>();
 
         for(Area area : areas){
@@ -96,4 +91,20 @@ public class GameAreaServiceImpl implements GameAreaService {
         }
         return areaResList;
     }
+
+
+//    @Override
+//    public List<AreaRes> getAreaByMemberIdAndAreaDate(Long memberId, LocalDate areaDate) {
+//        LocalDateTime startDate = areaDate.atStartOfDay();
+//        LocalDateTime endDate = areaDate.plusDays(1).atStartOfDay();
+//
+//        List<Area> areas = areaRepository.findByMemberIdAndAreaDate(memberId, startDate, endDate);
+//        List<AreaRes> areaResList = new ArrayList<>();
+//
+//        for(Area area : areas){
+//            AreaRes res = AreaRes.of(area);
+//            areaResList.add(res);
+//        }
+//        return areaResList;
+//    }
 }
