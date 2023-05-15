@@ -71,7 +71,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
     }
   }
 
-  // 최종랭킹 가져오기 (*500 에러)
+  // 최종랭킹 가져오기
   void getWeekRanking() async {
     var dio = Dio();
     try {
@@ -167,6 +167,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
                           child: WeeklyGameResultMap(
                             // memberId: _tokenInfo.memberId ?? '',   // *멤버아이디 수정
                             memberId: 1,
+                            gameId: gameId,
                           ),
                         )),
                         Positioned(
