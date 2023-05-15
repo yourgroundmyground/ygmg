@@ -1,20 +1,21 @@
 package com.ygmg.running.controller;
 
 
-import com.ygmg.running.dto.RunningCoordinateResponse;
-import com.ygmg.running.dto.RunningListResponse;
-import com.ygmg.running.dto.RunningRequest;
-import com.ygmg.running.dto.RunningResponse;
+import com.ygmg.running.dto.*;
 import com.ygmg.running.entity.Mode;
 import com.ygmg.running.service.RunningService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -70,5 +71,22 @@ public class RunningController {
         RunningListResponse runningListResponse = runningService.selectRunningList(memberId);
 
         return new ResponseEntity<RunningListResponse>(runningListResponse, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/detail/sum")
+    @ApiOperation(value = "특정 기간 모드별 기록 합 조회", notes = "특정 기간 모드별 달린 기록 합을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "조회 성공", response = RunningGameRecordResponse.class)
+    })
+    public ResponseEntity<?> findSumRunningRecord(
+            @RequestParam Long memberId,
+            @RequestParam String mode,
+            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate
+    ){
+        RunningGameRecordResponse runningGameRecordResponse = runningService.selectSumRunningDetail(memberId, mode, startDate, endDate);
+
+        return new ResponseEntity<RunningGameRecordResponse>(runningGameRecordResponse, HttpStatus.OK);
     }
 }

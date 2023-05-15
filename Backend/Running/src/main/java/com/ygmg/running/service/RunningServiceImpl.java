@@ -1,9 +1,6 @@
 package com.ygmg.running.service;
 
-import com.ygmg.running.dto.RunningCoordinateResponse;
-import com.ygmg.running.dto.RunningListResponse;
-import com.ygmg.running.dto.RunningRequest;
-import com.ygmg.running.dto.RunningResponse;
+import com.ygmg.running.dto.*;
 import com.ygmg.running.entity.Mode;
 import com.ygmg.running.entity.Running;
 import com.ygmg.running.entity.RunningCoordinate;
@@ -18,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,5 +138,33 @@ public class RunningServiceImpl implements RunningService{
 
 
         return runningCoordinateResponse;
+    }
+
+    @Override
+    public RunningGameRecordResponse selectSumRunningDetail(Long memberId, String mode, LocalDate startDate, LocalDate endDate) {
+        List<Running> runningList = runningRepository.findByMemberIdAndAndRunningDetail_RunningMode(memberId,Mode.valueOf(mode));
+        RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.parse("00:00:00"), 0.0, 0.0, 0.0);
+        int count = 0;
+        for(Running running : runningList){
+            if(isDateWithinRange(running.getRunningDate(), startDate, endDate)){
+
+                // 멤버의 지정된 기간의 모드별 기록 합을 저장
+                runningGameRecordResponse.addRecord(
+                        running.getRunningDetail().getRunningTime().toLocalTime(),
+                        running.getRunningDetail().getRunningPace(),
+                        running.getRunningDetail().getRunningDistance(),
+                        running.getRunningDetail().getRunningKcal());
+                count+=1;
+            }
+        }
+        Double avgSpeed = runningGameRecordResponse.getSpeed() / count;
+        runningGameRecordResponse.setSpeed(avgSpeed);
+        return runningGameRecordResponse;
+    }
+
+    public static boolean isDateWithinRange(LocalDate targetDate, LocalDate startDate, LocalDate endDate) {
+        return targetDate.isEqual(startDate) ||
+                targetDate.isEqual(endDate) ||
+                (targetDate.isAfter(startDate) && targetDate.isBefore(endDate));
     }
 }

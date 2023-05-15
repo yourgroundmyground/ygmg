@@ -23,8 +23,8 @@ public class AreaUtil {
     GeometryFactory factory = new GeometryFactory();
     private final AreaRepository areaRepository;
 
-    GameRankingService rankingService;
-    GameService gameService;
+    private final GameRankingService rankingService;
+    private final GameService gameService;
 
     public boolean defeatCoordinates(Area area, List<AreaCoordinateRegisterPostReq.AreaCoordinateDto> areaCoordinateDtoList){
 

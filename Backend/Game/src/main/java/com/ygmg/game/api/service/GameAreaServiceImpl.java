@@ -80,6 +80,17 @@ public class GameAreaServiceImpl implements GameAreaService {
         areaRepository.save(area);
     }
 
+    @Override
+    public List<AreaRes> getAreaByMemberIdAndGameId(Long memberId, Long gameId) {
+        List<Area> areas = areaRepository.findByMemberIdAndGameId(memberId, gameId);
+        List<AreaRes> areaResList = new ArrayList<>();
+
+        for(Area area : areas){
+            AreaRes res = AreaRes.of(area);
+            areaResList.add(res);
+        }
+        return areaResList;
+    }
 
 
     @Override

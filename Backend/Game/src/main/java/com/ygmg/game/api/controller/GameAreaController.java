@@ -90,9 +90,19 @@ public class GameAreaController {
         }
         return ResponseEntity.status(200).body(areas);
     }
-    @GetMapping("member/{memberId}/{areaDate}")
+    @GetMapping("day/{memberId}/{areaDate}")
     public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable Long memberId, @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate areaDate) throws Exception {
         List<AreaRes> areas = areaService.getAreaByMemberIdAndAreaDate(memberId, areaDate);
+        for (AreaRes area : areas) {
+            Long areaId = area.getAreaId();
+            area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
+        }
+        return ResponseEntity.status(200).body(areas);
+    }
+
+    @GetMapping("member/{memberId}/{gameId}")
+    public ResponseEntity<List<AreaRes>> getMemberArea(@PathVariable Long memberId, @PathVariable Long gameId) throws Exception {
+        List<AreaRes> areas = areaService.getAreaByMemberIdAndGameId(memberId, gameId);
         for (AreaRes area : areas) {
             Long areaId = area.getAreaId();
             area.setCoordinateList(coordinateService.getCoordinateByAreaId(areaId));
