@@ -4,7 +4,7 @@ class Userprofile extends StatelessWidget {
   final ImageProvider imageProvider;
   final String text1;
   final String text2;
-  final String? text3;
+  final String text3;
   final double height;
   final double width;
   final TextStyle? textStyle;
@@ -13,7 +13,7 @@ class Userprofile extends StatelessWidget {
     required this.imageProvider,
     required this.text1,
     required this.text2,
-    this.text3,
+    required this.text3,
     required this.height,
     required this.width,
     this.textStyle,
@@ -33,10 +33,16 @@ class Userprofile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image(image: imageProvider),
+          SizedBox(
+              width: 40,
+              height: 40,
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image(image: imageProvider,
+                  fit: BoxFit.cover))),
           Text(text1,style: textStyle),
-          Text(text2,style: textStyle),
-          Text(text3 ?? '',style: textStyle)
+          Text(text2, style: textStyle),
+          Text(text3,style: textStyle)
 
         ],
       ),
