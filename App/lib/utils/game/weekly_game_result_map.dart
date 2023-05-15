@@ -8,9 +8,11 @@ import '../../const/colors.dart';
 
 class WeeklyGameResultMap extends StatefulWidget {
   final int memberId;
+  final int gameId;
 
   const WeeklyGameResultMap({
     required this.memberId,
+    required this.gameId,
     Key? key}) : super(key: key);
 
   @override
@@ -62,13 +64,13 @@ class _WeeklyGameResultMapState extends State<WeeklyGameResultMap> {
     return result;
   }
 
-  // 주별 폴리곤 좌표리스트 조회 요청(*수정 필요)
+  // 주별 폴리곤 좌표리스트 조회 요청
   void getPolygonPoints() async {
     var dio = Dio();
     try {
       print('백에서 주별폴리곤 좌표리스트 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/${widget.memberId}');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1/2023-05-13');     // *요청 API 주소 넣기
+      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/${widget.memberId}/${widget.gameId}');
+      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1/1');     // *요청 API 주소 넣기
       print(response.data);
 
       // 받은 좌표 리스트로 폴리곤의 위치 좌표 구하기
