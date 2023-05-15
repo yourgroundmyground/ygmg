@@ -1,6 +1,9 @@
 import 'package:app/const/colors.dart';
 import 'package:app/widgets/modal.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../const/state_provider_token.dart';
+import '../../utils/game/weekly_game_result_map.dart';
 
 class WeeklyGame extends StatefulWidget {
   const WeeklyGame({Key? key}) : super(key: key);
@@ -10,20 +13,102 @@ class WeeklyGame extends StatefulWidget {
 }
 
 class _WeeklyGameState extends State<WeeklyGame> {
+  var _tokenInfo;
+  var profileImg;
+  var gameId;
+  bool isModalOpen = true;
+  int? weekRanking;
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
+
+  // 마이페이지 회원정보 조회 요청
+  void getGameOverMember() async {
+    var dio = Dio();
+    try {
+      print('백에서 마이페이지 회원정보 가져오기!');
+      print(_tokenInfo.accessToken);
+      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
+      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
+      print(response.data);
+      // 데이터 형식
+      // {
+      //   "kakaoEmail": "suasdfa1@naver.com",
+      //   "memberBirth": "0512",
+      //   "memberName": "adf",
+      //   "memberNickname": "asdf",
+      //   "memberWeight": 23,
+      //   "profileImg": "https://asdfasdf.jpg"
+      // }
+      setState(() {
+        profileImg = response.data['profileImg'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 저번 게임 아이디 가져오기
+  void getGameId() async {
+    var dio = Dio();
+    try {
+      print('백에서 게임아이디 가져오기!');
+      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/gameId');
+      print('게임 아이디 ${response.data}');
+      // 데이터 형식
+      // 1
+      setState(() {
+        gameId = response.data;
+        getWeekRanking();   // 게임아이디 받은 후에 최종랭킹 가져오기
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 최종랭킹 가져오기 (*500 에러)
+  void getWeekRanking() async {
+    var dio = Dio();
+    try {
+      print('백에서 최종랭킹 가져오기!');
+      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/result/$gameId/${_tokenInfo.memberId}');
+      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/result/1/1');   // *테스트용
+      print('최종 랭킹 ${response.data}');
+      // 데이터 형식
+      // 1
+      setState(() {
+        weekRanking = response.data;
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   void initState() {
+    _loadTokenInfo().then((value) => {
+      getGameOverMember(),
+      getGameId(),
+    });
     super.initState();
-    // 2초 후에 showModal 함수 호출
     Future.delayed(Duration(seconds: 2), showModal);
   }
 
   void showModal() {
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return CustomModal(modalType: 'gameRank',);
-    //   },
-    // );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomModal(modalType: 'gameRank', weeklyRank: 1);
+      },
+    );
+    setState(() {
+      isModalOpen = false;
+    });
   }
 
   @override
@@ -32,8 +117,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // 최종 랭킹 값
-    var rankingResult = 103;
+
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -62,7 +146,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
                               fontSize: mediaWidth*0.05,
                               fontWeight: FontWeight.w600
                           ),),
-                          Text('$rankingResult 위', style: TextStyle(
+                          Text(weekRanking == null || isModalOpen == true ? '' : '$weekRanking 위', style: TextStyle(
                               fontSize: mediaWidth*0.05,
                               fontWeight: FontWeight.w600,
                               color: YGMG_RED
@@ -72,11 +156,18 @@ class _WeeklyGameState extends State<WeeklyGame> {
                     ),
                     Stack(
                       children: [
-                        DailyMap(),
+                        SizedBox(
+                          width: double.infinity,
+                          height: mediaHeight*0.55,
+                        ),
                         Positioned(child: Container(
                           width: double.infinity,
                           height: mediaHeight*0.35,
-                          color: Colors.blue,         // *나중에 지도 맵 넣기
+                          color: Colors.blue,
+                          child: WeeklyGameResultMap(
+                            // memberId: _tokenInfo.memberId ?? '',   // *멤버아이디 수정
+                            memberId: 1,
+                          ),
                         )),
                         Positioned(
                             top: mediaHeight*0.01,
@@ -105,7 +196,13 @@ class _WeeklyGameState extends State<WeeklyGame> {
                             top: mediaHeight*0.3,
                             left:  mediaWidth*0.1,
                             right:  mediaWidth*0.1,
-                            child:DailyGameResult()
+                            child:DailyGameResult(
+                              areaSize: 123,          // *변경 필요
+                              runningPace: 3.4,
+                              runningDist: 15,
+                              runningDuration: '6:00:00',
+                              profileImg: profileImg,
+                            )
                         )
                       ],
                     )
@@ -118,26 +215,20 @@ class _WeeklyGameState extends State<WeeklyGame> {
   }
 }
 
-
-
-class DailyMap extends StatelessWidget {
-  const DailyMap({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // 미디어 사이즈
-    final mediaHeight = MediaQuery.of(context).size.height;
-    return Container(
-      child: Container(
-        width: double.infinity,
-        height: mediaHeight*0.55,
-      ),
-    );
-  }
-}
-
 class DailyGameResult extends StatelessWidget {
-  const DailyGameResult({Key? key}) : super(key: key);
+  final double areaSize;
+  final double runningPace;
+  final double runningDist;
+  final String runningDuration;
+  final String? profileImg;
+
+  const DailyGameResult({
+    required this.areaSize,
+    required this.runningPace,
+    required this.runningDist,
+    required this.runningDuration,
+    required this.profileImg,
+    Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -145,12 +236,7 @@ class DailyGameResult extends StatelessWidget {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // *게임결과 먹은 내 땅 면적
-    var myGround = 1.44;
-    // *게임결과 내 평균 속도
-    var myPace = '4\'99\'\'';
-    // *게임결과 달린 거리
-    var myDist = 4.8;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(mediaWidth*0.05),
@@ -180,12 +266,30 @@ class DailyGameResult extends StatelessWidget {
                 )
               ]
             ),
-            child: Image.asset('assets/images/testProfile.png'),      // *프로필 사진 넣어주기
+            child: Stack(
+              children: [
+                Positioned(
+                  top: (mediaWidth * 0.16 - mediaWidth * 0.13) / 2,
+                  left: (mediaWidth * 0.16 - mediaWidth * 0.13) / 2,
+                  child: Container(
+                    width: mediaWidth * 0.13,
+                    height: mediaWidth * 0.13,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(profileImg ?? ''),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),      // *프로필 사진 넣어주기
           ),
           SizedBox(
             height: mediaHeight*0.02
           ),
-          Text('58:25', style: TextStyle(
+          Text(runningDuration, style: TextStyle(
             fontSize: mediaWidth*0.12,
             fontWeight: FontWeight.w900
           )),
@@ -193,11 +297,11 @@ class DailyGameResult extends StatelessWidget {
             height: mediaHeight*0.02
           ),
           Container(
-            width: mediaWidth*0.6,
+            width: mediaWidth*0.7,
             height: mediaHeight*0.05,
             alignment: Alignment.center,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -207,7 +311,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${myGround}km²', style: TextStyle(       // *크기 변수설정
+                    Text('${areaSize.toStringAsFixed(0)}m²', style: TextStyle(       // *크기 변수설정
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
@@ -225,7 +329,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text(myPace, style: TextStyle(              // *평균 속도 변경하기
+                    Text('${runningPace.floor()}\'${(runningPace.remainder(1) * 10).floor()}\'\'', style: TextStyle(              // *평균 속도 변경하기
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
@@ -243,7 +347,7 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${myDist}km', style: TextStyle(
+                    Text('${runningDist.toStringAsFixed(1)}km', style: TextStyle(
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
