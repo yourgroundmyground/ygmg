@@ -73,11 +73,10 @@ public class RunningController {
         return new ResponseEntity<RunningListResponse>(runningListResponse, HttpStatus.OK);
     }
 
-    // yyyy-MM-dd
-    @GetMapping("/detail/{memberId}/{gameStartDate}/{gameEndDate}")
-    @ApiOperation(value = "특정 기간 게임 런닝기록 조회", notes = "특정 기간 게임에서 달린 기록을 조회합니다.")
+    @GetMapping("/sum/game/{memberId}/{gameStartDate}/{gameEndDate}")
+    @ApiOperation(value = "특정 기간 게임 런닝기록 합 조회", notes = "특정 기간 게임에서 달린 기록 합을 조회합니다.")
     @ApiResponses({
-//            @ApiResponse(code = 200, message = "조회 성공", response = RunningListResponse.class)
+            @ApiResponse(code = 200, message = "조회 성공", response = RunningGameRecordResponse.class)
     })
     public ResponseEntity<?> findGameRunningRecord(
             @PathVariable Long memberId,
@@ -85,6 +84,21 @@ public class RunningController {
             @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate gameEndDate
     ){
         RunningGameRecordResponse runningGameRecordResponse = runningService.selectGameRunningDetail(memberId, gameStartDate, gameEndDate);
+
+        return new ResponseEntity<RunningGameRecordResponse>(runningGameRecordResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/sum/{memberId}/{gameStartDate}/{gameEndDate}")
+    @ApiOperation(value = "특정 기간 런닝기록 합 조회", notes = "특정 기간 런닝에서 달린 기록 합을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "조회 성공", response = RunningGameRecordResponse.class)
+    })
+    public ResponseEntity<?> findSumRunningRecord(
+            @PathVariable Long memberId,
+            @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate gameStartDate,
+            @PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate gameEndDate
+    ){
+        RunningGameRecordResponse runningGameRecordResponse = runningService.selectSumRunningDetail(memberId, gameStartDate, gameEndDate);
 
         return new ResponseEntity<RunningGameRecordResponse>(runningGameRecordResponse, HttpStatus.OK);
     }
