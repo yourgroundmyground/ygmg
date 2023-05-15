@@ -1,4 +1,5 @@
 import 'package:app/const/state_provider_interceptor.dart';
+import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/const/state_provider_token.dart';
 import 'package:app/screens/login/loading.dart';
 import 'package:app/widgets/bottomnavbar.dart';
@@ -43,9 +44,12 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: [
-        //불러온 토큰 정보 설정
+        //유저 정보 상태관리를 위한 프로바이더 설정
         userInfoProvider.overrideWithProvider(StateNotifierProvider<UserInfoNotifier, TokenInfo>(
-                (ref) => UserInfoNotifier()..setUserInfo(tokenInfo)))
+                (ref) => UserInfoNotifier()..setUserInfo(tokenInfo))),
+        //랭킹 정보 상태관리를 위한 프로바이더 설정
+        rankingInfoProvider.overrideWithProvider(StateNotifierProvider<RankingInfoNotifier, List<RankingInfo>>(
+                (ref) => RankingInfoNotifier(ref))),
       ],
       child: MyApp(),
     )
