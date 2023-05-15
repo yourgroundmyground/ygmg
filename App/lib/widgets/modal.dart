@@ -1,26 +1,31 @@
+import 'dart:math';
 import 'package:app/const/colors.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class CustomModal extends StatelessWidget {
   final String modalType;
-  final double initialGoal;
+  final double? initialGoal;
+  final int? weeklyRank;
 
   const CustomModal({
     Key? key,
     required this.modalType,
-    required this.initialGoal,
+    this.initialGoal,
+    this.weeklyRank,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _todayGoal = ValueNotifier<double>(initialGoal);
     switch (modalType) {
       case 'goal':
         return RunningGoalModal(
         );
       case 'gameRank':
-        return GameRankModal();
+        return GameRankModal(
+          weeklyRank: weeklyRank!,
+        );
       default:
         return Container();
     }     // *현재 페이지가 뭐인지에 따라서 모달이 나오도록 추후에 설정하기
@@ -37,14 +42,12 @@ class RunningGoalModal extends StatelessWidget {
     // 미디어 크기
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // 모달 최종순위
-    const finalRank = 10322;
 
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      child: Container(
+      child: SizedBox(
           width: mediaWidth*0.8,
           height: mediaHeight*0.35,
           child: Padding(
@@ -160,22 +163,86 @@ class RunningGoalModal extends StatelessWidget {
 }
 
 
-class GameRankModal extends StatelessWidget {
-  const GameRankModal({Key? key}) : super(key: key);
+class GameRankModal extends StatefulWidget {
+  final int weeklyRank;
 
+  const GameRankModal({
+    required this.weeklyRank,
+    Key? key}) : super(key: key);
+
+  @override
+  State<GameRankModal> createState() => _GameRankModalState();
+}
+
+class _GameRankModalState extends State<GameRankModal> {
+  late ConfettiController _controllerCenter;
+
+  Path drawStar(Size size) {
+    // Method to convert degree to radians
+    double degToRad(double deg) => deg * (pi / 180.0);
+
+    const numberOfPoints = 5;
+    final halfWidth = size.width / 2;
+    final externalRadius = halfWidth;
+    final internalRadius = halfWidth / 2.5;
+    final degreesPerStep = degToRad(360 / numberOfPoints);
+    final halfDegreesPerStep = degreesPerStep / 2;
+    final path = Path();
+    final fullAngle = degToRad(360);
+    path.moveTo(size.width, halfWidth);
+
+    for (double step = 0; step < fullAngle; step += degreesPerStep) {
+      path.lineTo(halfWidth + externalRadius * cos(step),
+          halfWidth + externalRadius * sin(step));
+      path.lineTo(halfWidth + internalRadius * cos(step + halfDegreesPerStep),
+          halfWidth + internalRadius * sin(step + halfDegreesPerStep));
+    }
+    path.close();
+    return path;
+  }
+
+  Path drawRectangle(Size size) {
+    final rectWidth = size.width * 0.4;
+    final rectHeight = size.height * 0.8;
+    final rectLeft = (size.width - rectWidth) / 2;
+    final rectTop = (size.height - rectHeight) / 2;
+
+    return Path()
+      ..addRect(Rect.fromLTWH(rectLeft, rectTop, rectWidth, rectHeight));
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _controllerCenter =
+        ConfettiController(duration: const Duration(seconds: 10));
+    _controllerCenter.play();
+
+    // 10초 후에 confetti 중지
+    Future.delayed(Duration(seconds: 10), () {
+      _controllerCenter.stop();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controllerCenter.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
 
     // 미디어 크기
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // 모달 최종순위
-    const finalRank = 10322;
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      child: Container(
+      child: SizedBox(
           width: mediaWidth*0.8,
           height: mediaHeight*0.25,
           child: Padding(
@@ -200,6 +267,27 @@ class GameRankModal extends StatelessWidget {
                       )
                     ]
                 ),
+                Positioned.fill(
+                  child: ConfettiWidget(
+                    confettiController: _controllerCenter,
+                    blastDirectionality: BlastDirectionality
+                        .explosive,
+                    gravity: 0.5,
+                    shouldLoop:
+                    true,
+                    colors: const [
+                      YGMG_RED,
+                      YGMG_ORANGE,
+                      YGMG_YELLOW,
+                      YGMG_BEIGE,
+                      YGMG_GREEN,
+                      YGMG_SKYBLUE,
+                      YGMG_DARKGREEN,
+                      YGMG_PURPLE
+                    ],
+                    createParticlePath: drawRectangle,
+                  ),
+                ),
                 Container(
                     padding: EdgeInsets.fromLTRB(0, mediaHeight*0.03, 0, mediaHeight*0.03),
                     child: RichText(
@@ -210,7 +298,7 @@ class GameRankModal extends StatelessWidget {
                         ),
                         children: [
                           TextSpan(
-                            text: '$finalRank ',
+                            text: '${widget.weeklyRank} ',
                             style: TextStyle(
                               fontSize: mediaWidth * 0.1,
                               color: YGMG_RED,
@@ -225,6 +313,7 @@ class GameRankModal extends StatelessWidget {
                         ],
                       ),
                     ))
+
               ],
             ),
           )
