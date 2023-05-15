@@ -12,6 +12,7 @@ spring:
       hibernate:
         format_sql: true
     generate-ddl: true
+    show-sql: true
   rabbitmq:
     host: k8c107.p.ssafy.io
     port: 5672
