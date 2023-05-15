@@ -15,9 +15,9 @@ public class RunningGameRecordResponse {
     private Double kcal;
 
     public void addRecord(LocalTime time, Double speed, Double distance, Double kcal){
-        this.time.plusHours(time.getHour());
-        this.time.plusMinutes(time.getMinute());
-        this.time.plusSeconds(time.getSecond());
+        this.time = this.time.plusHours(time.getHour());
+        this.time = this.time.plusMinutes(time.getMinute());
+        this.time = this.time.plusSeconds(time.getSecond());
         this.speed += speed;
         this.distance += distance;
         this.kcal += kcal;
