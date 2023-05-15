@@ -142,20 +142,47 @@ public class RunningServiceImpl implements RunningService{
 
     @Override
     public RunningGameRecordResponse selectGameRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate) {
-        List<Running> runningList = runningRepository.findAllByMemberId(memberId);
+        List<Running> runningList = runningRepository.findByMemberIdAndAndRunningDetail_RunningMode(memberId,Mode.GAME);
         RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.parse("00:00:00"), 0.0, 0.0, 0.0);
+        int count = 0;
         for(Running running : runningList){
-            if(running.getRunningDetail().getRunningMode().equals(Mode.GAME) &&
+            if(
+//                    running.getRunningDetail().getRunningMode().equals(Mode.GAME) &&
                     isDateWithinRange(running.getRunningDate(), gameStartDate, gameEndDate)){
-                
+
                 // 멤버의 지정된 기간의 게임 기록 합을 저장
                 runningGameRecordResponse.addRecord(
                         running.getRunningDetail().getRunningTime().toLocalTime(),
                         running.getRunningDetail().getRunningPace(),
                         running.getRunningDetail().getRunningDistance(),
                         running.getRunningDetail().getRunningKcal());
+                count+=1;
             }
         }
+        Double avgSpeed = runningGameRecordResponse.getSpeed() / count;
+        runningGameRecordResponse.setSpeed(avgSpeed);
+        return runningGameRecordResponse;
+    }
+
+    @Override
+    public RunningGameRecordResponse selectSumRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate) {
+        List<Running> runningList = runningRepository.findByMemberIdAndAndRunningDetail_RunningMode(memberId,Mode.RUNNING);
+        RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.parse("00:00:00"), 0.0, 0.0, 0.0);
+        int count = 0;
+        for(Running running : runningList){
+            if(isDateWithinRange(running.getRunningDate(), gameStartDate, gameEndDate)){
+
+                // 멤버의 지정된 기간의 게임 기록 합을 저장
+                runningGameRecordResponse.addRecord(
+                        running.getRunningDetail().getRunningTime().toLocalTime(),
+                        running.getRunningDetail().getRunningPace(),
+                        running.getRunningDetail().getRunningDistance(),
+                        running.getRunningDetail().getRunningKcal());
+                count+=1;
+            }
+        }
+        Double avgSpeed = runningGameRecordResponse.getSpeed() / count;
+        runningGameRecordResponse.setSpeed(avgSpeed);
         return runningGameRecordResponse;
     }
 
