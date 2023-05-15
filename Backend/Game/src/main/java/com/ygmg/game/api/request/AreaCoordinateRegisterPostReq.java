@@ -38,13 +38,7 @@ public class AreaCoordinateRegisterPostReq {
 
     private double areaSize;
 
-
     List<AreaCoordinateDto> areaCoordinateDtoList = new ArrayList<>();
-
-    List<Long> defeatAreaIdList = new ArrayList<>();
-
-
-
 
     @AllArgsConstructor
     @RequiredArgsConstructor

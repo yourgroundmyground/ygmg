@@ -1,9 +1,6 @@
 package com.ygmg.running.service;
 
-import com.ygmg.running.dto.RunningCoordinateResponse;
-import com.ygmg.running.dto.RunningListResponse;
-import com.ygmg.running.dto.RunningRequest;
-import com.ygmg.running.dto.RunningResponse;
+import com.ygmg.running.dto.*;
 import com.ygmg.running.entity.Mode;
 import com.ygmg.running.entity.Running;
 import com.ygmg.running.entity.RunningCoordinate;
@@ -18,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,5 +138,32 @@ public class RunningServiceImpl implements RunningService{
 
 
         return runningCoordinateResponse;
+    }
+
+    @Override
+    public RunningGameRecordResponse selectGameRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate) {
+        List<Running> runningList = runningRepository.findAllByMemberId(memberId);
+        RunningGameRecordResponse runningGameRecordResponse = new RunningGameRecordResponse(LocalTime.MIDNIGHT, 0.0, 0.0, 0.0);
+        for(Running running : runningList){
+            //수정 해야 함
+            if(running.getRunningDetail().getRunningMode().equals(Mode.GAME) && isDateWithinRange(running.getRunningDate(), gameStartDate, gameEndDate)){
+
+                log.warn(running.getRunningDetail().getRunningTime().toLocalTime() + "test ");
+
+                runningGameRecordResponse.addRecord(
+                        //여기도 수정이 필요함
+                        running.getRunningDetail().getRunningTime().toLocalTime(),
+
+                        running.getRunningDetail().getRunningPace(),
+                        running.getRunningDetail().getRunningDistance(),
+                        running.getRunningDetail().getRunningKcal());
+
+            }
+        }
+        return runningGameRecordResponse;
+    }
+
+    public static boolean isDateWithinRange(LocalDate targetDate, LocalDate startDate, LocalDate endDate) {
+        return targetDate.isAfter(startDate) && targetDate.isBefore(endDate);
     }
 }

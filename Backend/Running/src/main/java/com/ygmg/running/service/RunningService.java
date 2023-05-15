@@ -1,11 +1,10 @@
 package com.ygmg.running.service;
 
-import com.ygmg.running.dto.RunningCoordinateResponse;
-import com.ygmg.running.dto.RunningListResponse;
-import com.ygmg.running.dto.RunningRequest;
-import com.ygmg.running.dto.RunningResponse;
+import com.ygmg.running.dto.*;
 import com.ygmg.running.entity.Mode;
 import com.ygmg.running.entity.RunningCoordinate;
+
+import java.time.LocalDate;
 
 public interface RunningService {
 
@@ -18,4 +17,5 @@ public interface RunningService {
 
     RunningCoordinateResponse selectRunningCoordinate(Long runningDetailId);
 
+    RunningGameRecordResponse selectGameRunningDetail(Long memberId, LocalDate gameStartDate, LocalDate gameEndDate);
 }
