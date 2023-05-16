@@ -15,9 +15,17 @@ class InGameState extends State<InGame> {
   bool isWalking = false;
   bool drawGround = false;
   String currentTime = '';
+  String runningStartTime = '';
+
 
   void executeCalculate() {
     drawPolygonStateKey.currentState?.calculate();
+  }
+
+  void toggleWalking(bool value) {
+    setState(() {
+      isWalking = false;
+    });
   }
 
   @override
@@ -29,10 +37,12 @@ class InGameState extends State<InGame> {
       children: [
         Container(
           child: DrawPolygon(
-              key: drawPolygonStateKey,
-              isWalking: isWalking,
-              drawGround: drawGround,
-              currentTime: currentTime
+            key: drawPolygonStateKey,
+            isWalking: isWalking,
+            drawGround: drawGround,
+            currentTime: currentTime,
+            toggleWalking: toggleWalking,
+            runningStartTime: runningStartTime
           ),
         ),
         Positioned(
@@ -169,6 +179,9 @@ class InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
+                          if (!isWalking) {
+                            runningStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+                          }
                           setState(() {
                             isWalking = !isWalking;
                           });
@@ -195,10 +208,12 @@ class InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
+                          setState(() {
+                            isWalking = !isWalking;
+                          });
                           drawPolygonStateKey.currentState?.calculate();
-                          isWalking = !isWalking;
                           drawGround = !drawGround;
-                          print(drawGround);
+                          currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
                         }, child: Icon(Icons.star_border_rounded, size: 45)),
                   ),
