@@ -4,6 +4,7 @@ import com.ygmg.game.api.request.AreaModifyPutReq;
 import com.ygmg.game.api.request.AreaRegisterPostReq;
 import com.ygmg.game.api.request.RankingUpdateReq;
 import com.ygmg.game.api.response.AreaRes;
+import com.ygmg.game.api.response.RankAndAreaSizeRes;
 import com.ygmg.game.api.response.RankingRes;
 import com.ygmg.game.api.service.GameAreaService;
 import com.ygmg.game.api.service.GameRankingService;
@@ -43,12 +44,22 @@ public class GameRankingController {
     }
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<Integer> getRankingByMemberId( @PathVariable int memberId) throws Exception {
+    public ResponseEntity<RankAndAreaSizeRes> getRankingByMemberId(@PathVariable int memberId) throws Exception {
+        RankAndAreaSizeRes res = new RankAndAreaSizeRes(rank, );
         long gameId = gameService.getGameId();
         String gid = Long.toString(gameId);
         String mid = Integer.toString(memberId);
         int rank = rankingService.getRank(gid, mid);
-        return ResponseEntity.status(200).body(rank);
+        res.setRank(rank);
+        return ResponseEntity.status(200).body(res);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCount() throws Exception {
+        long gameId = gameService.getGameId();
+        String gid = Long.toString(gameId);
+        int cnt = rankingService.getCount(gid);
+        return ResponseEntity.status(200).body(cnt);
     }
 
     @PostMapping("/")
