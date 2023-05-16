@@ -1,3 +1,5 @@
+import 'package:app/const/state_provider_countrunners.dart';
+import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/widgets/countdown_clock.dart';
 import 'package:app/widgets/profile_img.dart';
@@ -8,247 +10,191 @@ class GameStart extends ConsumerWidget {
 
   GameStart({Key? key}) : super(key: key);
 
+  // Future<int> fetchHowManyRunner() async {
+  //   try {
+  //     final response = await Dio().get('http://k8c107.p.ssafy.io/api/game/ranking/count');
+  //     if (response.statusCode == 200) {
+  //       countRunners = response.data;
+  //       return countRunners;
+  //     } else {
+  //       // 요청이 성공하지 않았을 때 처리할 내용을 여기에 추가하세요.
+  //       print('러너카운트 실패');
+  //       // throw Exception('Failed to fetch ranking count');
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
 
     final rankingInfoAsyncValue = ref.watch(rankingInfoFutureProvider);
+    final myRankingInfoAsyncValue = ref.watch(myRankingInfoFutureProvider);
+    final runnerCount = ref.watch(runnerCountProvider);
 
     return rankingInfoAsyncValue.when(
       data: (rankingInfoList) {
-        return Scaffold(
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage('assets/images/gamemap.png'),
-                )
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                    flex: 1,
-                    fit: FlexFit.tight,
-                    child: CountDownClock()),
-                Flexible(
-                    flex: 5,
-                    child: Container(
-                      color: Colors.white.withOpacity(0.8),
-                      width: mediaWidth*0.8,
-                      height: mediaHeight*0.6,
-                      child: Column(
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              child: Text(
-                                  '총 ${794}명의 러너가 달리고 있어요!',
-                                  style: TextStyle(fontSize: 25)),
-                            ),
-                          ),
-                          Flexible
-                            (
-                            flex: 5,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child: Userprofile(
-                                    height: mediaHeight*0.06,
-                                    width: mediaWidth*0.7,
-                                    // imageProvider: AssetImage('assets/images/profile01.png'),
-                                    imageProvider: NetworkImage(rankingInfoList.length > 0 ? rankingInfoList[0].profileUrl : ''),
-                                    text1: rankingInfoList.length > 0 ? '1' : '',
-                                    text2: rankingInfoList.length > 0 ? rankingInfoList[0].memberNickname.toString() : '',
-                                    text3: rankingInfoList.length > 0 ? rankingInfoList[0].areaSize.toString() : '',
-                                    // text2: rankingInfoList[0].memberNickname.toString(),
-                                    // text3: rankingInfoList[0].areaSize.toString(),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Userprofile(
-                                    height: mediaHeight*0.06,
-                                    width: mediaWidth*0.7,
-                                    // imageProvider: AssetImage('assets/images/profile02.png'),
-                                    imageProvider: NetworkImage(rankingInfoList.length > 1 ? rankingInfoList[1].profileUrl : ''),
-
-                                    text1: rankingInfoList.length > 1 ? '2' : '',
-                                    text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname : '',
-                                    text3: rankingInfoList.length > 1 ? rankingInfoList[1].areaSize.toString() : '',
-
-                                    // text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname.toString() : '',
-                                    // text3: rankingList[1]?.areaSize.toString(),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Userprofile(
-                                    height: mediaHeight*0.06,
-                                    width: mediaWidth*0.7,
-                                    imageProvider: NetworkImage(rankingInfoList.length > 2 ? rankingInfoList[2].profileUrl : ''),
-                                    text1: rankingInfoList.length > 2 ? '3': '',
-                                    text2: rankingInfoList.length > 2 ? rankingInfoList[2].memberNickname : '',
-                                    text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString(): '',
-                                    // imageProvider: AssetImage('assets/images/profile03.png'),
-                                    // text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString() : '',
-
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Flexible(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                Text('현재 나의 순위'),
-                                Userprofile(
-                                    height: mediaHeight*0.06,
-                                    width: mediaWidth*0.7,
-                                    imageProvider: AssetImage('assets/images/profileme.png'),
-                                    text1: '396',
-                                    text2: '가면말티즈',
-                                    text3: '101m²'),
-                              ],
-                            ),
-                          ),
-                          Flexible(
-                            fit: FlexFit.tight,
-                            flex: 2,
-                            child: GestureDetector(
-                              onTap: (){},
-                              child: Image.asset('assets/images/Startbutton.png'),
-                            ),
-                          )
-                        ],
-                      ),
+        return myRankingInfoAsyncValue.when(
+          data: (myRankingInfoList) {
+            return Scaffold(
+              body: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage('assets/images/gamemap.png'),
                     )
-                )
-              ],
-            ),
-          ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 15),
+                    Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: CountDownClock()
+                    ),
+                    const SizedBox(height: 15),
+                    Flexible(
+                        flex: 5,
+                        child: Container(
+                          color: Colors.white.withOpacity(0.8),
+                          width: mediaWidth * 0.8,
+                          height: mediaHeight * 0.6,
+                          child: Column(
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 15),
+                                  child: Text(
+                                      '총 ${runnerCount.toString()}명의 러너가 달리고 있어요!',
+                                      style: TextStyle(fontSize: 20)),
+                                ),
+                              ),
+                              Text('실시간 순위'),
+                              Flexible
+                                (
+                                flex: 5,
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      child: Visibility(
+                                        visible: rankingInfoList.isNotEmpty,
+                                        child: Userprofile(
+                                          height: mediaHeight * 0.06,
+                                          width: mediaWidth * 0.75,
+                                          imageProvider: NetworkImage(
+                                              rankingInfoList.isNotEmpty
+                                                  ? rankingInfoList[0]
+                                                  .profileUrl
+                                                  : ''),
+                                          text1: rankingInfoList.isNotEmpty ? '1' : '',
+                                          text2: rankingInfoList.isNotEmpty ? rankingInfoList[0].memberNickname.toString() : '',
+                                          text3: rankingInfoList.isNotEmpty ? rankingInfoList[0].areaSize.toString() : '',
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0),
+                                      child: Visibility(
+                                        visible: rankingInfoList.length > 1,
+                                        child: Userprofile(
+                                          height: mediaHeight * 0.06,
+                                          width: mediaWidth * 0.75,
+                                          // imageProvider: AssetImage('assets/images/profile02.png'),
+                                          imageProvider: NetworkImage(
+                                            rankingInfoList.length > 1 ? rankingInfoList[1].profileUrl : ''),
+                                            text1: rankingInfoList.length > 1 ? '2' : '',
+                                            text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname : '',
+                                            text3: rankingInfoList.length > 1 ? rankingInfoList[1].areaSize.toString() : '',
+                                          // text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname.toString() : '',
+                                          // text3: rankingList[1]?.areaSize.toString(),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0),
+                                      child: Visibility(
+                                        visible: rankingInfoList.length > 2,
+                                        child: Userprofile(
+                                          height: mediaHeight * 0.06,
+                                          width: mediaWidth * 0.75,
+                                          imageProvider: NetworkImage(
+                                              rankingInfoList.length > 2 ? rankingInfoList[2].profileUrl : ''),
+                                          text1: rankingInfoList.length > 2 ? '3' : '',
+                                          text2: rankingInfoList.length > 2 ? rankingInfoList[2].memberNickname : '',
+                                          text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString() : '',
+                                          // imageProvider: AssetImage('assets/images/profile03.png'),
+                                          // text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString() : '',
+
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                flex: 2,
+                                child: Column(
+                                  children: [
+                                    Text('현재 나의 순위'),
+                                    Visibility(
+                                      visible: myRankingInfoList.isNotEmpty,
+                                      child: Userprofile(
+                                        imageProvider: NetworkImage(
+                                            myRankingInfoList.isNotEmpty ? myRankingInfoList[0].profileUrl : ''),
+                                        height: mediaHeight * 0.06,
+                                        width: mediaWidth * 0.75,
+                                        // imageProvider: NetworkImage(
+                                        //     myRankingInfoList[0].profileUrl),
+                                        // text1: 'dd',
+                                        // text2: 'dd',
+                                        // text3: 'dd',
+                                        text1: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].rank.toString() : '',
+                                        text2: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].memberNickname : '',
+                                        text3: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].areaSize.toString() : '',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                fit: FlexFit.tight,
+                                flex: 2,
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Image.asset(
+                                      'assets/images/Startbutton.png'),
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () => CircularProgressIndicator(),
+          error: (err, stack) => Text('Error: $err'),
         );
       },
       loading: () => CircularProgressIndicator(),
       error: (err, stack) => Text('Error: $err'),
     );
 
-    //
-    // return Scaffold(
-    //   body: Container(
-    //     width: double.infinity,
-    //     height: double.infinity,
-    //     decoration: BoxDecoration(
-    //         image: DecorationImage(
-    //           fit: BoxFit.cover,
-    //           image: AssetImage('assets/images/gamemap.png'),
-    //         )
-    //     ),
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       crossAxisAlignment: CrossAxisAlignment.center,
-    //       children: [
-    //         Flexible(
-    //             flex: 1,
-    //             fit: FlexFit.tight,
-    //             child: CountDownClock()),
-    //         Flexible(
-    //             flex: 5,
-    //             child: Container(
-    //               color: Colors.white.withOpacity(0.8),
-    //               width: mediaWidth*0.8,
-    //               height: mediaHeight*0.6,
-    //               child: Column(
-    //                 children: [
-    //                   Flexible(
-    //                     flex: 2,
-    //                     child: Padding(
-    //                       padding: const EdgeInsets.symmetric(vertical: 15),
-    //                       child: Text(
-    //                           '총 ${794}명의 러너가 달리고 있어요!',
-    //                           style: TextStyle(fontSize: 25)),
-    //                     ),
-    //                   ),
-    //                   Flexible
-    //                     (
-    //                     flex: 5,
-    //                     child: Column(
-    //                       children: [
-    //                         Padding(
-    //                           padding: const EdgeInsets.symmetric(vertical: 4),
-    //                           child: Userprofile(
-    //                             height: mediaHeight*0.06,
-    //                             width: mediaWidth*0.7,
-    //                             imageProvider: AssetImage('assets/images/profile01.png'),
-    //                             text1: '1',
-    //                             text2: '군침이싹도나',
-    //                             // text3: rankerInfoGame.isEmpty
-    //                             //     ? CircularProgressIndicator()
-    //                             //     : rankerInfoGame[0].areaSize.toString(),
-    //                           ),
-    //                         ),
-    //                         Padding(
-    //                           padding: const EdgeInsets.symmetric(vertical: 4.0),
-    //                           child: Userprofile(
-    //                             height: mediaHeight*0.06,
-    //                             width: mediaWidth*0.7,
-    //                             imageProvider: AssetImage('assets/images/profile02.png'),
-    //                             text1: '2',
-    //                             text2: '오늘도군것질',
-    //                             // text3: rankingList[1]?.areaSize.toString(),
-    //                           ),
-    //                         ),
-    //                         Padding(
-    //                           padding: const EdgeInsets.symmetric(vertical: 4.0),
-    //                           child: Userprofile(
-    //                             height: mediaHeight*0.06,
-    //                             width: mediaWidth*0.7,
-    //                             imageProvider: AssetImage('assets/images/profile03.png'),
-    //                             text1: '3',
-    //                             text2: '개발진스땅땅',//flex로 간격 똑같이맞추기
-    //                             // text3: rankingList[2]?.areaSize.toString(),
-    //                           ),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                   ),
-    //                   Flexible(
-    //                     flex: 2,
-    //                     child: Column(
-    //                       children: [
-    //                         Text('현재 나의 순위'),
-    //                         Userprofile(
-    //                             height: mediaHeight*0.06,
-    //                             width: mediaWidth*0.7,
-    //                             imageProvider: AssetImage('assets/images/profileme.png'),
-    //                             text1: '396',
-    //                             text2: '가면말티즈',
-    //                             text3: '101m²'),
-    //                       ],
-    //                     ),
-    //                   ),
-    //                   Flexible(
-    //                     fit: FlexFit.tight,
-    //                     flex: 2,
-    //                     child: GestureDetector(
-    //                       onTap: (){},
-    //                       child: Image.asset('assets/images/Startbutton.png'),
-    //                     ),
-    //                   )
-    //                 ],
-    //               ),
-    //             )
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

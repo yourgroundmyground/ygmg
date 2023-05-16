@@ -14,7 +14,8 @@ class CountDownClock extends StatelessWidget {
     // *타이머시간설정
     const defaultDuration = Duration(days: 2, hours: 2, minutes: 30);
     return Container(
-      width: double.infinity,
+      width: mediaWidth,
+      alignment: Alignment.center,
       child: Column(
         children: [
           const Padding(
@@ -28,7 +29,7 @@ class CountDownClock extends StatelessWidget {
                 width: mediaWidth*0.2,
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
@@ -55,7 +56,7 @@ class CountDownClock extends StatelessWidget {
                 width: mediaWidth*0.2,
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
@@ -63,7 +64,7 @@ class CountDownClock extends StatelessWidget {
                   ),
                   textStyle: TextStyle(
                       color: Colors.white,
-                      fontSize: mediaWidth*0.08
+                      fontSize: mediaWidth*0.08,
                   ),
                   shouldShowDays: (p0) => false,
                   shouldShowHours: (p0) => true,
@@ -82,7 +83,7 @@ class CountDownClock extends StatelessWidget {
                 width: mediaWidth*0.2,
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
@@ -109,7 +110,7 @@ class CountDownClock extends StatelessWidget {
                 width: mediaWidth*0.2,
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
