@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../const/state_provider_token.dart';
 import '../../utils/game/weekly_game_result_map.dart';
+import '../../utils/game/weeklyg_game_all_result_map.dart';
 
 class WeeklyGame extends StatefulWidget {
   const WeeklyGame({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
   var _tokenInfo;
   var profileImg;
   var gameId;
+  var resultArea;
   bool isModalOpen = true;
   int? weekRanking;
 
@@ -34,7 +36,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
       print('백에서 마이페이지 회원정보 가져오기!');
       print(_tokenInfo.accessToken);
       dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
-      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/member/mypage');
       print(response.data);
       // 데이터 형식
       // {
@@ -58,12 +60,12 @@ class _WeeklyGameState extends State<WeeklyGame> {
     var dio = Dio();
     try {
       print('백에서 게임아이디 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/gameId');
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/gameId');
       print('게임 아이디 ${response.data}');
       // 데이터 형식
       // 1
       setState(() {
-        gameId = response.data;
+        gameId = response.data - 1;
         getWeekRanking();   // 게임아이디 받은 후에 최종랭킹 가져오기
       });
     } catch (e) {
@@ -76,13 +78,14 @@ class _WeeklyGameState extends State<WeeklyGame> {
     var dio = Dio();
     try {
       print('백에서 최종랭킹 가져오기!');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/result/$gameId/${_tokenInfo.memberId}');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/result/1/1');   // *테스트용
+      // var response = await dio.get('http://k8c107.p.ssafy.io/api/game/result/$gameId/${_tokenInfo.memberId}');
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/result/1/1');   // *테스트용
       print('최종 랭킹 ${response.data}');
       // 데이터 형식
       // 1
       setState(() {
-        weekRanking = response.data;
+        weekRanking = response.data['resultRanking'];
+        resultArea = response.data['resultArea'];
       });
     } catch (e) {
       print(e.toString());
@@ -160,20 +163,33 @@ class _WeeklyGameState extends State<WeeklyGame> {
                           width: double.infinity,
                           height: mediaHeight*0.55,
                         ),
-                        Positioned(child: Container(
-                          width: double.infinity,
-                          height: mediaHeight*0.35,
-                          color: Colors.blue,
-                          child: WeeklyGameResultMap(
-                            // memberId: _tokenInfo.memberId ?? '',   // *멤버아이디 수정
-                            memberId: 1,
-                            gameId: gameId,
+                        Positioned(child: InkWell(
+                          onLongPress: () {
+                            if (gameId != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => WeeklygGameResultAllMap(
+                                  // gameId: gameId,
+                                  gameId: 1,
+                                )),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: mediaHeight * 0.35,
+                            color: Colors.blue,
+                            child: _tokenInfo.memberId != null && gameId != null ? WeeklyGameResultMap(
+                                memberId: _tokenInfo.memberId,
+                                // gameId: gameId
+                                gameId: 1,
+                              ) : CircularProgressIndicator()
                           ),
                         )),
                         Positioned(
-                            top: mediaHeight*0.01,
-                            left: (MediaQuery.of(context).size.width - mediaWidth*0.35) / 2,
-                            child: Container(
+                          top: mediaHeight*0.01,
+                          left: (MediaQuery.of(context).size.width - mediaWidth*0.35) / 2,
+                          child: Container(
                               width: mediaWidth*0.35,
                               height:  mediaHeight*0.035,
                               decoration: BoxDecoration(
@@ -197,13 +213,13 @@ class _WeeklyGameState extends State<WeeklyGame> {
                             top: mediaHeight*0.3,
                             left:  mediaWidth*0.1,
                             right:  mediaWidth*0.1,
-                            child:DailyGameResult(
-                              areaSize: 123,          // *변경 필요
+                            child: resultArea != null ? DailyGameResult(
+                              areaSize: resultArea,          // *변경 필요
                               runningPace: 3.4,
                               runningDist: 15,
                               runningDuration: '6:00:00',
                               profileImg: profileImg,
-                            )
+                            ) : SizedBox()
                         )
                       ],
                     )

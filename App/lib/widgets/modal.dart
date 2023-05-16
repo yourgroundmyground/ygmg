@@ -243,80 +243,84 @@ class _GameRankModalState extends State<GameRankModal> {
         borderRadius: BorderRadius.circular(25),
       ),
       child: SizedBox(
-          width: mediaWidth*0.8,
-          height: mediaHeight*0.25,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(mediaWidth*0.08, mediaHeight*0.03, mediaWidth*0.05, mediaHeight*0.03),
-            child: Column(
-              children: [
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('최종 순위',
-                        style: TextStyle(
-                            fontSize: mediaWidth*0.05,
-                            fontWeight: FontWeight.w700,
-                            color: TEXT_GREY,
-                            letterSpacing: 2
-                        ),
-                      ),
-                      IconButton(onPressed: () {
-                        Navigator.of(context).pop();
-                      }, icon: Icon(Icons.close),
-                        iconSize: mediaWidth*0.08,
-                      )
-                    ]
-                ),
-                Positioned.fill(
-                  child: ConfettiWidget(
-                    confettiController: _controllerCenter,
-                    blastDirectionality: BlastDirectionality
-                        .explosive,
-                    gravity: 0.5,
-                    shouldLoop:
-                    true,
-                    colors: const [
-                      YGMG_RED,
-                      YGMG_ORANGE,
-                      YGMG_YELLOW,
-                      YGMG_BEIGE,
-                      YGMG_GREEN,
-                      YGMG_SKYBLUE,
-                      YGMG_DARKGREEN,
-                      YGMG_PURPLE
-                    ],
-                    createParticlePath: drawRectangle,
+        width: mediaWidth*0.8,
+        height: mediaHeight*0.25,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(mediaWidth*0.08, mediaHeight*0.03, mediaWidth*0.05, mediaHeight*0.03),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('최종 순위',
+                    style: TextStyle(
+                        fontSize: mediaWidth*0.05,
+                        fontWeight: FontWeight.w700,
+                        color: TEXT_GREY,
+                        letterSpacing: 2
+                    ),
                   ),
-                ),
-                Container(
-                    padding: EdgeInsets.fromLTRB(0, mediaHeight*0.03, 0, mediaHeight*0.03),
-                    child: RichText(
-                      text: TextSpan(
+                  IconButton(onPressed: () {
+                    Navigator.of(context).pop();
+                  }, icon: Icon(Icons.close),
+                    iconSize: mediaWidth*0.08,
+                  )
+                ]
+              ),
+              Stack(
+                children: [
+                  Positioned(
+                    child: ConfettiWidget(
+                      confettiController: _controllerCenter,
+                      blastDirectionality: BlastDirectionality
+                          .explosive,
+                      gravity: 0.5,
+                      shouldLoop:
+                      true,
+                      colors: const [
+                        YGMG_RED,
+                        YGMG_ORANGE,
+                        YGMG_YELLOW,
+                        YGMG_BEIGE,
+                        YGMG_GREEN,
+                        YGMG_SKYBLUE,
+                        YGMG_DARKGREEN,
+                        YGMG_PURPLE
+                      ],
+                      createParticlePath: drawRectangle,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(0, mediaHeight*0.03, 0, mediaHeight*0.03),
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 10,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '${widget.weeklyRank} ',
                         style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 10,
+                          fontSize: mediaWidth * 0.1,
+                          color: YGMG_RED,
                         ),
-                        children: [
-                          TextSpan(
-                            text: '${widget.weeklyRank} ',
-                            style: TextStyle(
-                              fontSize: mediaWidth * 0.1,
-                              color: YGMG_RED,
-                            ),
-                          ),
-                          TextSpan(text: '위',
-                              style: TextStyle(
-                                  fontSize: mediaWidth * 0.06,
-                                  color: Colors.black
-                              )
-                          ),
-                        ],
                       ),
-                    ))
-
-              ],
-            ),
-          )
+                      TextSpan(text: '위',
+                        style: TextStyle(
+                            fontSize: mediaWidth * 0.06,
+                            color: Colors.black
+                        )
+                      ),
+                    ],
+                  ),
+                )
+              )
+            ],
+          ),
+        )
       ),
     );
   }
