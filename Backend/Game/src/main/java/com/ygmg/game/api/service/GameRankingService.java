@@ -17,4 +17,8 @@ public interface GameRankingService {
     int getRank(String gameId, String memberId);
 
     void subAreaSize(String gameId, String memberId, double areaSize);
+
+    int getCount(String gameId);
+
+    double getAreaSize(String gid, String mid);
 }
