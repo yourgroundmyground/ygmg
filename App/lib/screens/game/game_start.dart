@@ -1,3 +1,4 @@
+import 'package:app/const/state_provider_countrunners.dart';
 import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/widgets/countdown_clock.dart';
@@ -9,6 +10,23 @@ class GameStart extends ConsumerWidget {
 
   GameStart({Key? key}) : super(key: key);
 
+  // Future<int> fetchHowManyRunner() async {
+  //   try {
+  //     final response = await Dio().get('http://k8c107.p.ssafy.io/api/game/ranking/count');
+  //     if (response.statusCode == 200) {
+  //       countRunners = response.data;
+  //       return countRunners;
+  //     } else {
+  //       // 요청이 성공하지 않았을 때 처리할 내용을 여기에 추가하세요.
+  //       print('러너카운트 실패');
+  //       // throw Exception('Failed to fetch ranking count');
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mediaWidth = MediaQuery.of(context).size.width;
@@ -16,7 +34,7 @@ class GameStart extends ConsumerWidget {
 
     final rankingInfoAsyncValue = ref.watch(rankingInfoFutureProvider);
     final myRankingInfoAsyncValue = ref.watch(myRankingInfoFutureProvider);
-
+    final runnerCount = ref.watch(runnerCountProvider);
 
     return rankingInfoAsyncValue.when(
       data: (rankingInfoList) {
@@ -57,10 +75,11 @@ class GameStart extends ConsumerWidget {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 15),
                                   child: Text(
-                                      '총 ${794}명의 러너가 달리고 있어요!',
+                                      '총 ${runnerCount.toString()}명의 러너가 달리고 있어요!',
                                       style: TextStyle(fontSize: 20)),
                                 ),
                               ),
+                              Text('실시간 순위'),
                               Flexible
                                 (
                                 flex: 5,
@@ -131,19 +150,22 @@ class GameStart extends ConsumerWidget {
                                 child: Column(
                                   children: [
                                     Text('현재 나의 순위'),
-                                    Userprofile(
-                                      imageProvider: NetworkImage(
-                                          myRankingInfoList.isNotEmpty ? myRankingInfoList[0].profileUrl : ''),
-                                      height: mediaHeight * 0.06,
-                                      width: mediaWidth * 0.75,
-                                      // imageProvider: NetworkImage(
-                                      //     myRankingInfoList[0].profileUrl),
-                                      // text1: 'dd',
-                                      // text2: 'dd',
-                                      // text3: 'dd',
-                                      text1: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].rank.toString() : '',
-                                      text2: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].memberNickname : '',
-                                      text3: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].areaSize.toString() : '',
+                                    Visibility(
+                                      visible: myRankingInfoList.isNotEmpty,
+                                      child: Userprofile(
+                                        imageProvider: NetworkImage(
+                                            myRankingInfoList.isNotEmpty ? myRankingInfoList[0].profileUrl : ''),
+                                        height: mediaHeight * 0.06,
+                                        width: mediaWidth * 0.75,
+                                        // imageProvider: NetworkImage(
+                                        //     myRankingInfoList[0].profileUrl),
+                                        // text1: 'dd',
+                                        // text2: 'dd',
+                                        // text3: 'dd',
+                                        text1: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].rank.toString() : '',
+                                        text2: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].memberNickname : '',
+                                        text3: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].areaSize.toString() : '',
+                                      ),
                                     ),
                                   ],
                                 ),
