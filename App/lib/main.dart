@@ -1,4 +1,5 @@
 import 'package:app/const/state_provider_interceptor.dart';
+import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/const/state_provider_token.dart';
 import 'package:app/screens/login/loading.dart';
@@ -51,6 +52,9 @@ void main() async {
         //랭킹 정보 상태관리를 위한 프로바이더 설정
         rankingInfoProvider.overrideWithProvider(StateNotifierProvider<RankingInfoNotifier, List<RankingInfo>>(
                 (ref) => RankingInfoNotifier(ref))),
+        //내 랭킹 정보 상태관리를 위한 프로바이더 설정
+        myRankingInfoProvider.overrideWithProvider(StateNotifierProvider<MyRankingInfoNotifier, List<MyRankingInfo>>(
+                (ref) => MyRankingInfoNotifier(ref))),
       ],
       child: MyApp(),
     )
