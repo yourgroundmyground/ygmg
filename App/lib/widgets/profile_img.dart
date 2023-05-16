@@ -4,7 +4,7 @@ class Userprofile extends StatelessWidget {
   final ImageProvider imageProvider;
   final String text1;
   final String text2;
-  final String text3;
+  final String? text3;
   final double height;
   final double width;
   final TextStyle? textStyle;
@@ -13,7 +13,7 @@ class Userprofile extends StatelessWidget {
     required this.imageProvider,
     required this.text1,
     required this.text2,
-    required this.text3,
+    this.text3,
     required this.height,
     required this.width,
     this.textStyle,
@@ -42,7 +42,7 @@ class Userprofile extends StatelessWidget {
                   fit: BoxFit.cover))),
           Text(text1,style: textStyle),
           Text(text2, style: textStyle),
-          Text(text3,style: textStyle)
+          Text(text3 ?? '',style: textStyle)
 
         ],
       ),
