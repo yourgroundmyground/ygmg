@@ -22,7 +22,7 @@ public class GameAreaCoordinateController {
     public GameAreaCoordinateController(GameAreaCoordinateService coordinateService){
         this.coordinateService = coordinateService;
     }
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<String> createCoordinate(@RequestBody AreaCoordinateRegisterPostReq areaCoordinateRegisterPostReq) throws Exception {
         areaCoordinateRegisterPostReq.setAreaDate(LocalDateTime.now());
         coordinateService.createAreaCoordinate(areaCoordinateRegisterPostReq);

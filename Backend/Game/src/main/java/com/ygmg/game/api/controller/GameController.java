@@ -33,7 +33,7 @@ public class GameController {
 //        return ResponseEntity.status(200).body("게임이 생성되었습니다.");
 //    }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<GameRes>> getGame() throws Exception {
         List<GameRes> games = gameService.getGame();
         return ResponseEntity.status(200).body(games);

@@ -4,10 +4,13 @@ import com.ygmg.game.api.request.ResultRegisterPostReq;
 import com.ygmg.game.api.response.ResultRes;
 import com.ygmg.game.db.model.Result;
 
+import java.util.List;
+
 public interface GameResultService {
-    Result getResultByResultId(Long resultId);
 
     Result createResult(ResultRegisterPostReq resultInfo);
 
     Result getResultByGameIdAndMemberId(Long gameId, Long memberId);
+
+    List<ResultRes> getResultByGameId(Long gameId);
 }
