@@ -81,7 +81,7 @@ class _RunningMapState extends State<RunningMap> {
           markerId: MarkerId('runningStart'),
           position: latLngList.first,
           icon: startMarkerImage,
-          anchor: Offset(0.3, 0.85),
+          anchor: Offset(0.2, 0.9),
         ),
       );
       _markers.add(
@@ -117,7 +117,7 @@ class _RunningMapState extends State<RunningMap> {
       polylines: {
         Polyline(
           polylineId: PolylineId("runningRoute"),
-          color: YGMG_ORANGE,
+          color: YGMG_ORANGE.withOpacity(0.7),
           width: 5,
           points: latLngList,
         ),

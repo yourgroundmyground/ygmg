@@ -21,6 +21,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,10 +68,10 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
         List<AreaCoordinate> list = new ArrayList<>();
 
-        log.info(coordinateInfo.getAreaDate() + "" );
+        log.info(LocalDateTime.now() + "" );
 
         Area area = Area.builder()
-                .areaDate(coordinateInfo.getAreaDate())
+                .areaDate(LocalDateTime.now())
                 .areaSize(coordinateInfo.getAreaSize())
                 .memberId(coordinateInfo.getMemberId())
                 .game(game)
@@ -82,7 +83,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
             AreaCoordinate areaCoordinate = AreaCoordinate.builder()
                     .areaCoordinateLat(areaCoordinateDto.getAreaCoordinateLat())
                     .areaCoordinateLng(areaCoordinateDto.getAreaCoordinateLng())
-                    .areaCoordinateTime(areaCoordinateDto.getAreaCoordinateTime())
+                    .areaCoordinateTime(LocalDateTime.now())
                     .area(area)
                     .build();
 

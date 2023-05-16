@@ -62,4 +62,16 @@ public class RankingRepositoryImpl implements RankingRepository{
             redisTemplate.opsForZSet().add(gameId, memberId, newScore);
         }
     }
+
+    @Override
+    public int getCount(String gameId) {
+        Long count = redisTemplate.opsForZSet().zCard(gameId);
+        return count != null ? count.intValue() : 0;
+    }
+
+    @Override
+    public double getAreaSize(String gameId, String memberId) {
+        Double score = redisTemplate.opsForZSet().score(gameId, memberId);
+        return score != null ? score : 0;
+    }
 }
