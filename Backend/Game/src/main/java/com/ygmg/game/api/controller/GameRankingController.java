@@ -45,12 +45,12 @@ public class GameRankingController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<RankAndAreaSizeRes> getRankingByMemberId(@PathVariable int memberId) throws Exception {
-        RankAndAreaSizeRes res = new RankAndAreaSizeRes(rank, );
         long gameId = gameService.getGameId();
         String gid = Long.toString(gameId);
         String mid = Integer.toString(memberId);
         int rank = rankingService.getRank(gid, mid);
-        res.setRank(rank);
+        double areaSize = rankingService.getAreaSize(gid, mid);
+        RankAndAreaSizeRes res = new RankAndAreaSizeRes(rank, areaSize);
         return ResponseEntity.status(200).body(res);
     }
 

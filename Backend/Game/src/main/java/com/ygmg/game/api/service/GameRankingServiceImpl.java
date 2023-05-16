@@ -43,4 +43,9 @@ public class GameRankingServiceImpl implements GameRankingService {
     public int getCount(String gameId) {
         return rankingRepository.getCount(gameId);
     }
+
+    @Override
+    public double getAreaSize(String gameId, String memberId) {
+        return rankingRepository.getAreaSize(gameId, memberId);
+    }
 }
