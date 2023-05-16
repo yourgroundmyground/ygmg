@@ -15,4 +15,6 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
     Result save(Result result);
 
     Optional<Result> findByGame_IdAndMemberId(Long gameId, Long memberId);
+
+    List<Result> findByGame_Id(Long gameId);
 }

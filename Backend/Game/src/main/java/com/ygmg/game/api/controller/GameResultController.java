@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/game/result")
@@ -15,10 +17,10 @@ public class GameResultController {
     // 게임 ID별 결과 조회
     private final GameResultService resultService;
 
-    @GetMapping("/{resultId}")
-    public ResponseEntity<ResultRes> getResult(@PathVariable Long resultId) throws Exception {
-        Result result = resultService.getResultByResultId(resultId);
-        return ResponseEntity.status(200).body(ResultRes.of(result));
+    @GetMapping("/{gameId}")
+    public ResponseEntity<List<ResultRes>> getResult(@PathVariable Long gameId) throws Exception {
+        List<ResultRes> list =  resultService.getResultByGameId(gameId);
+        return ResponseEntity.status(200).body(list);
     }
 
     // 게임 종료 후 결과 생성

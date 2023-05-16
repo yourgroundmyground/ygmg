@@ -1,15 +1,18 @@
 package com.ygmg.game.api.service;
 
-import com.ygmg.game.api.controller.GameResultController;
 import com.ygmg.game.api.request.ResultRegisterPostReq;
+import com.ygmg.game.api.response.AreaRes;
+import com.ygmg.game.api.response.ResultRes;
+import com.ygmg.game.db.model.Area;
 import com.ygmg.game.db.model.Game;
 import com.ygmg.game.db.model.Result;
 import com.ygmg.game.db.repository.GameRepository;
 import com.ygmg.game.db.repository.ResultRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -20,9 +23,15 @@ public class GameResultServiceImpl implements GameResultService {
     private final GameRepository gameRepository;
 
     @Override
-    public Result getResultByResultId(Long resultId) {
-        Result result = resultRepository.findById(resultId).get();
-        return result;
+    public List<ResultRes> getResultByGameId(Long gameId) {
+        List<Result> results = resultRepository.findByGame_Id(gameId);
+        List<ResultRes> resultResList = new ArrayList<>();
+
+        for(Result result : results){
+            ResultRes res = ResultRes.of(result);
+            resultResList.add(res);
+        }
+        return resultResList;
     }
 
     @Override
