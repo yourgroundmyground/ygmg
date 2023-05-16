@@ -21,6 +21,7 @@ class Userprofile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaWidth = MediaQuery.of(context).size.width;
 
     return Container(
       decoration: BoxDecoration(
@@ -33,6 +34,7 @@ class Userprofile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(width: mediaWidth*0.02),
           SizedBox(
               width: 40,
               height: 40,
@@ -40,10 +42,16 @@ class Userprofile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   child: Image(image: imageProvider,
                   fit: BoxFit.cover))),
-          Text(text1,style: textStyle),
-          Text(text2, style: textStyle),
-          Text(text3 ?? '',style: textStyle)
-
+          SizedBox(width: mediaWidth*0.02),
+          SizedBox(
+            width: mediaWidth*0.07,
+              child: Text(text1,style: textStyle)),
+          SizedBox(
+              width: mediaWidth*0.3,
+              child: Text(text2, style: textStyle)),
+          SizedBox(
+              width: mediaWidth*0.2,
+              child: Text(text3 ?? '',style: textStyle))
         ],
       ),
     );
