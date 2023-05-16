@@ -31,7 +31,7 @@ public class GameAreaController {
         this.coordinateService = coordinateService;
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<String> createArea(@RequestBody AreaRegisterPostReq areaInfo) throws Exception {
 
         areaService.createArea(areaInfo);
@@ -52,7 +52,7 @@ public class GameAreaController {
         return ResponseEntity.status(200).body("면적이 생성되었습니다.");
     }
 //  해당 면적 ID에 해당하는 면적의 넓이 수정
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<String> modifyArea(@RequestBody AreaModifyPutReq areaInfo) throws Exception {
         areaService.modifyArea(areaInfo);
 
