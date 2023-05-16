@@ -22,7 +22,7 @@ public class GameResultController {
     }
 
     // 게임 종료 후 결과 생성
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<String> createResult(@RequestBody ResultRegisterPostReq resultInfo) throws Exception {
         resultService.createResult(resultInfo);
         return ResponseEntity.status(200).body("결과가 생성되었습니다.");

@@ -62,7 +62,7 @@ public class GameRankingController {
         return ResponseEntity.status(200).body(cnt);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<String> addRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
         rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
         rankingService.addAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
@@ -76,7 +76,7 @@ public class GameRankingController {
         return ResponseEntity.status(200).body("Member area size has been subed successfully.");
     }
 
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<String> modifyRanking(@RequestBody RankingUpdateReq rankingUpdateReq) {
         rankingUpdateReq.setGameId(String.valueOf(gameService.getGameId()));
         rankingService.modifyAreaSize(rankingUpdateReq.getGameId(), rankingUpdateReq.getMemberId(), rankingUpdateReq.getAreaSize());
