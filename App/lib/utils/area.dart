@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../const/state_provider_token.dart';
 
 class DrawPolygonState extends State<DrawPolygon> {
@@ -46,7 +45,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   var area = 0.0;
   var computedArea = 0.0;
   var isCompleted = false;
-  var gameId = '';
+  var gameId;
 
   // 프로필 이미지 가져오기
   var memberIdString;
@@ -71,12 +70,20 @@ class DrawPolygonState extends State<DrawPolygon> {
   // *달린 시간 변경
   Duration runningDuration = Duration.zero;
 
+  String formatDuration(Duration duration) {
+    var hours = duration.inHours.toString().padLeft(2, '0');
+    var minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    var seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
+  }
+
   // *태운 칼로리 변경
   double runningKcal = 0.0;
   double _distance = 0.0;
   double _currentSpeed = 0.0;
+  late Timer _timer;
 
-  final List<Map<String, dynamic>> _polygonList = [];
+  List<Map<String, dynamic>> _polygonList = [];
 
   // 실시간 나의 위치 보여주는 프로필사진 마커
   void setCustomMarkerIcon() {
@@ -116,6 +123,7 @@ class DrawPolygonState extends State<DrawPolygon> {
     getLocation();
     getPolygons();
     setCustomMarkerIcon();
+    _timer = Timer.periodic(Duration(seconds: 1), _updateRunningTime);
     super.initState();
   }
 
@@ -123,6 +131,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   void dispose() {
     _locationSubscription?.cancel();
     super.dispose();
+    _timer.cancel();
   }
 
   //dio 요청
@@ -133,7 +142,11 @@ class DrawPolygonState extends State<DrawPolygon> {
     try {
       print('gameId 가져오기');
       var gameid = await dio.get('http://k8c107.p.ssafy.io/api/game/gameId');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/area/game/${gameid}');
+      gameId = gameid;
+      print('게임앙디');
+      print(gameid);
+      // var response = await dio.get('http://k8c107.p.ssafy.io/api/game/area/game/${gameid}');
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/area/game/1');
       print(response.data);
       List<int> memberIds = [];
       response.data.forEach((entry) {
@@ -145,6 +158,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       memberIdString = memberIds.join(',');
       print('멤버들.. $memberIdString');
       var profileresponse = await dio.get('http://k8c107.p.ssafy.io/api/member/profiles?memberList=${memberIdString}');
+      print('응답');
       print(profileresponse);
       setState(() {
         addPolygon(response.data, profileresponse);
@@ -163,8 +177,8 @@ class DrawPolygonState extends State<DrawPolygon> {
       double runningKcal,
       double runningPace,
       String runningStart,
-      Duration runningDuration,
-      String gameId,
+      String runningDuration,
+      int gameId,
       String areaDate,
       double areaSize,
       List<Map<String, dynamic>> areaCoordinateDtoList)
@@ -174,16 +188,16 @@ class DrawPolygonState extends State<DrawPolygon> {
       print('백에 보낸당!');
       var response = await dio.post('http://k8c107.p.ssafy.io/api/game/coordinate/',
           data: {
-            "memberId": _tokenInfo.memberId,   // *회원 아이디 넣기
-            'runningDistance': runningDist,
+            "memberId": memberId,   // *회원 아이디 넣기
+            "runningDistance": runningDist,
             "runningEnd": runningEnd,
-            'runningKcal': runningKcal,
-            'runningPace': runningPace,
-            'runningStart': runningStart,
-            'runningTime': runningDuration,
+            "runningKcal": runningKcal,
+            "runningPace": runningPace,
+            "runningStart": runningStart,
+            "runningTime": runningDuration,
             "gameId" : gameId,
             "areaDate" : areaDate,
-            // "areaSize" : 333.3333,
+            "areaSize" : areaSize,
             "areaCoordinateDtoList" : areaCoordinateDtoList
           },
           options: Options(
@@ -271,7 +285,7 @@ class DrawPolygonState extends State<DrawPolygon> {
                               ),
                             )
                         ),
-                        Text("${getNickname(data['memberId'])}", style: TextStyle(
+                        Text(getNickname(data['memberId']), style: TextStyle(
                             fontSize: mediaWidth * 0.04)),
                         SizedBox(width: mediaWidth * 0.1),
                         Text("${data['areaDate']}", style: TextStyle(
@@ -330,6 +344,13 @@ class DrawPolygonState extends State<DrawPolygon> {
         setState(() {
           _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
           _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
+          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((currentLocation!.time! ~/ 1).toInt());
+          String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+          _polygonList.add({
+            "areaCoordinateLat": currentLocation!.latitude!,
+            "areaCoordinateLng": currentLocation!.longitude!,
+            "areaCoordinateTime": formattedTime,
+          });
           _savePoints();
         });
         LatLng newLocation = LatLng(location.latitude!, location.longitude!);
@@ -425,8 +446,9 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 폴리곤의 자기교차 여부 판단
   bool isNotSimplePolygon(List<LatLng> polygon){
-    if(polygon.length <= 3)
+    if(polygon.length <= 3) {
       return false;
+    }
 
     for(int i = 0; i < polygon.length - 2; i++){
       double x1 = polygon[i].latitude;
@@ -446,11 +468,13 @@ class DrawPolygonState extends State<DrawPolygon> {
         double maxx2 = max(x21, x22), maxy2 = max(y21, y22);
         double minx2 = min(x21, x22), miny2 = min(y21, y22);
 
-        if ((x1 == x21 && y1 == y21) || (x2 == x22 && y2 == y22) || (x1 == x22 && y1 == y22) || (x2 == x21 && y2 == y21))
+        if ((x1 == x21 && y1 == y21) || (x2 == x22 && y2 == y22) || (x1 == x22 && y1 == y22) || (x2 == x21 && y2 == y21)) {
           continue;
+        }
 
-        if (minx1 > maxx2 || maxx1 < minx2 || miny1 > maxy2 || maxy1 < miny2)
+        if (minx1 > maxx2 || maxx1 < minx2 || miny1 > maxy2 || maxy1 < miny2) {
           continue;  // The moment when the lines have one common vertex...
+        }
 
 
         double dx1 = x2-x1, dy1 = y2-y1; // The length of the projections of the first line on the x and y axes
@@ -499,7 +523,6 @@ class DrawPolygonState extends State<DrawPolygon> {
   // 폴리곤 면적 계산
   void calculate() {
     print(_currentPoints);
-    if (isCompleted) {
       print('면적만들기 실행');
       LatLng center = findPolygonCenter(_points);
       final mediaWidth = MediaQuery
@@ -537,11 +560,12 @@ class DrawPolygonState extends State<DrawPolygon> {
             strokeWidth: 2,
             strokeColor: Colors.red,
           );
-          if (!isNotSimplePolygon(_currentPoints)) {
+          if (isNotSimplePolygon(_currentPoints)) {
             _onCustomAnimationAlertPressed(context);
             _points = [];
             _currentPoints = [];
             _currentPolylines = {};
+            _polygonList = [];
             // widget.isWalking = false;
             print('영역 생성 실패');
           } else {
@@ -601,21 +625,32 @@ class DrawPolygonState extends State<DrawPolygon> {
             print(_polygonSets.length);
             print('last polygon, first point - latitude: ${lastLatLng
                 .latitude}, longitude: ${lastLatLng.longitude}');
+            print(_tokenInfo.memberId);
+            print(runningDist);
+            print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
+            print(runningKcal);
+            print(runningPace);
+            print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
+            print(runningDuration.toString());
+            print(1);
+            print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
+            print(area);
+            print([..._polygonList, _polygonList.first]);
             sendGameData(
-                _tokenInfo.memberId,
+                1,
                 runningDist,
                 DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
                 runningKcal,
                 runningPace,
                 DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
                 // widget.currentTime,
-                runningDuration,
-                gameId,
+                formatDuration(runningDuration),
+                1,
                 DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
                 area,
-                _polygonList
+                [..._polygonList, _polygonList.first]
             );
-            isCompleted = true;
+            widget.isWalking = false;
           }
         }
         _points = [];
@@ -624,9 +659,6 @@ class DrawPolygonState extends State<DrawPolygon> {
       } else {
         print('영역이 생성되지 않았습니다.');
         _onCustomAnimationAlertPressed(context);
-      }
-    } else {
-      print('오늘 영역 생성 끝');
       }
     }
   void resetPoints() {
@@ -763,11 +795,7 @@ class DrawPolygonState extends State<DrawPolygon> {
         runningDist = _distance;
         runningPace = _currentSpeed;
         runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
-        _polygonList.add({
-          "areaCoordinateLat": locationData.latitude!,
-          "areaCoordinateLng": locationData.longitude!,
-          "areaCoordinateTime": locationData.time!,
-        });
+
       } else {
         runningPace = 0.0;
       }
@@ -778,28 +806,17 @@ class DrawPolygonState extends State<DrawPolygon> {
   }
 
   void _updateRunningTime(Timer timer) {
-    // if (widget.isWalking) {
+    if (widget.isWalking == true) {
       setState(() {
         runningDuration += Duration(seconds: 1);
       });
-    // }
+    }
   }
-
-  String formatDuration(Duration duration) {
-    var hours = duration.inHours.toString().padLeft(2, '0');
-    var minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
-    var seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$hours:$minutes:$seconds';
-  }
-
   @override
 
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${computedArea}'),
-      ),
       body: currentLocation == null
           ? Center(
         child: CircularProgressIndicator(),
@@ -818,27 +835,6 @@ class DrawPolygonState extends State<DrawPolygon> {
         polylines: _currentPolylines,
         polygons: _polygonSets,
         tiltGesturesEnabled: false,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-          });
-          // if (widget.isWalking) {
-            // 현재 경로를 다시 그리기
-            _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
-            _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
-            Polyline route = Polyline(
-              polylineId: PolylineId('route1'),
-              points: _currentPoints,
-              width: 5,
-              color: Colors.blue,
-            );
-            _currentPolylines = {
-              route,
-            };
-          // }
-        },
-        child: Icon(Icons.play_arrow),
       ),
     );
   }
