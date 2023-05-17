@@ -8,6 +8,7 @@ class GameResultInfo extends StatelessWidget {
   final double runningDist;
   final double runningKcal;
   final double runningPace;
+  final double? areaSize;
 
   const GameResultInfo({
     required this.modalType,
@@ -15,15 +16,16 @@ class GameResultInfo extends StatelessWidget {
     required this.runningDist,
     required this.runningKcal,
     required this.runningPace,
+    this.areaSize,
     Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // return DailyInfo();   // *추후에 페이지별로 다르게 세팅해야 함
+
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // *달린 시간 변경
+
     return Stack(
       children: [
         Container(
@@ -55,8 +57,7 @@ class GameResultInfo extends StatelessWidget {
               SizedBox(height: mediaHeight*0.005),
               Row(
                 children: [
-                  // Text(modalType == 'running' ? runningTime : '$runningArea m²',     // *게임일 경우 면적으로 표시되게 하기
-                  Text(runningTime,
+                  Text(modalType == 'running' ? runningTime : '${(areaSize! * 1000000000000).toStringAsFixed(0)} m²',
                     style: TextStyle(
                       fontSize: mediaWidth*0.08,
                       fontWeight: FontWeight.w700,
@@ -75,112 +76,106 @@ class GameResultInfo extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        child: Row(
-                            children: [
-                              Container(
-                                  width: mediaWidth*0.05,
-                                  alignment: Alignment.topCenter,
-                                  child:
-                                  Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.rotationY(math.pi),
-                                      child: Image.asset('assets/images/runningimg.png')
-                                  )
-                              ),
-                              // SizedBox(height: mediaHeight*0.0025),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(runningDist.toStringAsFixed(1), style: TextStyle(
-                                      fontSize: mediaWidth*0.045,
-                                      fontWeight: FontWeight.w700
-                                  ),),
-                                  Text('km',
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                        fontSize: mediaWidth*0.03,
-                                        color: TEXT_GREY
-                                    ),),
-                                ],
+                      Row(
+                        children: [
+                          Container(
+                              width: mediaWidth*0.05,
+                              alignment: Alignment.topCenter,
+                              child:
+                              Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(math.pi),
+                                  child: Image.asset('assets/images/runningimg.png')
                               )
-                            ]
-                        ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(runningDist.toStringAsFixed(1), style: TextStyle(
+                                  fontSize: mediaWidth*0.045,
+                                  fontWeight: FontWeight.w700
+                              ),),
+                              Text('km',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    fontSize: mediaWidth*0.03,
+                                    color: TEXT_GREY
+                                ),
+                              ),
+                            ],
+                          )
+                        ]
                       ),
                       VerticalDivider(
                           thickness: 1,
                           color: TEXT_GREY
                       ),
-                      Container(
-                        child: Row(
-                            children: [
-                              Container(
-                                  width: mediaWidth*0.05,
-                                  alignment: Alignment.topCenter,
-                                  child:
-                                  Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.rotationY(math.pi),
-                                      child: Image.asset('assets/images/fireimg.png')
-                                  )
-                              ),
-                              // SizedBox(height: mediaHeight*0.0025),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(runningKcal.toStringAsFixed(1), style: TextStyle(
-                                      fontSize: mediaWidth*0.045,
-                                      fontWeight: FontWeight.w700
-                                  ),),
-                                  Text('kcal',
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                        fontSize: mediaWidth*0.03,
-                                        color: TEXT_GREY
-                                    ),),
-                                ],
+                      Row(
+                        children: [
+                          Container(
+                              width: mediaWidth*0.05,
+                              alignment: Alignment.topCenter,
+                              child:
+                              Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(math.pi),
+                                  child: Image.asset('assets/images/fireimg.png')
                               )
-                            ]
-                        ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(runningKcal.toStringAsFixed(0), style: TextStyle(
+                                  fontSize: mediaWidth*0.045,
+                                  fontWeight: FontWeight.w700
+                              ),),
+                              Text('kcal',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    fontSize: mediaWidth*0.03,
+                                    color: TEXT_GREY
+                                ),
+                              ),
+                            ],
+                          )
+                        ]
                       ),
                       VerticalDivider(
                         thickness: 1,
                         color: TEXT_GREY,
                       ),
-                      Container(
-                        child: Row(
-                            children: [
-                              Container(
-                                  width: mediaWidth*0.05,
-                                  alignment: Alignment.topCenter,
-                                  child:
-                                  Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.rotationY(math.pi),
-                                      child: Image.asset('assets/images/lighteningimg.png')
-                                  )
-                              ),
-                              // SizedBox(height: mediaHeight*0.0025),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(runningPace.toStringAsFixed(1), style: TextStyle(
-                                      fontSize: mediaWidth*0.045,
-                                      fontWeight: FontWeight.w700
-                                  ),),
-                                  Text('km/hr',
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(
-                                        fontSize: mediaWidth*0.03,
-                                        color: TEXT_GREY
-                                    ),),
-                                ],
+                      Row(
+                        children: [
+                          Container(
+                              width: mediaWidth*0.05,
+                              alignment: Alignment.topCenter,
+                              child:
+                              Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.rotationY(math.pi),
+                                  child: Image.asset('assets/images/lighteningimg.png')
                               )
-                            ]
-                        ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(runningPace.toStringAsFixed(1), style: TextStyle(
+                                  fontSize: mediaWidth*0.045,
+                                  fontWeight: FontWeight.w700
+                              ),),
+                              Text('km/hr',
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    fontSize: mediaWidth*0.03,
+                                    color: TEXT_GREY
+                                ),
+                              ),
+                            ],
+                          )
+                        ]
                       ),
                     ],
                   ),
