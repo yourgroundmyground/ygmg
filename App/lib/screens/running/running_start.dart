@@ -91,8 +91,6 @@ class _RunningStartState extends State<RunningStart> {
               fit: BoxFit.fitWidth,
               alignment: Alignment.topLeft,
               repeat: ImageRepeat.noRepeat,
-              // 이미지 왼쪽 상단 1/4만 표시
-              // centerSlice: Rect.fromLTRB(0, 0, 0, 0),
             )
           ),
           child: Column(
@@ -119,14 +117,6 @@ class _RunningStartState extends State<RunningStart> {
                           width: mediaWidth*0.01,
                           color: Color.fromRGBO(255, 255, 255, 0.9)
                       ),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.white.withOpacity(0.5),
-                      //     // spreadRadius: 5,
-                      //     blurRadius: 4,
-                      //     // offset: Offset(0, 3),
-                      //   ),
-                      // ],
                     ),
                   ),
                   Positioned(
@@ -164,7 +154,6 @@ class _RunningStartState extends State<RunningStart> {
                                       fontSize: mediaWidth * 0.08,
                                       fontWeight: FontWeight.w600,
                                       color: todayGoal > 0 ? YGMG_DARKGREEN : YGMG_ORANGE,
-
                                     ),
                                   ),
                                 ],
@@ -180,13 +169,11 @@ class _RunningStartState extends State<RunningStart> {
                             )
                         )
                     ),
-
                 ],
               ),
               Container(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, mediaHeight*0.15),
               ),
-              // 목표 입력창
               Container(
                 width: mediaWidth*0.8,
                 height: mediaWidth*0.17,
@@ -196,9 +183,7 @@ class _RunningStartState extends State<RunningStart> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),
-                      // spreadRadius: 7,
                       blurRadius: 28,
-                      // offset: Offset(0, 7),
                     ),
                   ],
                 ),
@@ -237,7 +222,7 @@ class _RunningStartState extends State<RunningStart> {
                               ),
                             ]
                           )
-                        )        // *목표미설정시 0.0, 설정 후 변경되도록하기
+                        )
                       ],
                     ),
                   ),
@@ -247,7 +232,6 @@ class _RunningStartState extends State<RunningStart> {
           ),
         ),
       ),
-      // bottomNavigationBar: HomePage(),
     );
   }
 }
