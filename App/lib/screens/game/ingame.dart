@@ -3,6 +3,10 @@ import 'package:app/utils/area.dart';
 import 'package:app/widgets/profile_img.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:slide_countdown/slide_countdown.dart';
+import 'dart:async';
+import '../../main.dart';
+
 
 class InGame extends StatefulWidget {
   const InGame({Key? key}) : super(key: key);
@@ -27,6 +31,7 @@ class InGameState extends State<InGame> {
       isWalking = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +62,19 @@ class InGameState extends State<InGame> {
             ),
             child: Column(
               children: [
-                Text('시간모달', style: TextStyle(fontSize: 20,color: Colors.black),),
-                Text('0m²', style: TextStyle(fontSize: 25,color: Colors.black, fontWeight: FontWeight.w400),)
+              //   Text('시간모달', style: TextStyle(fontSize: 20,color: Colors.black),),
+              //   Text('0m²', style: TextStyle(fontSize: 25,color: Colors.black, fontWeight: FontWeight.w400),)
+                SlideCountdown(
+                  duration: const Duration(hours: 1),
+                  onDone: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Home(),
+                      ),
+                    );
+                  },
+                )
               ],
             ),
           ),
