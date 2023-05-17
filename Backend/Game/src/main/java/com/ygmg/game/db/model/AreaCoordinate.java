@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @Getter
 @Table(name = "area_coordinate")
-public class
-AreaCoordinate {
+public class AreaCoordinate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

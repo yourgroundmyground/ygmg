@@ -50,12 +50,15 @@ public class AreaUtil {
 
         if(winPolygon.intersects(defeatPolygon)) {
 
+            // difference는 겹친 부분의 면적
             Geometry difference = defeatPolygon.difference(winPolygon);
             long gameId = gameService.getGameId();
             rankingService.subAreaSize(String.valueOf(gameId), String.valueOf(memberId), defeatPolygon.getArea()-difference.getArea());
             if(difference instanceof MultiPolygon){
+                System.out.println("멀티폴리곤 ");
                 MultiPolygon multiPolygon = (MultiPolygon) difference;
                 for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+
                     //멀티 폴리곤 안에 있는 폴리곤 하나씩 추출
                     Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
 
@@ -84,6 +87,18 @@ public class AreaUtil {
             }
             else if(difference instanceof Polygon){
                 Polygon polygon = (Polygon) difference;
+                int count = 0;
+                Coordinate[] coordinates = difference.getCoordinates();
+                double startX = coordinates[0].x;
+                double startY = coordinates[0].y;
+                boolean donut = false;
+                for(int i = 1; i < coordinates.length - 1; i++) {
+                    if (coordinates[i].x == startX && coordinates[i].y == startY) {
+                        donut = true;
+                        break;
+                    }
+                }
+
 
                 List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
 
@@ -103,8 +118,9 @@ public class AreaUtil {
                             .areaCoordinateTime(LocalDateTime.now())
                             .build());
                 }
-
-
+                if(donut){
+                    newArea.makeDonut(coordinates[0],newArea);
+                }
 
                 log.info("기존 폴리곤 사이즈는 : " + area.getAreaSize());
                 log.info("패배한 폴리곤 사이즈는 : " + newArea.getAreaSize());
