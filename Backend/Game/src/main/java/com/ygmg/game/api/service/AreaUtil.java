@@ -30,7 +30,7 @@ public class AreaUtil {
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
         Long memberId = area.getMemberId();
-        LocalDateTime originLocalDateTime = area.getAreaDate();
+        LocalDateTime originLocalDateTime = area.getAreaDate().plusHours(9);
 
         Coordinate [] defeatCoordinate = new Coordinate[defeatAreaCoordinateList.size()];
         Coordinate [] winCoordinates = new Coordinate[areaCoordinateDtoList.size()];
@@ -77,7 +77,7 @@ public class AreaUtil {
                                 .areaCoordinateLat(coordinate.x)
                                 .areaCoordinateLng(coordinate.y)
                                 .area(newArea)
-                                .areaCoordinateTime(LocalDateTime.now())
+                                .areaCoordinateTime(originLocalDateTime)
                                 .build());
                     }
 
@@ -87,18 +87,21 @@ public class AreaUtil {
             }
             else if(difference instanceof Polygon){
                 Polygon polygon = (Polygon) difference;
-                int count = 0;
-                Coordinate[] coordinates = difference.getCoordinates();
-                double startX = coordinates[0].x;
-                double startY = coordinates[0].y;
+
                 boolean donut = false;
-                for(int i = 1; i < coordinates.length - 1; i++) {
-                    if (coordinates[i].x == startX && coordinates[i].y == startY) {
-                        donut = true;
-                        break;
+                Coordinate[] coordinates = {};
+                if(polygon.getArea() != 0){
+                    coordinates = difference.getCoordinates();
+                    double startX = coordinates[0].x;
+                    double startY = coordinates[0].y;
+
+                    for(int i = 1; i < coordinates.length - 1; i++) {
+                        if (coordinates[i].x == startX && coordinates[i].y == startY) {
+                            donut = true;
+                            break;
+                        }
                     }
                 }
-
 
                 List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
 

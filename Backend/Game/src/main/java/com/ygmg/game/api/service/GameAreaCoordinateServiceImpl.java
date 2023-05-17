@@ -71,10 +71,8 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
         List<AreaCoordinate> list = new ArrayList<>();
 
-        log.info(LocalDateTime.now() + "" );
-
         Area area = Area.builder()
-                .areaDate(LocalDateTime.now())
+                .areaDate(LocalDateTime.now().plusHours(9))
                 .areaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()))
                 .memberId(coordinateInfo.getMemberId())
                 .game(game)
@@ -86,7 +84,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
             AreaCoordinate areaCoordinate = AreaCoordinate.builder()
                     .areaCoordinateLat(areaCoordinateDto.getAreaCoordinateLat())
                     .areaCoordinateLng(areaCoordinateDto.getAreaCoordinateLng())
-                    .areaCoordinateTime(LocalDateTime.now())
+                    .areaCoordinateTime(LocalDateTime.now().plusHours(9))
                     .area(area)
                     .build();
 
