@@ -109,10 +109,7 @@ class _WeeklygGameResultAllMapState extends State<WeeklygGameResultAllMap> {
   void getPolygonPoints() async {
     var dio = Dio();
     try {
-      print('백에서 주별 모든폴리곤 좌표리스트 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/area/game/${widget.gameId}');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1/1');     // *요청 API 주소 넣기
-      print(response.data);
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/${widget.gameId}');
 
       Map<int, List<dynamic>> memberData = {};
 
@@ -125,11 +122,7 @@ class _WeeklygGameResultAllMapState extends State<WeeklygGameResultAllMap> {
       }
 
       // memberId 별로 생성된 리스트 출력
-      print('멤버별로 출력');
-      print(memberData);
       memberData.forEach((memberId, memberList) {
-        print('Member ID: $memberId');
-        print('Member List: $memberList');
 
         // // 랜덤한 색상 선택
         Color randomColor = _polygonColors[Random().nextInt(
@@ -137,19 +130,13 @@ class _WeeklygGameResultAllMapState extends State<WeeklygGameResultAllMap> {
 
         // 멤버별 폴리곤 리스트 하나씩 넣기
         for (int i = 0; i < memberList.length; i++) {
-          print(memberList[i]);
           int memberId = memberList[i]['memberId'];
-          print('폴리곤 별 멤버아이디: $memberId');
           List<dynamic> polygonData = memberList[i]['coordinateList'];
-          // print('멤버별 폴리곤 리스트 하나씩 넣기');
-          // print(polygonData);
           List<LatLng> latLngList = polygonData.map((item) {
             double lat = item["areaCoordinateLat"];
             double lng = item["areaCoordinateLng"];
             return LatLng(lat, lng);
           }).toList();
-          print('좌표들만뽑음');
-          print(latLngList);
 
           Polygon polygon = Polygon(
             polygonId: PolygonId('polygon_$i'),
@@ -196,16 +183,13 @@ class _WeeklygGameResultAllMapState extends State<WeeklygGameResultAllMap> {
   Future<List<dynamic>> getMemberInfo(int memberId) async {
     var dio = Dio();
     try {
-      print('백에서 사용자들 닉네임, 프로필 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/member/profiles?memberList=$memberId');
-      print(response.data);
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=$memberId');
       return response.data ?? [];
     } catch (e) {
       print(e.toString());
       return [];
     }
   }
-
 
   @override
   void initState() {

@@ -1,115 +1,74 @@
 import 'package:app/screens/mypage/mypage.dart';
+import 'package:app/utils/mypage/game_map.dart';
 import 'package:app/widgets/game_result.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
+import '../../utils/game/weeklyg_game_all_result_map.dart';
 
 class GameDetailView1 extends StatefulWidget {
-  const GameDetailView1({Key? key}) : super(key: key);
+  final List<Map<String, dynamic>> gamedata;
+  final int memberId;
+
+  const GameDetailView1({
+    required this.gamedata,
+    required this.memberId,
+    Key? key}) : super(key: key);
+
   @override
-  _GameDetailView1State createState() => _GameDetailView1State();
+  State<GameDetailView1> createState() => _GameDetailView1State();
 }
+
 class _GameDetailView1State extends State<GameDetailView1> {
-  // GET 요청으로 받아온 데이터를 저장할 변수
-  Map<String, dynamic>? gameData;
+  double runningDistance = 0.0;
+  double runningKcal = 0.0;
+  double runningPace = 0.0;
+  String runningTime = '';
+  String formattedDate = '';
+  String date = '';
+  double gameArea = 0.0;
+  bool gameRunningloaded = false;
 
-  // Dio 객체 생성
-  Dio dio = Dio();
-  @override
-  void initState() {
-    super.initState();
-    // GET 요청 보내기
-    _fetchGameData();
-  }
-
-  Future<void> _fetchGameData() async {
+  void getGameRunningDetail(String date) async {
+  // 게임러닝 상세정보 조회 요청
+    var dio = Dio();
     try {
-      Response response =
-      await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1');
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running/detail/sum?memberId=${widget.memberId}&mode=GAME&startDate=$date&endDate=$date');
       setState(() {
-        List<dynamic> responseData = response.data;
-        gameData = responseData.length > 0 ? responseData[0] as Map<String, dynamic> : null;
+        runningDistance = response.data['distance'];
+        runningKcal = response.data['kcal'];
+        runningPace = response.data['speed'];
+        runningTime = response.data['time'];
+        gameRunningloaded = true;
       });
-      print('데이터 내놔 ${gameData}');
-
     } catch (e) {
-      print(e);
+      print(e.toString());
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-
-    // 미디어 사이즈
-    final mediaWidth = MediaQuery.of(context).size.width;
-    final mediaHeight = MediaQuery.of(context).size.height;
-    // *날짜 변경
-    const month = 4;
-    const day = 20;
-    const time = '10:23AM';
-
-    return Scaffold(
-      body: SafeArea(
-        top: true,
-        bottom: false,
-        child: Container(
-          decoration: BoxDecoration(
-              image : DecorationImage(
-                  image : AssetImage('assets/images/mypage-bg.png'),
-                  fit : BoxFit.fitWidth,
-                  alignment: Alignment.topLeft,
-                  repeat: ImageRepeat.noRepeat
-              )
-          ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
-            // padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$month월 $day일 $time',
-                      style: TextStyle(
-                          fontSize: mediaWidth*0.08,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1
-                      ),
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Mypage(),
-                            ),
-                          );
-                        }, icon: Image.asset('assets/images/closebtn.png')
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: mediaHeight*0.04,
-                ),
-                SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo(
-                  modalType: 'game',
-                  // *여기에 get 으로 받은 데이터를 넣어주세요!
-                  runningPace: 0,
-                  runningDist: 0,
-                  runningKcal: 0,
-                  runningTime: 'asdf',
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  String formatDate(String dateString) {
+    DateFormat inputFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat outputFormat = DateFormat("M월 d일 h:mm a");
+    DateTime dateTime = inputFormat.parse(dateString);
+    String formattedDate = outputFormat.format(dateTime);
+    return formattedDate;
   }
-}
 
-class GameDetailView2 extends StatelessWidget {
-  const GameDetailView2({Key? key}) : super(key: key);
+  @override
+  void initState() {
+    for (var i = 0; i < widget.gamedata.length; i++) {
+      setState(() {
+        gameArea += widget.gamedata[i]['areaSize'];
+      });
+    }
+    DateTime dateTime = DateTime.parse(widget.gamedata[0]['areaDate']);
+    setState(() {
+      formattedDate = formatDate(widget.gamedata[0]['areaDate']);
+      date = DateFormat('yyyy-MM-dd').format(dateTime);
+      getGameRunningDetail(date);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,65 +76,82 @@ class GameDetailView2 extends StatelessWidget {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // *날짜 변경
-    const month = 4;
-    const day = 21;
-    const time = '04:23PM';
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         top: true,
         bottom: false,
-        child: Container(
-          decoration: BoxDecoration(
-              image : DecorationImage(
-                  image : AssetImage('assets/images/mypage-bg.png'),
-                  fit : BoxFit.fitWidth,
-                  alignment: Alignment.topLeft,
-                  repeat: ImageRepeat.noRepeat
-              )
-          ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
-            // padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('$month월 $day일 $time',
-                      style: TextStyle(
-                          fontSize: mediaWidth*0.08,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1
-                      ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    formattedDate != '' ? formattedDate : '',
+                    style: TextStyle(
+                        fontSize: mediaWidth*0.075,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1
                     ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Mypage(),
-                            ),
-                          );
-                        }, icon: Image.asset('assets/images/closebtn.png')
-                    )
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Mypage(),
+                          ),
+                        );
+                      }, icon: Image.asset('assets/images/closebtn.png')
+                  )
+                ],
+              ),
+              SizedBox(height: mediaHeight*0.04),
+              Container(
+                width: mediaWidth*0.7,
+                height: mediaHeight*0.35,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 28,
+                    ),
                   ],
                 ),
-                SizedBox(
-                  height: mediaHeight*0.04,
-                ),
-                SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo(
-                  modalType: 'game',
-                  // *여기에 get 으로 받은 데이터를 넣어주세요!
-                  runningPace: 0,
-                  runningDist: 0,
-                  runningKcal: 0,
-                  runningTime: 'asdf',
+                child: InkWell(
+                  onLongPress: () {
+                    if (widget.gamedata[0]['gameId'] != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => WeeklygGameResultAllMap(
+                          gameId: widget.gamedata[0]['gameId'],
+                        )),
+                      );
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(mediaWidth * 0.02),
+                    child: widget.gamedata.isEmpty ? SizedBox() :
+                    GameMap(
+                      gamedata: widget.gamedata,
+                    ),
+                  ),
                 )
-              ],
-            ),
+              ),
+              SizedBox(height: mediaHeight*0.05,),
+              gameRunningloaded ?
+              GameResultInfo(
+                modalType: 'game',
+                runningPace: runningPace,
+                runningDist: runningDistance,
+                runningKcal: runningKcal,
+                runningTime: runningTime,
+                areaSize: gameArea,
+              ) : SizedBox()
+            ],
           ),
         ),
       ),
