@@ -39,25 +39,11 @@ class _DailyGameState extends State<DailyGame> {
   void getGameOverMember() async {
     var dio = Dio();
     try {
-      print('백에서 마이페이지 회원정보 가져오기!');
-      print(_tokenInfo.accessToken);
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/1');
-      //토큰 멤버아이디 바꾸기;
-      print('나와이시끼야');
-      print(response.data);
-      // 데이터 형식
-      // {
-      //   "kakaoEmail": "suasdfa1@naver.com",
-      //   "memberBirth": "0512",
-      //   "memberName": "adf",
-      //   "memberNickname": "asdf",
-      //   "memberWeight": 23,
-      //   "profileImg": "https://asdfasdf.jpg"
-      // }
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/${_tokenInfo.memberId}');
+
       setState(() {
         profileImg = response.data['profileUrl'];
       });
-      print(profileImg);
     } catch (e) {
       print(e.toString());
     }
@@ -67,16 +53,12 @@ class _DailyGameState extends State<DailyGame> {
   void getNowRanking() async {
     var dio = Dio();
     try {
-      print('백에서 현재랭킹 가져오기!');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/ranking/${_tokenInfo.memberId}');
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/1');   // *테스트용
-      print('현재 랭킹 ${response.data}');
-      // 데이터 형식
-      // 1
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/${_tokenInfo.memberId}');
+
       setState(() {
         nowRanking = response.data['rank'];
         areaSize = response.data['areaSize'];
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 1), () {
           setState(() {
             showSvg = true;
           });
@@ -115,29 +97,34 @@ class _DailyGameState extends State<DailyGame> {
                 children: [
                   Column(
                     children: [
-                      // const SizedBox(height: 51,),
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.1, 0, mediaHeight*0.02),
-                        child: Text('결과', style: TextStyle(
+                        child: Text('결과',
+                          style: TextStyle(
                             fontSize: mediaWidth*0.07,
                             fontWeight: FontWeight.w700
-                        ),),
+                          ),
+                        ),
                       ),
                       Container(
                         padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.03, mediaWidth*0.1, mediaHeight*0.02),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('현재 랭킹 :', style: TextStyle(
+                            Text('현재 랭킹 :',
+                              style: TextStyle(
                                 fontSize: mediaWidth*0.05,
                                 fontWeight: FontWeight.w600
-                            ),),
-                            Text(nowRanking != null ? '$nowRanking 위' : '', style: TextStyle(
+                              ),
+                            ),
+                            Text(nowRanking != null ? '$nowRanking 위' : '',
+                              style: TextStyle(
                                 fontSize: mediaWidth*0.05,
                                 fontWeight: FontWeight.w600,
                                 color: YGMG_RED
-                            ),),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -150,46 +137,47 @@ class _DailyGameState extends State<DailyGame> {
                           Positioned(child: Container(
                             width: double.infinity,
                             height: mediaHeight*0.35,
-                            color: Colors.blue,         // *나중에 지도 맵 넣기
-                            child: DailyGameResultMap(
-                              // memberId: _tokenInfo.memberId ?? '',
-                              memberId: 1,
-                            ),
+                            color: Colors.transparent,
+                            child: _tokenInfo != null ? DailyGameResultMap(
+                              memberId: _tokenInfo.memberId,
+                            ) : Center(child: CircularProgressIndicator(),)
                           )),
                           Positioned(
-                              top: mediaHeight*0.01,
-                              left: (MediaQuery.of(context).size.width - mediaWidth*0.3) / 2,
-                              child: Container(
-                                width: mediaWidth*0.3,
-                                height: mediaHeight*0.035,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(mediaWidth*0.1),
-                                  color: Color.fromRGBO(0, 0, 0, 0.4),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('오늘 차지한 땅',
-                                      style: TextStyle(
-                                        fontSize: mediaWidth*0.028,
-                                        color: Colors.white,
-                                      ),
-                                      textAlign: TextAlign.center,
+                            top: mediaHeight*0.01,
+                            left: (MediaQuery.of(context).size.width - mediaWidth*0.3) / 2,
+                            child: Container(
+                              width: mediaWidth*0.3,
+                              height: mediaHeight*0.035,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(mediaWidth*0.1),
+                                color: Color.fromRGBO(0, 0, 0, 0.4),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('오늘 차지한 땅',
+                                    style: TextStyle(
+                                      fontSize: mediaWidth*0.028,
+                                      color: Colors.white,
                                     ),
-                                  ],
-                                ),
-                              )),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            )
+                          ),
                           Positioned(
-                              top: mediaHeight*0.3,
-                              left: mediaWidth*0.1,
-                              right: mediaWidth*0.1,
-                              child: profileImg != null && areaSize != null ? DailyGameResult(
-                                areaSize: areaSize,
-                                runningPace: widget.runningPace,
-                                runningDist: widget.runningDist,
-                                runningDuration: widget.runningDuration,
-                                profileImg: profileImg,
-                              ) : SizedBox()
+                            top: mediaHeight*0.3,
+                            left: mediaWidth*0.1,
+                            right: mediaWidth*0.1,
+                            child: profileImg != null && areaSize != null ?
+                            DailyGameResult(
+                              areaSize: areaSize,
+                              runningPace: widget.runningPace,
+                              runningDist: widget.runningDist,
+                              runningDuration: widget.runningDuration,
+                              profileImg: profileImg,
+                            ) : SizedBox()
                           )
                         ],
                       )
@@ -203,7 +191,6 @@ class _DailyGameState extends State<DailyGame> {
               )
             ],
           ),
-
         ),
     );
   }
