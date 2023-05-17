@@ -21,9 +21,6 @@ class _RunningDetailState extends State<RunningDetail> {
 
   @override
   void initState() {
-    // print(widget.weekDay);
-    // print(widget.runningIds);
-    // 러닝 기록 개수만큼 페이지 생성
     setState(() {
       _pages = List.generate(
         widget.runningIds.length,
@@ -42,10 +39,22 @@ class _RunningDetailState extends State<RunningDetail> {
       body: SafeArea(
         top: true,
         bottom: false,
-        child: PageView(
-          controller: _pageController,
-          children: _pages,
-        ),
+        child: Container(
+          decoration: BoxDecoration(
+              image : DecorationImage(
+                  image : AssetImage('assets/images/mypage-bg.png'),
+                  fit : BoxFit.fitWidth,
+                  alignment: Alignment.topLeft,
+                  repeat: ImageRepeat.noRepeat
+              )
+          ),
+          child: PageView(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            controller: _pageController,
+            children: _pages,
+          ),
+        )
       ),
     );
   }

@@ -30,9 +30,7 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
   void getRunningDetail(int runningId) async {
     var dio = Dio();
     try {
-      print('백에서 러닝상세정보 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/detail/$runningId');
-      print(response.data);
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running/detail/$runningId');
       setState(() {
         runningDetailId = response.data['runningDetailId'];
         runningDistance = response.data['runningDistance'];
@@ -52,14 +50,11 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
     DateFormat outputFormat = DateFormat("M월 d일 h:mm a");
     DateTime dateTime = inputFormat.parse(dateString);
     String formattedDate = outputFormat.format(dateTime);
-    print(formattedDate);
     return formattedDate;
   }
 
   @override
   void initState() {
-    print('러닝상세정보 조회');
-    print(widget.runningId);
     getRunningDetail(widget.runningId);
     super.initState();
   }
@@ -72,78 +67,67 @@ class _RunningDetailView1State extends State<RunningDetailView1> {
     final mediaHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         top: true,
         bottom: false,
-        child: Container(
-          decoration: BoxDecoration(
-              image : DecorationImage(
-                  image : AssetImage('assets/images/mypage-bg.png'),
-                  fit : BoxFit.fitWidth,
-                  alignment: Alignment.topLeft,
-                  repeat: ImageRepeat.noRepeat
-              )
-          ),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
-            // padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      formattedDate != '' ? formattedDate : '',
-                      style: TextStyle(
-                          fontSize: mediaWidth*0.075,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1
-                      ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    formattedDate != '' ? formattedDate : '',
+                    style: TextStyle(
+                        fontSize: mediaWidth*0.075,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1
                     ),
-                    IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Mypage(),
-                            ),
-                          );
-                        }, icon: Image.asset('assets/images/closebtn.png', width: mediaWidth*0.08,)
-                    )
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Mypage(),
+                          ),
+                        );
+                      }, icon: Image.asset('assets/images/closebtn.png', width: mediaWidth*0.08,)
+                  )
+                ],
+              ),
+              SizedBox(height: mediaHeight*0.04,),
+              Container(
+                width: mediaWidth*0.7,
+                height: mediaHeight*0.35,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 28,
+                    ),
                   ],
                 ),
-                SizedBox(height: mediaHeight*0.04,),
-                // 달리기 경로 들어갈 컨테이너
-                Container(
-                  width: mediaWidth*0.7,
-                  height: mediaHeight*0.35,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        blurRadius: 28,
-                      ),
-                    ],
-                  ),
-                  child:
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(mediaWidth * 0.02),
-                    child: runningDetailId == 0 ? SizedBox() :
-                    RunningMap(
-                      runningDetailId: runningDetailId,
-                    ),
+                child:
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(mediaWidth * 0.02),
+                  child: runningDetailId == 0 ? SizedBox() :
+                  RunningMap(
+                    runningDetailId: runningDetailId,
                   ),
                 ),
-                SizedBox(height: mediaHeight*0.05,),
-                GameResultInfo(
-                  modalType: 'running',
-                  runningPace: runningPace,
-                  runningDist: runningDistance,
-                  runningKcal: runningKcal,
-                  runningTime: runningTime,
-                )
-              ],
-            ),
+              ),
+              SizedBox(height: mediaHeight*0.05,),
+              GameResultInfo(
+                modalType: 'running',
+                runningPace: runningPace,
+                runningDist: runningDistance,
+                runningKcal: runningKcal,
+                runningTime: runningTime,
+              )
+            ],
           ),
         ),
       ),
