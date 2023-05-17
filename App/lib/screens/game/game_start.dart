@@ -149,6 +149,7 @@ class GameStart extends ConsumerWidget {
                                   ],
                                 ),
                               ),
+                              SizedBox(height: 10),
                               Flexible(
                                 fit: FlexFit.tight,
                                 flex: 2,
