@@ -11,7 +11,7 @@ class RunnerCountNotifier extends StateNotifier<int> {
   Future<void> getRunners() async {
     while(true) {
       try {
-        final response = await Dio().get('http://k8c107.p.ssafy.io/api/game/ranking/count');
+        final response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/count');
         if (response.statusCode == 200) {
           print('러너수 ${response.data}');
           state = response.data;
