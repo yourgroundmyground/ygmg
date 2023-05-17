@@ -36,12 +36,10 @@ class _RunningMapState extends State<RunningMap> {
   void getRunningRoute(int runningDetailId) async {
     var dio = Dio();
     try {
-      print('백에서 러닝경로 가져오기!');
       var response = await dio.get(
-        'http://k8c107.p.ssafy.io:8081/api/running/coordinate/$runningDetailId',
+        'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running/coordinate/$runningDetailId',
       );
-      print(response.data);
-      // 받은 데이터 중 좌표를 형식을 바꾸기
+      // 받은 데이터 중 좌표형식을 바꾸기
       setState(() {
         List<dynamic> tmpList = response.data['runningCoordinateList'];
         convertToLatLngList(tmpList);
@@ -129,7 +127,7 @@ class _RunningMapState extends State<RunningMap> {
       },
       myLocationButtonEnabled: false,
       rotateGesturesEnabled: false,
-      zoomControlsEnabled: false,
+      zoomControlsEnabled: true,
       tiltGesturesEnabled: false,
     );
   }
