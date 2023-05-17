@@ -1,7 +1,9 @@
+import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:app/const/state_provider_interceptor.dart';
 import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/const/state_provider_token.dart';
+import 'package:app/screens/game/weekly_game_result.dart';
 import 'package:app/screens/login/loading.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:dio/dio.dart';
@@ -41,6 +43,20 @@ void main() async {
     );
   }
 
+  fetchGameInfo();
+  print('게임아이디 가져오기');
+  updateGameId();
+  print('게임인포 업데이트');
+
+
+  final gameTimes = await getGameTime();
+  final String? gameStart = gameTimes != null ? gameTimes['gameStart'] : null;
+  final String? gameEnd = gameTimes != null ? gameTimes['gameEnd'] : null;
+
+  final TodaysDate = DateTime.now();
+
+
+
 
   runApp(
     ProviderScope(
@@ -55,21 +71,41 @@ void main() async {
         myRankingInfoProvider.overrideWithProvider(StateNotifierProvider<MyRankingInfoNotifier, List<MyRankingInfo>>(
                 (ref) => MyRankingInfoNotifier(ref))),
       ],
-      child: MyApp(),
+      child: MyApp(
+        gameStart:gameStart,
+        gameEnd: gameEnd,
+        todaysDate: TodaysDate,
+      ),
     )
   );
 }
 
 class MyApp extends StatelessWidget{
+  final String? gameStart;
+  final String? gameEnd;
+  final DateTime todaysDate;
+
+  MyApp({
+    required this.gameStart,
+    required this.gameEnd,
+    required this.todaysDate,
+  });
+
   @override
   Widget build(BuildContext context) {
+    final isWithinGameTime = gameStart != null &&
+        gameEnd != null &&
+        todaysDate.isAfter(DateTime.parse(gameStart.toString())) &&
+        todaysDate.isBefore(DateTime.parse(gameEnd.toString()));
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: LoadingScreen(),
-      // home: InGame(),
+      home: isWithinGameTime ? LoadingScreen() : WeeklyGameResult(),
+      // home: LoadingScreen(),
+
     );
   }
 }
