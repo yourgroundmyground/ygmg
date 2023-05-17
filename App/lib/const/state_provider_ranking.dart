@@ -23,13 +23,13 @@ class RankingInfoNotifier extends StateNotifier<List<RankingInfo>> {
 
   Future<List<RankingInfo>> fetchRankingDataAndSaveState() async {
     try {
-      final response = await Dio().get('http://k8c107.p.ssafy.io/api/game/ranking/top/');
+      final response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/top/');
       final List<dynamic> data = response.data;
       print('페치 게임데이터 $data');
 
       final rankerList = data.map((item) => item['memberId']).toList();
       final queryParameters = rankerList.map((memberId) => '$memberId').toList();
-      final url = 'http://k8c107.p.ssafy.io/api/member/profiles?memberList=${queryParameters.join(',')}';
+      final url = 'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=${queryParameters.join(',')}';
 
       final response2 = await Dio().get(url);
       final List<dynamic> data2 = response2.data;

@@ -10,22 +10,6 @@ class GameStart extends ConsumerWidget {
 
   GameStart({Key? key}) : super(key: key);
 
-  // Future<int> fetchHowManyRunner() async {
-  //   try {
-  //     final response = await Dio().get('http://k8c107.p.ssafy.io/api/game/ranking/count');
-  //     if (response.statusCode == 200) {
-  //       countRunners = response.data;
-  //       return countRunners;
-  //     } else {
-  //       // 요청이 성공하지 않았을 때 처리할 내용을 여기에 추가하세요.
-  //       print('러너카운트 실패');
-  //       // throw Exception('Failed to fetch ranking count');
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
