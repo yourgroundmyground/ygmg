@@ -30,6 +30,7 @@ public class AreaUtil {
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
         Long memberId = area.getMemberId();
+        LocalDateTime originLocalDateTime = area.getAreaDate();
 
         Coordinate [] defeatCoordinate = new Coordinate[defeatAreaCoordinateList.size()];
         Coordinate [] winCoordinates = new Coordinate[areaCoordinateDtoList.size()];
@@ -63,7 +64,7 @@ public class AreaUtil {
 
                     Area newArea = Area.builder()
                             .areaCoordinateList(newAreaCoordinateList)
-                            .areaDate(LocalDateTime.now())
+                            .areaDate(originLocalDateTime)
                             .areaSize(polygon.getArea())
                             .memberId(memberId)
                             .game(area.getGame())
@@ -88,7 +89,7 @@ public class AreaUtil {
 
                 Area newArea = Area.builder()
                         .areaCoordinateList(newAreaCoordinateList)
-                        .areaDate(LocalDateTime.now())
+                        .areaDate(originLocalDateTime)
                         .areaSize(polygon.getArea())
                         .memberId(memberId)
                         .game(area.getGame())
