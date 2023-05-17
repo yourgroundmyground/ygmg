@@ -35,12 +35,12 @@ class MyRankingInfoNotifier extends StateNotifier<List<MyRankingInfo>> {
     try {
       //현재 내 순위
       final response = await Dio().get(
-          'http://k8c107.p.ssafy.io/api/game/ranking/$myId');
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/$myId');
       final data = response.data;
       print('내 게임데이터 $data');
 
       final response2 = await Dio().get(
-          'http://k8c107.p.ssafy.io/api/member/me/$myId');
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/$myId');
       final data2 = response2.data;
       print('내 멤버데이터 $data2');
 

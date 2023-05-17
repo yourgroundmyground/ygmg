@@ -27,7 +27,7 @@ class TokenInterceptor extends Interceptor {
       }
 
       var response = await dio.post(
-          'http://k8c107.p.ssafy.io:8080/api/member/reissue',
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/reissue',
         data: {
             'authorization':accessToken,
             'refreshToken': refreshToken
