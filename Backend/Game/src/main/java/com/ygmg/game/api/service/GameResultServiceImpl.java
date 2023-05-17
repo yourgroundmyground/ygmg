@@ -35,6 +35,12 @@ public class GameResultServiceImpl implements GameResultService {
     }
 
     @Override
+    public int getCount(String gid) {
+        System.out.println(gid);
+        return resultRepository.getCount(Long.valueOf(gid));
+    }
+
+    @Override
     public Result createResult(ResultRegisterPostReq resultInfo) {
 
         Game game = gameRepository.findById(resultInfo.getGameId()).get();
