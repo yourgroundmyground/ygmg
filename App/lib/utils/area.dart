@@ -14,20 +14,37 @@ import '../../const/state_provider_token.dart';
 import 'package:app/screens/game/daily_game.dart';
 import '../../const/colors.dart';
 
-class DrawPolygonState extends State<DrawPolygon> {
-  var _tokenInfo;
+class DrawPolygon extends StatefulWidget {
+  late bool? isWalking;
+  final bool? drawGround;
+  final currentTime;
+  final Function(bool) toggleWalking;
+  final runningStartTime;
 
-  // 로컬에 저장된 토큰정보 가져오기
-  Future<void> _loadTokenInfo() async {
-    final tokenInfo = await loadTokenFromSecureStorage();
-    setState(() {
-      _tokenInfo = tokenInfo;
-    });
-  }
+  DrawPolygon(
+    {this.isWalking,
+      this.drawGround,
+      this.currentTime,
+      required this.toggleWalking,
+      this.runningStartTime,
+      Key? key})
+    : super(key: key);
+
+  @override
+  State<DrawPolygon> createState() => DrawPolygonState();
+}
+
+Future<String> loadMapStyle() async {
+  return await rootBundle.loadString('assets/style/map_style.txt');
+}
+
+class DrawPolygonState extends State<DrawPolygon> {
   late GoogleMapController mapController;
+  var customMapStyle;
   LocationData? currentLocation;
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+  var _tokenInfo;
 
   // 실시간 위치를 표시할 좌표 리스트와 폴리라인
   List<LatLng> _currentPoints = [];
@@ -35,6 +52,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 영역이 형성되면 해당 좌표의 리스트 저장할 리스트
   List<LatLng> _points = [];
+
   // 폴리곤 저장
   Set<Polygon> _polygonSets = {};
   Location location = Location();
@@ -42,8 +60,12 @@ class DrawPolygonState extends State<DrawPolygon> {
   Stream<bool> drawGroundStream = StreamController<bool>().stream;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
   final _gyroscopeValues = <double>[0, 0, 0];
-  var customMapStyle;
+
   Polygon? _polygon;
+  int polygonId = 0;
+  List<Map<String, dynamic>> _polygonList = [];
+  var _center;
+
   var area = 0.0;
   var isCompleted = false;
   var gameId;
@@ -51,9 +73,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   // 프로필 이미지 가져오기
   var memberIdString;
 
-  // 영역 보내기 post 요청 관련 변수
-
-  // 땅따먹기 기록
+  // 컬러
   final List<Color> _polygonColors = [
     YGMG_RED,
     YGMG_ORANGE,
@@ -64,9 +84,6 @@ class DrawPolygonState extends State<DrawPolygon> {
     YGMG_DARKGREEN,
     YGMG_PURPLE,
   ];
-  int polygonId = 0;
-  var _center;
-
 
   // 달리기 기록
   bool _isLocationServiceEnabled = false;
@@ -82,6 +99,19 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // *달린 시간 변경
   Duration runningDuration = Duration.zero;
+  // *태운 칼로리 변경
+  double runningKcal = 0.0;
+  double _distance = 0.0;
+  double _currentSpeed = 0.0;
+  late Timer _timer;
+
+  // 로컬에 저장된 토큰정보 가져오기
+  Future<void> _loadTokenInfo() async {
+    final tokenInfo = await loadTokenFromSecureStorage();
+    setState(() {
+      _tokenInfo = tokenInfo;
+    });
+  }
 
   String formatDuration(Duration duration) {
     var hours = duration.inHours.toString().padLeft(2, '0');
@@ -89,14 +119,6 @@ class DrawPolygonState extends State<DrawPolygon> {
     var seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
     return '$hours:$minutes:$seconds';
   }
-
-  // *태운 칼로리 변경
-  double runningKcal = 0.0;
-  double _distance = 0.0;
-  double _currentSpeed = 0.0;
-  late Timer _timer;
-
-  List<Map<String, dynamic>> _polygonList = [];
 
   // 실시간 나의 위치 보여주는 프로필사진 마커
   void setCustomMarkerIcon() {
@@ -121,11 +143,14 @@ class DrawPolygonState extends State<DrawPolygon> {
     _loadTokenInfo();
     setupTimer();
     getLocation();
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    // _timer = Timer.periodic(Duration(seconds: 5), (timer) {
       getPolygons();
-    });
+    // });
     setCustomMarkerIcon();
     _timer = Timer.periodic(Duration(seconds: 1), _updateRunningTime);
+    // gps 측정으로 변경
+    // _location = Location();
+    _checkLocationService();
     super.initState();
   }
 
@@ -148,7 +173,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       print('게임앙디');
       print(gameid);
       // var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/${gameid}');
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/${gameid}');
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/$gameId');
       print(response.data);
       Map<int, List<dynamic>> memberData = {};
 
@@ -168,8 +193,9 @@ class DrawPolygonState extends State<DrawPolygon> {
         print('Member List: $memberList');
 
         // // 랜덤한 색상 선택
-        Color randomColor = _polygonColors[Random().nextInt(
-            _polygonColors.length)];
+        // Color randomColor = _polygonColors[Random().nextInt(
+        //     _polygonColors.length)];
+        Color randomColor = _polygonColors[memberId % _polygonColors.length];
 
         // 멤버별 폴리곤 리스트 하나씩 넣기
         for (int i = 0; i < memberList.length; i++) {
@@ -298,7 +324,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       },
     );
   }
-
+  var responsedata;
   // post 요청
   void sendGameData(
       int memberId,
@@ -328,15 +354,14 @@ class DrawPolygonState extends State<DrawPolygon> {
             "areaSize" : areaSize,
             "areaCoordinateDtoList" : areaCoordinateDtoList
           },
-          options: Options(
-            headers: {
-              // 'Authorization': 'Bearer $token',    // *토큰 넣어주기
-            },
-          ));
+          );
+      responsedata = response.data;
+      print('성공인가');
       print(response.data);
       if (response.data == '면적이 생성되었습니다.') {
         print('됨');
         addNewPolygon();
+        print('뭔데');
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -345,6 +370,8 @@ class DrawPolygonState extends State<DrawPolygon> {
         );
       }
     } catch (e) {
+      print('에러임');
+      responsedata = e.toString();
       resetPoints();
       print(e.toString());
     }
@@ -725,6 +752,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             [..._polygonList, _polygonList.first]
           );
         }
+
       }
     } else {
       print('조금밖에안걸었음');
@@ -879,6 +907,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       }
     }
 
+
     _locationSubscription =
         location.onLocationChanged.listen((LocationData locationData) {
           _updateRunningInfo(locationData);
@@ -928,7 +957,8 @@ class DrawPolygonState extends State<DrawPolygon> {
       if (_currentSpeed >= 2.0) {
         runningDist = _distance;
         runningPace = _currentSpeed;
-        runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
+        // runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
+        runningKcal = calculateRunningKcal(44, runningDuration);      // *위의 주석 풀고 이거는 지워주세요.
 
       } else {
         runningPace = 0.0;
@@ -965,34 +995,18 @@ class DrawPolygonState extends State<DrawPolygon> {
           zoom: 17.0,
         ),
         // myLocationEnabled: true,
-        markers: _markers,
+        markers: widget.isWalking == true? {Marker(
+          markerId: MarkerId('current'),
+          icon: currentLocationIcon,
+          position: LatLng(
+            currentLocation!.latitude!,
+            currentLocation!.longitude!,
+          ),
+        )} : _markers,
         polylines: _currentPolylines,
         polygons: _polygonSets,
         tiltGesturesEnabled: false,
       ),
     );
   }
-}
-class DrawPolygon extends StatefulWidget {
-  late bool? isWalking;
-  final bool? drawGround;
-  final currentTime;
-  final Function(bool) toggleWalking;
-  final runningStartTime;
-
-  DrawPolygon(
-      {this.isWalking,
-        this.drawGround,
-        this.currentTime,
-        required this.toggleWalking,
-        this.runningStartTime,
-          Key? key})
-      : super(key: key);
-
-  @override
-  State<DrawPolygon> createState() => DrawPolygonState();
-}
-
-Future<String> loadMapStyle() async {
-  return await rootBundle.loadString('assets/style/map_style.txt');
 }
