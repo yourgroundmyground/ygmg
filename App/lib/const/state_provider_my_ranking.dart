@@ -27,9 +27,9 @@ class MyRankingInfoNotifier extends StateNotifier<List<MyRankingInfo>> {
   Future<List<MyRankingInfo>> fetchMyRankingDataAndSaveState() async {
     final tokenInfo = await loadTokenFromSecureStorage();
     final myId = tokenInfo.memberId;
-    print('내아이디 $myId');
+    // print('내아이디 $myId');
     final myNickname = tokenInfo.memberNickname;
-    print('내닉네임 $myNickname');
+    // print('내닉네임 $myNickname');
 
 
     try {
@@ -37,12 +37,12 @@ class MyRankingInfoNotifier extends StateNotifier<List<MyRankingInfo>> {
       final response = await Dio().get(
           'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/$myId');
       final data = response.data;
-      print('내 게임데이터 $data');
+      // print('내 게임데이터 $data');
 
       final response2 = await Dio().get(
           'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/$myId');
       final data2 = response2.data;
-      print('내 멤버데이터 $data2');
+      // print('내 멤버데이터 $data2');
 
       final myRankingInfo = MyRankingInfo(
           memberId: myId,
@@ -53,10 +53,10 @@ class MyRankingInfoNotifier extends StateNotifier<List<MyRankingInfo>> {
       );
 
       state = [myRankingInfo];
-      print('내스테이트 ${state[0].memberNickname}');
-      print('내스테이트 ${state[0].memberId}');
-      print('내스테이트 ${state[0].rank}');
-      print('내스테이트 ${state[0].areaSize}');
+      // print('내스테이트 ${state[0].memberNickname}');
+      // print('내스테이트 ${state[0].memberId}');
+      // print('내스테이트 ${state[0].rank}');
+      // print('내스테이트 ${state[0].areaSize}');
 
       return state;
 

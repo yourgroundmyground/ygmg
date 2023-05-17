@@ -13,7 +13,7 @@ class RunnerCountNotifier extends StateNotifier<int> {
       try {
         final response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/count');
         if (response.statusCode == 200) {
-          print('러너수 ${response.data}');
+          // print('러너수 ${response.data}');
           state = response.data;
         } else {
           print('러너카운트 실패');

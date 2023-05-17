@@ -1,3 +1,4 @@
+import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:app/const/state_provider_token.dart';
 import 'package:app/widgets/countdown_clock.dart';
 import 'package:app/widgets/profile_img.dart';
@@ -37,8 +38,11 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
   //이번주 랭킹 결과 가져오기
   void getWeeklyRankingResult() async {
     try {
-      var response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/1');
-      print('위클리 리절트 ${response.data[0]['memberId']}');
+      var thisweekgameId = await getGameId();
+      // print('디스윜 $thisweekgameId');
+
+      var response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/1'); //여기 결과값 바꿔야함. 이번주 결과가 없어서 오류가 남.
+      // print('위클리 리절트 ${response.data[0]['memberId']}');
 
       var resultRankingmem = [response.data[0]['memberId'],response.data[1]['memberId'],response.data[2]['memberId']];
       print(resultRankingmem);
@@ -46,7 +50,7 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
       print(memberIds);
 
       var response2 = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=$memberIds');
-      print('위클리 리절트 2 ${response2.data}');
+      // print('위클리 리절트 2 ${response2.data}');
 
       setState(() {
         resultRanking = response.data;
@@ -62,13 +66,13 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
     void _loadTokenInfo() async {
       final tokenInfo = await loadTokenFromSecureStorage();
       var myId = tokenInfo.memberId;
-      print('나 $myId');
+      // print('나 $myId');
 
-      final response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/2/$myId');
-      print('이거다이거 ${response.data}');
+      final response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/2/$myId'); //여기도 게임아이디 들어감. 수정.
+      // print('이거다이거 ${response.data}');
 
       final response2 = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/$myId');
-      print('이거라고~ ${response2.data}');
+      // print('이거라고~ ${response2.data}');
 
       setState(() {
         myresultRanking = response.data;
@@ -99,6 +103,7 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
     getRunnersCountResult();
     getWeeklyRankingResult();
     // getMyWeeklyRankingResult();
+    // fetchGameId();
   }
 
 
