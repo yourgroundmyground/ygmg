@@ -2,6 +2,7 @@ import 'package:app/const/colors.dart';
 import 'package:app/widgets/modal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../const/state_provider_token.dart';
 import '../../utils/game/weekly_game_result_map.dart';
 import '../../utils/game/weeklyg_game_all_result_map.dart';
@@ -17,9 +18,16 @@ class _WeeklyGameState extends State<WeeklyGame> {
   var _tokenInfo;
   var profileImg;
   var gameId;
+  var startDate;
+  var endDate;
   var resultArea;
   bool isModalOpen = true;
   int? weekRanking;
+  bool isloaded = false;
+  var time;
+  var speed;
+  var distance;
+  var kcal;
 
   // 로컬에 저장된 토큰정보 가져오기
   Future<void> _loadTokenInfo() async {
@@ -33,22 +41,9 @@ class _WeeklyGameState extends State<WeeklyGame> {
   void getGameOverMember() async {
     var dio = Dio();
     try {
-      print('백에서 마이페이지 회원정보 가져오기!');
-      print(_tokenInfo.accessToken);
-      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/member/mypage');
-      print(response.data);
-      // 데이터 형식
-      // {
-      //   "kakaoEmail": "suasdfa1@naver.com",
-      //   "memberBirth": "0512",
-      //   "memberName": "adf",
-      //   "memberNickname": "asdf",
-      //   "memberWeight": 23,
-      //   "profileImg": "https://asdfasdf.jpg"
-      // }
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/${_tokenInfo.memberId}');
       setState(() {
-        profileImg = response.data['profileImg'];
+        profileImg = response.data['profileUrl'];
       });
     } catch (e) {
       print(e.toString());
@@ -59,15 +54,30 @@ class _WeeklyGameState extends State<WeeklyGame> {
   void getGameId() async {
     var dio = Dio();
     try {
-      print('백에서 게임아이디 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/gameId');
-      print('게임 아이디 ${response.data}');
-      // 데이터 형식
-      // 1
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/gameId');
       setState(() {
         gameId = response.data - 1;
-        getWeekRanking();   // 게임아이디 받은 후에 최종랭킹 가져오기
       });
+      getGameIdInfo();
+      getWeekRanking();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void getGameIdInfo() async {
+    var dio = Dio();
+    try {
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/$gameId');
+
+      String formattedStart = DateFormat('yyyy-MM-dd').format(DateTime.parse(response.data['gameStart']));
+      String formattedEnd = DateFormat('yyyy-MM-dd').format(DateTime.parse(response.data['gameEnd']));
+      setState(() {
+        startDate = formattedStart;
+        endDate = formattedEnd;
+      });
+      getWeekRunning();
+
     } catch (e) {
       print(e.toString());
     }
@@ -77,12 +87,8 @@ class _WeeklyGameState extends State<WeeklyGame> {
   void getWeekRanking() async {
     var dio = Dio();
     try {
-      print('백에서 최종랭킹 가져오기!');
-      // var response = await dio.get('http://k8c107.p.ssafy.io/api/game/result/$gameId/${_tokenInfo.memberId}');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/result/1/1');   // *테스트용
-      print('최종 랭킹 ${response.data}');
-      // 데이터 형식
-      // 1
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/$gameId/${_tokenInfo.memberId}');   // *테스트용
+
       setState(() {
         weekRanking = response.data['resultRanking'];
         resultArea = response.data['resultArea'];
@@ -92,21 +98,40 @@ class _WeeklyGameState extends State<WeeklyGame> {
     }
   }
 
+  // 최종게임 러닝 가져오기
+  void getWeekRunning() async {
+    var dio = Dio();
+    try {
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running/detail/sum?memberId=${_tokenInfo.memberId}&mode=GAME&startDate=$startDate&endDate=$endDate');   // *테스트용
+      setState(() {
+        time = response.data['time'];
+        speed = response.data['speed'];
+        distance = response.data['distance'];
+        kcal = response.data['kcal'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+    setState(() {
+      isloaded = true;
+    });
+  }
+
   @override
   void initState() {
     _loadTokenInfo().then((value) => {
       getGameOverMember(),
       getGameId(),
-    });
+  });
     super.initState();
-    Future.delayed(Duration(seconds: 2), showModal);
+    Future.delayed(Duration(seconds: 1), showModal);
   }
 
   void showModal() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomModal(modalType: 'gameRank', weeklyRank: 1);
+        return CustomModal(modalType: 'gameRank', weeklyRank: weekRanking);
       },
     );
     setState(() {
@@ -131,7 +156,6 @@ class _WeeklyGameState extends State<WeeklyGame> {
               children: [
                 Column(
                   children: [
-                    // const SizedBox(height: 51,),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.1, 0, mediaHeight*0.02),
@@ -169,8 +193,7 @@ class _WeeklyGameState extends State<WeeklyGame> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => WeeklygGameResultAllMap(
-                                  // gameId: gameId,
-                                  gameId: 1,
+                                  gameId: gameId,
                                 )),
                               );
                             }
@@ -178,12 +201,15 @@ class _WeeklyGameState extends State<WeeklyGame> {
                           child: Container(
                             width: double.infinity,
                             height: mediaHeight * 0.35,
-                            color: Colors.blue,
-                            child: _tokenInfo.memberId != null && gameId != null ? WeeklyGameResultMap(
+                            color: Colors.white,
+                            child: gameId != null ? WeeklyGameResultMap(
                                 memberId: _tokenInfo.memberId,
-                                // gameId: gameId
-                                gameId: 1,
-                              ) : CircularProgressIndicator()
+                                gameId: gameId,
+                              ) : Center(
+                              child: CircularProgressIndicator(
+                                color: YGMG_SKYBLUE
+                              )
+                            )
                           ),
                         )),
                         Positioned(
@@ -213,11 +239,11 @@ class _WeeklyGameState extends State<WeeklyGame> {
                             top: mediaHeight*0.3,
                             left:  mediaWidth*0.1,
                             right:  mediaWidth*0.1,
-                            child: resultArea != null ? DailyGameResult(
+                            child: resultArea != null && isloaded ? DailyGameResult(
                               areaSize: resultArea,          // *변경 필요
-                              runningPace: 3.4,
-                              runningDist: 15,
-                              runningDuration: '6:00:00',
+                              runningPace: speed,
+                              runningDist: distance,
+                              runningDuration: time,
                               profileImg: profileImg,
                             ) : SizedBox()
                         )
@@ -301,7 +327,7 @@ class DailyGameResult extends StatelessWidget {
                   ),
                 ),
               ],
-            ),      // *프로필 사진 넣어주기
+            ),
           ),
           SizedBox(
             height: mediaHeight*0.02
@@ -328,7 +354,8 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${areaSize.toStringAsFixed(0)}m²', style: TextStyle(       // *크기 변수설정
+                    Text('${(areaSize*10000000000).toStringAsFixed(0)}m²',
+                      style: TextStyle(
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
@@ -346,7 +373,8 @@ class DailyGameResult extends StatelessWidget {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${runningPace.floor()}\'${(runningPace.remainder(1) * 10).floor()}\'\'', style: TextStyle(              // *평균 속도 변경하기
+                    Text('${runningPace.floor()}\'${(runningPace.remainder(1) * 10).floor()}\'\'',
+                      style: TextStyle(
                         fontSize: mediaWidth*0.045,
                         fontWeight: FontWeight.w900
                     ),)
