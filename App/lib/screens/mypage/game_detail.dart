@@ -1,41 +1,80 @@
-import 'package:app/widgets/game_result.dart';
 import 'package:app/screens/mypage/game_detail_view.dart';
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class GameDetail extends StatefulWidget {
-  const GameDetail({Key? key}) : super(key: key);
+  final int gameId;
+  final int memberId;
+  final String start;
+  final String end;
+
+  const GameDetail({
+    required this.gameId,
+    required this.memberId,
+    required this.start,
+    required this.end,
+    Key? key}) : super(key: key);
 
   @override
-  _GameDetailState createState() => _GameDetailState();
+  State<GameDetail> createState() => _GameDetailState();
 }
 
 class _GameDetailState extends State<GameDetail> {
-  int _seletedItem = 0;
-  var _pages = [GameDetailView1(), GameDetailView2()];
-  var _pageController = PageController();
-  Map<String, dynamic>? gameData;
-  Dio dio = Dio();
-  @override
-  void initState() {
-    super.initState();
-    // GET 요청 보내기
-    _fetchGameData();
+  List<Widget> _pages = [];
+  var pagesLength;
+  final _pageController = PageController();
+  var test;
+
+  // 마이페이지 게임상세조회 요청
+  void getGameDetail() async {
+    var dio = Dio();
+      try {
+        var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/member/${widget.memberId}/${widget.gameId}');
+
+        List<dynamic> gamedata = response.data;
+        List<List<Map<String, dynamic>>> groupedAreaLists = [];
+        Map<String, List<Map<String, dynamic>>> tempMap = {};
+
+        for (var area in gamedata) {
+          String areaDate = area['areaDate'];
+          DateTime dateTime = DateFormat('yyyy-MM-dd').parse(areaDate);
+          String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+
+          if (!tempMap.containsKey(formattedDate)) {
+            tempMap[formattedDate] = [];
+          }
+
+          tempMap[formattedDate]!.add(area);
+        }
+
+        groupedAreaLists = tempMap.values.toList();
+
+        setState(() {
+          test = response.data;
+          _pages = List.generate(
+            groupedAreaLists.length,
+                (index) => GameDetailView1(
+                gamedata: groupedAreaLists[index],
+                memberId: widget.memberId
+            ),
+          );
+        });
+      } catch (e) {
+        print(e.toString());
+      }
   }
 
-  Future<void> _fetchGameData() async {
-    try {
-      Response response =
-      await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1');
-      setState(() {
-        List<dynamic> responseData = response.data;
-        gameData = responseData.length > 0 ? responseData[0] as Map<String, dynamic> : null;
-      });
-      print('데이터 내놔 ${gameData}');
+  @override
+  void initState() {
+    getGameDetail();
+    super.initState();
+  }
 
-    } catch (e) {
-      print(e);
-    }
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,15 +84,22 @@ class _GameDetailState extends State<GameDetail> {
       body: SafeArea(
         top: true,
         bottom: false,
-        child: PageView(
-          children: _pages,
-          onPageChanged: (index) {
-            setState(() {
-              _seletedItem = index;
-            });
-          },
-          controller: _pageController,
-        ),
+        child: Container(
+          decoration: BoxDecoration(
+            image : DecorationImage(
+              image : AssetImage('assets/images/mypage-bg.png'),
+              fit : BoxFit.fitWidth,
+              alignment: Alignment.topLeft,
+              repeat: ImageRepeat.noRepeat
+            )
+          ),
+          child: PageView(
+            physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            controller: _pageController,
+            children: _pages,
+          ),
+        )
       ),
     );
   }
