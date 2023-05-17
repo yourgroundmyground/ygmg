@@ -3,18 +3,25 @@ package com.ygmg.game.api.controller;
 import com.ygmg.game.api.request.AreaModifyPutReq;
 import com.ygmg.game.api.request.AreaRegisterPostReq;
 import com.ygmg.game.api.response.AreaRes;
+import com.ygmg.game.api.response.RankingRes;
 import com.ygmg.game.api.service.GameAreaCoordinateService;
 import com.ygmg.game.api.service.GameAreaService;
+import com.ygmg.game.api.service.GameRankingService;
+import com.ygmg.game.api.service.GameService;
 import com.ygmg.game.db.model.Area;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/game/area")
@@ -24,11 +31,14 @@ public class GameAreaController {
     private final ConcurrentLinkedQueue<SseEmitter> emitters = new ConcurrentLinkedQueue<>();
 
     private final GameAreaService areaService;
-
     private final GameAreaCoordinateService coordinateService;
-    public GameAreaController(GameAreaService areaService, GameAreaCoordinateService coordinateService){
+    private final GameRankingService rankingService;
+    private final GameService gameService;
+    public GameAreaController(GameAreaService areaService, GameAreaCoordinateService coordinateService, GameRankingService rankingService, GameService gameService){
         this.areaService = areaService;
         this.coordinateService = coordinateService;
+        this.rankingService = rankingService;
+        this.gameService = gameService;
     }
 
     @PostMapping("")
@@ -38,14 +48,20 @@ public class GameAreaController {
 //
 //        면적이 생성되면  모든 클라이언트에게 데이터베이스에서 값을 가져와 랭킹을 매겨 전달합니다.
 //        랭킹 데이터를 가져옵니다. -> Rankings
-//        for (SseEmitter emitter : emitters) {
-//            try {
-//                // SSEEmitter로 데이터를 전달합니다.
-//                emitter.send(Rankings);
-//            } catch (IOException e) {
-//                // 에러 처리 로직을 작성합니다.
-//            }
-//        }
+        for (SseEmitter emitter : emitters) {
+            try {
+                String gameId = String.valueOf(gameService.getGameId());
+                Set<ZSetOperations.TypedTuple<String>> topRankings = rankingService.getTopScores(gameId);
+
+                List<RankingRes> rankings = topRankings.stream()
+                        .map(tuple -> new RankingRes(tuple.getValue(), tuple.getScore()))
+                        .collect(Collectors.toList());
+                // SSEEmitter로 데이터를 전달합니다.
+                emitter.send(rankings);
+            } catch (IOException e) {
+                // 에러 처리 로직을 작성합니다.
+            }
+        }
 //    }
 
 
