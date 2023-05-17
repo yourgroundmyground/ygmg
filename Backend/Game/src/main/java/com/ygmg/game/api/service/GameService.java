@@ -18,4 +18,6 @@ public interface GameService {
     List<GameRes> getGame();
 
     Long getGameId();
+
+    GameRes getGameByGameId(long gameId);
 }

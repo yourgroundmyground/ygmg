@@ -32,13 +32,18 @@ public class GameController {
 //        gameService.createGame(gameInfo);
 //        return ResponseEntity.status(200).body("게임이 생성되었습니다.");
 //    }
+{}
+//    @GetMapping("/")
+//    public ResponseEntity<List<GameRes>> getGame() throws Exception {
+//        List<GameRes> games = gameService.getGame();
+//        return ResponseEntity.status(200).body(games);
+//    }
 
-    @GetMapping("")
-    public ResponseEntity<List<GameRes>> getGame() throws Exception {
-        List<GameRes> games = gameService.getGame();
-        return ResponseEntity.status(200).body(games);
+    @GetMapping("/{gameId}")
+    public ResponseEntity<GameRes> getGame(@PathVariable long gameId) throws Exception {
+        GameRes game = gameService.getGameByGameId(gameId);
+        return ResponseEntity.status(200).body(game);
     }
-
     @GetMapping("/gameId")
     public ResponseEntity<Long> getGameId() throws Exception {
         Long gameId = gameService.getGameId();
