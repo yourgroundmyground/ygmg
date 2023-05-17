@@ -13,4 +13,6 @@ public interface GameResultService {
     Result getResultByGameIdAndMemberId(Long gameId, Long memberId);
 
     List<ResultRes> getResultByGameId(Long gameId);
+
+    int getCount(String gid);
 }
