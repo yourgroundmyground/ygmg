@@ -72,6 +72,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 프로필 이미지 가져오기
   var memberIdString;
+  var myprofimg;
 
   // 컬러
   final List<Color> _polygonColors = [
@@ -121,6 +122,46 @@ class DrawPolygonState extends State<DrawPolygon> {
   }
 
   // 실시간 나의 위치 보여주는 프로필사진 마커
+  // void setCustomMarkerIcon() async {
+  //   var dio = Dio();
+  //   try {
+  //     print('백에서 사용자들 닉네임, 프로필 가져오기!');
+  //     // var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=${_tokenInfo.memberId}');
+  //     var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=1');
+  //     print(response.data);
+  //     List<dynamic> profiles = response.data ?? [];
+  //     if (profiles.isNotEmpty) {
+  //       String profileUrl = profiles[0]['profileUrl']; // 첫 번째 프로필의 URL을 가져옴
+  //
+  //       // 외부 이미지를 다운로드하여 BitmapDescriptor 생성
+  //       BitmapDescriptor? markerIcon = await _getMarkerIconFromUrl(profileUrl);
+  //
+  //       // markerIcon을 사용하여 마커 이미지 업데이트
+  //       setState(() {
+  //         currentLocationIcon = markerIcon!;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
+  //
+  // Future<BitmapDescriptor?> _getMarkerIconFromUrl(String imageUrl) async {
+  //   var dio = Dio();
+  //   try {
+  //     var response = await dio.get(imageUrl, options: Options(responseType: ResponseType.bytes));
+  //     if (response.statusCode == 200) {
+  //       return BitmapDescriptor.fromBytes(response.data);
+  //     } else {
+  //       print('이미지 다운로드 실패');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //     return null;
+  //   }
+  // }
+
   void setCustomMarkerIcon() {
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(100, 100)), "assets/images/testProfile.png")
         .then(
@@ -141,12 +182,12 @@ class DrawPolygonState extends State<DrawPolygon> {
       });
     });
     _loadTokenInfo();
+    setCustomMarkerIcon();
     setupTimer();
     getLocation();
     // _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      getPolygons();
+    getPolygons();
     // });
-    setCustomMarkerIcon();
     _timer = Timer.periodic(Duration(seconds: 1), _updateRunningTime);
     // gps 측정으로 변경
     // _location = Location();
@@ -358,21 +399,21 @@ class DrawPolygonState extends State<DrawPolygon> {
       responsedata = response.data;
       print('성공인가');
       print(response.data);
-      if (response.data == '면적이 생성되었습니다.') {
+      // if (response.data == '면적이 생성되었습니다.') {
         print('됨');
         addNewPolygon();
         print('뭔데');
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DailyGame(areaSize: area, runningPace: 0.0, runningDist: 0.0, runningDuration: '00:00:00'),
+            builder: (context) => DailyGame(runningPace: runningPace, runningDist: runningDist, runningDuration: runningDuration),
           ),
         );
-      }
+      // }
     } catch (e) {
       print('에러임');
       responsedata = e.toString();
-      resetPoints();
+      // resetPoints();
       print(e.toString());
     }
   }
@@ -718,7 +759,7 @@ class DrawPolygonState extends State<DrawPolygon> {
         LatLng lastLatLng = _polygonSets.last.points.first;
         print(_polygonSets.length);
         print('last polygon, first point - latitude: ${lastLatLng.latitude}, longitude: ${lastLatLng.longitude}');
-        print(_tokenInfo.memberId);
+        // print(_tokenInfo.memberId);
         print(runningDist);
         print(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()));
         print(runningKcal);
@@ -740,6 +781,7 @@ class DrawPolygonState extends State<DrawPolygon> {
           _onCustomAnimationAlertPressed(context);
         } else {
           sendGameData(
+            // _tokenInfo.memberId,
             1,
             runningDist,
             DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
