@@ -2,6 +2,7 @@ package com.ygmg.game.db.model;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
+import org.locationtech.jts.geom.Coordinate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -38,6 +39,14 @@ public class Area {
 
     public void updateAreaSize(double areaSize){
         this.areaSize = areaSize;
+    }
+    public void makeDonut(Coordinate coordinate, Area area){
+        areaCoordinateList.add(AreaCoordinate.builder()
+                .areaCoordinateLat(coordinate.x)
+                .areaCoordinateLng(coordinate.y)
+                .area(area)
+                .areaCoordinateTime(LocalDateTime.now())
+                .build());
     }
 
 
