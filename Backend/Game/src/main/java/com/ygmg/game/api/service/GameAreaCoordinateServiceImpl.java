@@ -15,6 +15,7 @@ import com.ygmg.game.db.model.Game;
 import com.ygmg.game.db.repository.AreaCoordinateRepository;
 import com.ygmg.game.db.repository.AreaRepository;
 import com.ygmg.game.db.repository.GameRepository;
+import com.ygmg.game.db.repository.RankingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -36,6 +37,8 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
     private final RabbitTemplate rabbitTemplate;
 
+    private final RankingRepository rankingRepository;
+
     private final AreaUtil areaUtil;
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
@@ -56,6 +59,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
         coordinateInfo.setAreaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()));
         saveAreaCoordinateList(coordinateInfo);
+        rankingRepository.addAreaSize(String.valueOf(game.getId()), String.valueOf(coordinateInfo.getMemberId()), coordinateInfo.getAreaSize());
         RunningDataSend(coordinateInfo);
 
 
