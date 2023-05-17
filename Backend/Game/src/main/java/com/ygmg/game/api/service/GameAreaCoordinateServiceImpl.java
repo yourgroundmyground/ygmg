@@ -72,7 +72,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
         Area area = Area.builder()
                 .areaDate(LocalDateTime.now())
-                .areaSize(coordinateInfo.getAreaSize())
+                .areaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()))
                 .memberId(coordinateInfo.getMemberId())
                 .game(game)
                 .areaCoordinateList(list)
