@@ -39,8 +39,8 @@ class RunningChartState extends State<RunningChart> {
       DateTime runningDate = DateFormat('yyyy-MM-dd').parse(item['runningDate']);
       return runningDate.isAfter(startOfWeek) &&
           runningDate.isBefore(endOfWeek) &&
-          runningDate.year == now.year && // 추가: 같은 연도인지 확인
-          runningDate.month == now.month; // 추가: 같은 월인지 확인
+          runningDate.year == now.year &&
+          runningDate.month == now.month;
     }).toList();
   }
 
@@ -87,62 +87,6 @@ class RunningChartState extends State<RunningChart> {
 
   @override
   void initState() {
-    // final testList = [
-    //   {
-    //     "runningDate": "2023-05-05",
-    //     "runningDistance": 1.2,
-    //     "runningId": 1,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-08",
-    //     "runningDistance": 1.2,
-    //     "runningId": 1,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-09",
-    //     "runningDistance": 3,
-    //     "runningId": 2,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-10",
-    //     "runningDistance": 2,
-    //     "runningId": 3,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-08",
-    //     "runningDistance": 1.5,
-    //     "runningId": 4,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-08",
-    //     "runningDistance": 4,
-    //     "runningId": 5,
-    //     "runningType": "GAME"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-09",
-    //     "runningDistance": 3.2,
-    //     "runningId": 6,
-    //     "runningType": "GAME"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-10",
-    //     "runningDistance": 4,
-    //     "runningId": 7,
-    //     "runningType": "RUNNING"
-    //   },
-    //   {
-    //     "runningDate": "2023-05-11",
-    //     "runningDistance": 5,
-    //     "runningId": 8,
-    //     "runningType": "GAME"
-    //   },
-    // ];
     List<dynamic> filteredList = filterDataByCurrentWeek(widget.runningList);
     groupData(filteredList);
     groupRunningIdsByDayOfWeek(filteredList);
@@ -235,7 +179,7 @@ class RunningChartState extends State<RunningChart> {
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: (rod.toY).toString(),
+                            text: (rod.toY).toStringAsFixed(1),
                             style: TextStyle(
                               color: YGMG_YELLOW,
                               fontSize: 16,

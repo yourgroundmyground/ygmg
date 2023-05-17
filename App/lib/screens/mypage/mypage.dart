@@ -4,8 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:app/widgets/chart.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import '../../const/state_provider_token.dart';
+import '../../widgets/my_weekly_game.dart';
 
 
 class Mypage extends StatefulWidget {
@@ -14,10 +14,16 @@ class Mypage extends StatefulWidget {
   @override
   State<Mypage> createState() => _MypageState();
 }
-class _MypageState extends State<Mypage> {
+class _MypageState extends State<Mypage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   List<dynamic> runningList = [];
   var profileImg;
   var _tokenInfo;
+  var gameId;
+  bool runningListLoading = true;
+  // 현재 날짜까지 각 주의 월요일과 일요일을 구합니다.
+  List<DateTime> tuesdaysList = [];
+  List<DateTime> sundaysList = [];
 
   // 마이페이지 회원정보 조회 요청
   void getMyPageMember() async {
@@ -27,22 +33,9 @@ class _MypageState extends State<Mypage> {
     );
 
     try {
-      print('백에서 마이페이지 회원정보 가져오기!');
-      print(_tokenInfo.accessToken);
-      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
-      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
-      print(response.data);
-      // 데이터 형식
-      // {
-      //   "kakaoEmail": "suasdfa1@naver.com",
-      //   "memberBirth": "0512",
-      //   "memberName": "adf",
-      //   "memberNickname": "asdf",
-      //   "memberWeight": 23,
-      //   "profileImg": "https://asdfasdf.jpg"
-      // }
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/${_tokenInfo.memberId}');
       setState(() {
-        profileImg = response.data['profileImg'];
+        profileImg = response.data['profileUrl'];
       });
     } catch (e) {
       print(e.toString());
@@ -52,17 +45,10 @@ class _MypageState extends State<Mypage> {
   // 마이페이지 회원 전체러닝정보 조회 요청
   void getMyPageRunning() async {
     var dio = Dio();
-    dio.interceptors.add(TokenInterceptor(_tokenInfo));
 
     try {
       print('백에서 회원 전체러닝정보 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8081/api/running/${_tokenInfo.memberId}',
-        // options: Options(
-          // headers: {
-          //   'Authorization': 'Bearer ${_tokenInfo.accessToken}',    // *토큰 넣어주기
-          // }
-        // )
-      );
+      var response = await dio.get('http://k8c107.p.ssafy.io/api/running/${_tokenInfo.memberId}');
       print('러닝정보 가져오기 ${response.data}');
       // 데이터 형식
       // {
@@ -73,10 +59,81 @@ class _MypageState extends State<Mypage> {
       // },
       setState(() {
         runningList = response.data['runningList'];
+        runningListLoading = false;
       });
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  // 현재 게임아이디 조회
+  void getGameId() async {
+    var dio = Dio();
+    try {
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/gameId');
+      setState(() {
+        gameId = response.data;
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // 출시일 포함 각 주의 월요일과 일요일
+  void getTuesdaySunday() {
+    DateTime releaseDate = DateTime(2023, 5, 1);
+    DateTime now = DateTime.now();
+
+    // 출시일 이후의 화요일과 일요일을 구합니다.
+    DateTime startTuesday = releaseDate;
+    while (startTuesday.weekday != DateTime.tuesday) {
+      startTuesday = startTuesday.add(Duration(days: 1));
+    }
+    DateTime startSunday = startTuesday.add(Duration(days: 6));
+
+    // 현재 날짜의 주차까지 화요일과 일요일을 구합니다.
+    DateTime currentTuesday = startTuesday;
+    DateTime currentSunday = startSunday;
+
+    List<DateTime> allTuesdays = [];
+    List<DateTime> allSundays = [];
+
+    while (currentSunday.isBefore(now)) {
+      allTuesdays.add(currentTuesday);
+      allSundays.add(currentSunday);
+      currentTuesday = currentTuesday.add(Duration(days: 7));
+      currentSunday = currentSunday.add(Duration(days: 7));
+    }
+
+    DateTime nowdate = DateTime(now.year, now.month, now.day);
+
+    DateTime nowTuesday = nowdate.subtract(Duration(days: nowdate.weekday - 2));
+    DateTime nowSunday = nowTuesday.add(Duration(days: 6));
+
+    allTuesdays.add(nowTuesday);
+    allSundays.add(nowSunday);
+
+    // 출시일 이후의 화요일과 일요일만 따로 리스트로 구성합니다.
+    List<DateTime> tuesdays = [];
+    List<DateTime> sundays = [];
+
+    for (int i = 0; i < allTuesdays.length; i++) {
+      if (allTuesdays[i].isAfter(releaseDate)) {
+        tuesdays.add(allTuesdays[i]);
+        sundays.add(allSundays[i]);
+      }
+    }
+
+    tuesdaysList = tuesdays;
+    sundaysList = sundays;
+
+    // // 결과 출력
+    // for (int i = 0; i < tuesdays.length; i++) {
+    //   print('주차: ${i + 1}');
+    //   print('화요일: ${DateFormat('yyyy-MM-dd').format(tuesdays[i])}');
+    //   print('일요일: ${DateFormat('yyyy-MM-dd').format(sundays[i].subtract(Duration(days: 1)))}');
+    //   print('---------------------------');
+    // }
   }
 
   // 로컬에 저장된 토큰정보 가져오기
@@ -90,51 +147,28 @@ class _MypageState extends State<Mypage> {
   @override
   void initState() {
     super.initState();
+    getGameId();
     _loadTokenInfo().then((_) {
       getMyPageMember();
       getMyPageRunning();
     });
+    getTuesdaySunday();
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 2000));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
-    // 결과
-    void main() async {
-      await initializeDateFormatting('ko_KR', null);
-      // 오늘의 날짜 가져오기
-      DateTime today = DateTime.now();
 
-      // 이번 주의 첫 날짜 가져오기 (월요일)
-      DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-
-      // 이번 주의 마지막 날짜 가져오기 (일요일)
-      DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
-
-      // 이번 주의 모든 날짜 가져오기
-      List<DateTime> daysOfWeek = [];
-      for (var i = 0; i < 7; i++) {
-        daysOfWeek.add(startOfWeek.add(Duration(days: i)));
-      }
-
-      // 출력하기
-      for (var day in daysOfWeek) {
-        print(DateFormat.yMd('ko_KR').format(day));
-      }
-      var now = DateTime.now();
-      // var today = DateFormat('yyyy.MM.dd EEEE', 'ko_KR').format(now);
-      var weekdayName = DateFormat('EEEE', 'ko_KR').format(now);
-      var nextWeek = List.generate(
-        7,
-            (index) => DateFormat('yyyy.MM.dd EEEE', 'ko_KR').format(now.add(Duration(days: index))),
-      );
-
-      print(today);
-      print(weekdayName);
-      print(nextWeek);
-    }
-    return  Scaffold(
+    return Scaffold(
       body: SafeArea(
         top: true,
         bottom: false,
@@ -170,17 +204,16 @@ class _MypageState extends State<Mypage> {
                   ),
                   Positioned(
                     top: mediaHeight*0.12,
-                    child: Container(
-                      child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            '안녕하세요, ${_tokenInfo?.memberNickname ?? ''} 님!',
-                            style: TextStyle(
-                                fontSize: mediaWidth*0.045,
-                                fontWeight: FontWeight.w700,
-                                color: Color.fromRGBO(255, 255, 255, 1)
-                            ),
-                          )),
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        '안녕하세요, ${_tokenInfo?.memberNickname ?? ''} 님!',
+                        style: TextStyle(
+                          fontSize: mediaWidth*0.045,
+                          fontWeight: FontWeight.w700,
+                          color: Color.fromRGBO(255, 255, 255, 1)
+                        ),
+                      )
                     ),
                   ),
                   Positioned(
@@ -214,15 +247,21 @@ class _MypageState extends State<Mypage> {
                           Positioned(
                             left: mediaWidth*0.01,
                             top: mediaWidth*0.01,
-                            child: Container(
+                            child: profileImg != null ? Container(
                               width: mediaWidth*0.18,
                               height: mediaWidth*0.18,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                  image: NetworkImage('$profileImg'),
+                                  image: NetworkImage(profileImg),
                                   fit: BoxFit.cover,
                                 ),
+                              )
+                            ) : SizedBox(
+                              width: mediaWidth*0.18,
+                              height: mediaWidth*0.18,
+                              child: Center(
+                                child: CircularProgressIndicator(),
                               )
                             )
                           )
@@ -236,7 +275,6 @@ class _MypageState extends State<Mypage> {
                   Positioned(
                     left: mediaWidth*0.05,
                     top: mediaHeight*0.04,
-                    // margin: EdgeInsets.fromLTRB(mediaWidth*0.5, mediaHeight*0.1, 0, mediaHeight*0.1),
                     child: Text('마이페이지', style: TextStyle(
                         fontSize: mediaWidth*0.07,
                         fontWeight: FontWeight.w700,
@@ -248,6 +286,7 @@ class _MypageState extends State<Mypage> {
               Expanded(
                 child: ListView(
                   controller: ScrollController(),
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, mediaHeight*0.2),
                   children: [
                     Container(
                       margin: const EdgeInsets.fromLTRB(10, 10, 10, 20),
@@ -259,47 +298,82 @@ class _MypageState extends State<Mypage> {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.5),
-                            // spreadRadius: 7,
                             blurRadius: 28,
-                            // offset: Offset(0, 7),
                           ),
                         ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(23, 19, 23, 19),
                         child: Column(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text('달린 거리',
-                                style: TextStyle(
-                                  fontSize: mediaWidth*0.04,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                textAlign: TextAlign.start
+                              style: TextStyle(
+                                fontSize: mediaWidth*0.04,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.start
                             ),
-                            runningList.isEmpty ?
-                              SizedBox(
-                                width: mediaWidth*0.8,
-                                height: mediaHeight*0.3,
+                            runningList.isNotEmpty ?
+                              RunningChart(
+                                runningList: runningList,
+                              )
+                              : SizedBox(
+                                width: mediaWidth * 0.8,
+                                height: mediaHeight * 0.3,
                                 child: Center(
-                                  child: CircularProgressIndicator(
+                                  child: runningListLoading == true ?
+                                  CircularProgressIndicator(
                                     color: YGMG_ORANGE,
                                   )
+                                  // : Text(
+                                  //     '러닝을 시작하세요!',
+                                  //     style: TextStyle(
+                                  //       fontSize: mediaWidth*0.05,
+                                  //       fontWeight: FontWeight.w700,
+                                  //       color: YGMG_ORANGE,
+                                  //       letterSpacing: 1
+                                  //     ),
+                                  //   )
+                                  : FadeTransition(
+                                    opacity: _controller,
+                                    child: Text(
+                                      '러닝을 시작하세요!',
+                                      style: TextStyle(
+                                        fontSize: mediaWidth*0.05,
+                                        fontWeight: FontWeight.w700,
+                                        color: YGMG_ORANGE,
+                                        letterSpacing: 1
+                                      ),
+                                    ),
+                                  )
                                 ),
-                              ) :
-                            RunningChart(
-                              runningList: runningList,
-                            ),
+                              )
                           ],
                         ),
                       ),
                     ),
                     Column(
                       children: [
-                        // MyWeeklyGame(),
-                        // MyWeeklyGame(),
-                        // MyWeeklyGame(),
+                      _tokenInfo != null && _tokenInfo.memberId != null && gameId != null ?
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: sundaysList.length,
+                          itemBuilder: (context, index) {
+                            final reversedIndex = sundaysList.length - 1 - index;
+                            if (reversedIndex < 4) {
+                              return MyWeeklyGame(
+                                memberId: _tokenInfo.memberId,
+                                nowgameId: gameId,
+                                tuesday: DateFormat('yyyy-MM-dd').format(tuesdaysList[reversedIndex]),
+                                sunday: DateFormat('yyyy-MM-dd').format(sundaysList[reversedIndex].subtract(Duration(days: 1))),
+                              );
+                            } else {
+                              return SizedBox(); // 빈 컨테이너 반환
+                            }
+                          },
+                        ) : SizedBox()
                       ],
                     ),
                   ],
@@ -308,11 +382,6 @@ class _MypageState extends State<Mypage> {
             ],
           ),
         ),
-      ),
-      // bottomNavigationBar: DrawPolygon(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: main,
-        child: Icon(Icons.ice_skating),
       ),
     );
   }
