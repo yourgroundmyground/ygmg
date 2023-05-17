@@ -6,13 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../const/state_provider_token.dart';
 
 class DailyGame extends StatefulWidget {
-  final double areaSize;
   final double runningPace;
   final double runningDist;
   final String runningDuration;
 
   const DailyGame({
-    required this.areaSize,
     required this.runningPace,
     required this.runningDist,
     required this.runningDuration,
@@ -27,6 +25,7 @@ class _DailyGameState extends State<DailyGame> {
   int? nowRanking;
   var _tokenInfo;
   var profileImg;
+  var areaSize;
 
   // 로컬에 저장된 토큰정보 가져오기
   Future<void> _loadTokenInfo() async {
@@ -42,8 +41,9 @@ class _DailyGameState extends State<DailyGame> {
     try {
       print('백에서 마이페이지 회원정보 가져오기!');
       print(_tokenInfo.accessToken);
-      dio.options.headers['Authorization'] = 'Bearer ${_tokenInfo.accessToken}';
-      var response = await dio.get('http://k8c107.p.ssafy.io:8080/api/member/mypage');
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/1');
+      //토큰 멤버아이디 바꾸기;
+      print('나와이시끼야');
       print(response.data);
       // 데이터 형식
       // {
@@ -55,8 +55,9 @@ class _DailyGameState extends State<DailyGame> {
       //   "profileImg": "https://asdfasdf.jpg"
       // }
       setState(() {
-        profileImg = response.data['profileImg'];
+        profileImg = response.data['profileUrl'];
       });
+      print(profileImg);
     } catch (e) {
       print(e.toString());
     }
@@ -68,12 +69,13 @@ class _DailyGameState extends State<DailyGame> {
     try {
       print('백에서 현재랭킹 가져오기!');
       // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/ranking/${_tokenInfo.memberId}');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/ranking/1');   // *테스트용
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/ranking/1');   // *테스트용
       print('현재 랭킹 ${response.data}');
       // 데이터 형식
       // 1
       setState(() {
-        nowRanking = response.data;
+        nowRanking = response.data['rank'];
+        areaSize = response.data['areaSize'];
         Future.delayed(Duration(seconds: 2), () {
           setState(() {
             showSvg = true;
@@ -150,8 +152,8 @@ class _DailyGameState extends State<DailyGame> {
                             height: mediaHeight*0.35,
                             color: Colors.blue,         // *나중에 지도 맵 넣기
                             child: DailyGameResultMap(
-                              memberId: _tokenInfo.memberId ?? '',
-                              // memberId: 1,
+                              // memberId: _tokenInfo.memberId ?? '',
+                              memberId: 1,
                             ),
                           )),
                           Positioned(
@@ -181,13 +183,13 @@ class _DailyGameState extends State<DailyGame> {
                               top: mediaHeight*0.3,
                               left: mediaWidth*0.1,
                               right: mediaWidth*0.1,
-                              child:DailyGameResult(
-                                areaSize: widget.areaSize,
+                              child: profileImg != null && areaSize != null ? DailyGameResult(
+                                areaSize: areaSize,
                                 runningPace: widget.runningPace,
                                 runningDist: widget.runningDist,
                                 runningDuration: widget.runningDuration,
                                 profileImg: profileImg,
-                              )
+                              ) : SizedBox()
                           )
                         ],
                       )
@@ -310,7 +312,7 @@ class _DailyGameResultState extends State<DailyGameResult> {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${widget.areaSize.toStringAsFixed(0)}m²', style: TextStyle(
+                    Text('${(widget.areaSize*10000000000).toStringAsFixed(0)}m²', style: TextStyle(
                       fontSize: mediaWidth*0.045,
                       fontWeight: FontWeight.w900
                     ),)

@@ -63,7 +63,7 @@ class _DailyGameResultMapState extends State<DailyGameResultMap> {
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
     try {
       print('백에서 일별폴리곤 좌표리스트 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/day/${widget.memberId}/$formattedDate');
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/day/${widget.memberId}/$formattedDate');
       // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/day/1/2023-05-13');     // *요청 API 주소 넣기
       print(response.data);
       // 데이터 형식
