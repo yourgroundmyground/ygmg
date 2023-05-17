@@ -109,7 +109,6 @@ public class AreaUtil {
                 log.info("패배한 폴리곤 사이즈는 : " + newArea.getAreaSize());
 
                 areaRepository.save(newArea);
-                rankingService.addAreaSize(String.valueOf(newArea.getGame().getId()), String.valueOf(newArea.getMemberId()), newArea.getAreaSize());
 
             }
             return true;
