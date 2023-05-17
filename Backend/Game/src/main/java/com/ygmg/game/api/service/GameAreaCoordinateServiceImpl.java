@@ -49,7 +49,6 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
 
         List<Game> gameList = gameRepository.findAll();
         Game game = gameList.get(gameList.size() - 1);
-        System.out.println();
         List<Area> areaList = areaRepository.findByGame_Id(game.getId());
         for(Area area : areaList){
             if(areaUtil.defeatCoordinates(area, coordinateInfo.getAreaCoordinateDtoList())){

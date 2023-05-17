@@ -51,8 +51,7 @@ public class AreaUtil {
 
             Geometry difference = defeatPolygon.difference(winPolygon);
             long gameId = gameService.getGameId();
-            rankingService.subAreaSize(String.valueOf(gameId), String.valueOf(memberId), difference.getArea());
-
+            rankingService.subAreaSize(String.valueOf(gameId), String.valueOf(memberId), defeatPolygon.getArea()-difference.getArea());
             if(difference instanceof MultiPolygon){
                 MultiPolygon multiPolygon = (MultiPolygon) difference;
                 for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
@@ -79,6 +78,7 @@ public class AreaUtil {
                     }
 
                     areaRepository.save(newArea);
+                    System.out.println(i+"번째 폴리곤 넓이 : "+newArea.getAreaSize());
                 }
             }
             else if(difference instanceof Polygon){
