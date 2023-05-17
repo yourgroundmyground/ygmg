@@ -46,8 +46,8 @@ class MyRankingInfoNotifier extends StateNotifier<List<MyRankingInfo>> {
 
       final myRankingInfo = MyRankingInfo(
           memberId: myId,
-          rank: data['rank'],
-          areaSize: data['areaSize'],
+          rank: data['rank'] ?? 0 ,
+          areaSize: data['areaSize'] ?? 0,
           memberNickname: myNickname,
           profileUrl: data2['profileUrl'],
       );
