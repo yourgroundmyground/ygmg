@@ -18,7 +18,7 @@ class WeeklyGameIntro extends StatelessWidget {
         decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: AssetImage('assets/images/gamemap.png'),
+              image: AssetImage('assets/images/gamemapgj.jpg'),
             )
         ),
         child: Column(
