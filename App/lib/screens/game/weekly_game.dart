@@ -65,10 +65,11 @@ class _WeeklyGameState extends State<WeeklyGame> {
     }
   }
 
+  // 게임아이디 날짜 정보 조회
   void getGameIdInfo() async {
     var dio = Dio();
     try {
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/game/$gameId');
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/$gameId');
 
       String formattedStart = DateFormat('yyyy-MM-dd').format(DateTime.parse(response.data['gameStart']));
       String formattedEnd = DateFormat('yyyy-MM-dd').format(DateTime.parse(response.data['gameEnd']));
