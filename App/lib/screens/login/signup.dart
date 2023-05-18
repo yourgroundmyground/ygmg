@@ -92,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       var encodedNickname = Uri.encodeComponent(nickname);
       var response = await dio.get(
-          "http://k8c107.p.ssafy.io:8080/api/member/check/$nickname",
+          "https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/check/$nickname",
           queryParameters: {"memberNickname": encodedNickname});
 
       if (response.statusCode == 200) {
@@ -144,7 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final response = await dio.post(
-        'http://k8c107.p.ssafy.io:8080/api/member/app',
+        'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/app',
         data: formData,
         options: Options(
           // method: 'POST',
@@ -155,7 +155,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       );
 
-      print('회원가입 성공! $response.data');
+      // print('회원가입 성공! $response.data');
 
       if (response.data['statusCode'] == 200) {
         int memberId = response.data['tokenInfo']['memberId'];
@@ -172,9 +172,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           refreshToken: refreshToken,
         );
 
-        print('회원가입 성공???????? $response.data');
         await saveTokenSecureStorage(tokenInfo);
-        print('회원가입 성공~~ $response.data');
+        // print('회원가입 성공~~ $response.data');
         return true;
 
       }
@@ -483,15 +482,6 @@ class _NicknameFieldState extends State<NicknameField> {
             cursorColor: Colors.teal,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             onChanged: widget.onChanged,
-            // validator: (value) {
-            //   if (value!.length>8) {
-            //     return '8글자를 넘을 수 없습니다';
-            //   } else if (!RegExp(r'^[가-힣a-zA-Z0-9]+$').hasMatch(value)) {
-            //     return '특수문자는 사용할 수 없습니다';
-            //   } else {
-            //     return null;
-            //   }
-            // },
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(10),
               focusedBorder: InputBorder.none, //밑줄 없애기
@@ -511,14 +501,12 @@ class _NicknameFieldState extends State<NicknameField> {
 class WeightField extends StatefulWidget {
   final TextEditingController? controller;
   final String? hintText;
-  // final String? errorText;
   final ValueChanged<String>? onChanged;
 
 
   const WeightField({
     this.controller,
     this.hintText,
-    // this.errorText,
     this.onChanged,
     Key? key}) : super(key: key);
 
@@ -550,23 +538,11 @@ class _WeightFieldState extends State<WeightField> {
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(10),
               hintText: widget.hintText,
-              // errorText: errorText,
               hintStyle: TextStyle(color: Colors.grey),
               filled: true,
               fillColor: Colors.white.withOpacity(0.5),
               border: baseBorder,
             ),
-            // validator: (value) {
-            //   if (value == null || value.isEmpty) {
-            //     return '몸무게를 입력하세요';
-            //   } else {
-            //     int? parsedValue = int.tryParse(value);
-            //     if (parsedValue == null || parsedValue > 400 || parsedValue < 10) {
-            //       return '실제 몸무게가 맞나요?';
-            //     }
-            //   }
-            //   return null;
-            // },
           ),
         ),
       ],
