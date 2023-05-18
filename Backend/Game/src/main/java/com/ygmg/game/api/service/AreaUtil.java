@@ -30,7 +30,7 @@ public class AreaUtil {
 
         List<AreaCoordinate> defeatAreaCoordinateList = area.getAreaCoordinateList();
         Long memberId = area.getMemberId();
-        LocalDateTime originLocalDateTime = area.getAreaDate().plusHours(9);
+        LocalDateTime originLocalDateTime = area.getAreaDate();
 
         Coordinate [] defeatCoordinate = new Coordinate[defeatAreaCoordinateList.size()];
         Coordinate [] winCoordinates = new Coordinate[areaCoordinateDtoList.size()];
