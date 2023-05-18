@@ -27,7 +27,7 @@ class GameStart extends ConsumerWidget {
     final todaysDate = DateTime.now();
     final formattedDate = DateFormat('yyyy-MM-dd').format(todaysDate); //2023-05-18
 
-
+    //오늘 게임 참여 여부 검사
     Future<dynamic> amIjoined() async {
       try {
         final tokenInfo = await loadTokenFromSecureStorage();

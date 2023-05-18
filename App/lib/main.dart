@@ -1,9 +1,9 @@
+import 'package:app/const/const_isgameEnd.dart';
 import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:app/const/state_provider_interceptor.dart';
 import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
 import 'package:app/const/state_provider_token.dart';
-import 'package:app/screens/game/weekly_game_result.dart';
 import 'package:app/screens/login/loading.dart';
 import 'package:app/widgets/bottomnavbar.dart';
 import 'package:dio/dio.dart';
@@ -51,9 +51,8 @@ void main() async {
   final String? gameStart = gameTimes != null ? gameTimes['gameStart'] : null;
   final String? gameEnd = gameTimes != null ? gameTimes['gameEnd'] : null;
 
-  final TodaysDate = DateTime.now();
-
-
+  final todaysDate = DateTime.now();
+  await setFirstTimeInThisWeek();
 
 
 
@@ -73,7 +72,7 @@ void main() async {
       child: MyApp(
         gameStart:gameStart,
         gameEnd: gameEnd,
-        todaysDate: TodaysDate,
+        todaysDate: todaysDate,
       ),
     )
   );
@@ -92,18 +91,13 @@ class MyApp extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    final isWithinGameTime = gameStart != null &&
-        gameEnd != null &&
-        todaysDate.isAfter(DateTime.parse(gameStart.toString())) &&
-        todaysDate.isBefore(DateTime.parse(gameEnd.toString()));
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: isWithinGameTime ? LoadingScreen() : WeeklyGameResult(),
-      // home: LoadingScreen(),
+      home: LoadingScreen(),
 
     );
   }
