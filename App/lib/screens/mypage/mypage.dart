@@ -251,11 +251,6 @@ class _MypageState extends State<Mypage> with SingleTickerProviderStateMixin {
                         ])
                       ),
                   Positioned(
-                      right: mediaWidth*0.05,
-                      top: mediaHeight*0.125,
-                      child: Image.asset('assets/images/Gear.png'),
-                  ),
-                  Positioned(
                     left: mediaWidth*0.05,
                     top: mediaHeight*0.04,
                     child: Text('마이페이지', style: TextStyle(
