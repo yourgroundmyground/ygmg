@@ -92,7 +92,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       var encodedNickname = Uri.encodeComponent(nickname);
       var response = await dio.get(
-          "https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/check/$nickname",
+          "http://k8c107.p.ssafy.io/api/member/check/$nickname",
           queryParameters: {"memberNickname": encodedNickname});
 
       if (response.statusCode == 200) {
@@ -106,6 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return response.data;
       }
     } catch (e) {
+      print('닉네임체크에러발생');
       print(e);
       return '닉네임 체크 에러 발생';
     }
@@ -144,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final response = await dio.post(
-        'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/app',
+        'http://k8c107.p.ssafy.io/api/member/app',
         data: formData,
         options: Options(
           // method: 'POST',
