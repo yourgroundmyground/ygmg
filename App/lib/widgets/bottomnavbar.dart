@@ -9,6 +9,8 @@ import 'package:app/screens/running/running_start.dart';
 import 'package:dio/dio.dart';
 import 'package:app/const/state_provider_interceptor.dart';
 
+import '../const/state_provider_token.dart';
+
 class Navbar extends StatefulWidget {
   @override
   _NavbarState createState() => _NavbarState();
@@ -27,9 +29,6 @@ final defaultImg = 'assets/images/testProfile.png'; // 기본 이미지 경로
 // 회원정보 조회 요청
 void getMyPageMember() async {
   var dio = Dio();
-  dio.interceptors.add(
-      TokenInterceptor(_tokenInfo)
-  );
 
   try {
     var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/${_tokenInfo.memberId}');
@@ -93,9 +92,17 @@ void isOverGameTime() async {
   }
 }
 
+// 로컬에 저장된 토큰정보 가져오기
+Future<void> _loadTokenInfo() async {
+  final tokenInfo = await loadTokenFromSecureStorage();
+  setState(() {
+    _tokenInfo = tokenInfo;
+  });
+}
 
 @override
 void initState() {
+  _loadTokenInfo().then((value) => getMyPageMember());
   fetchGameTime();
   fetchIsitFirst();
   _pages.add(RunningStart());
@@ -115,6 +122,8 @@ void initState() {
   @override
   Widget build(BuildContext context) {
 
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: null,
@@ -150,7 +159,7 @@ void initState() {
                   BottomNavigationBarItem(
                       icon: Image.asset('assets/images/RunningShoe.png'), label: 'Running'),
                   BottomNavigationBarItem(
-                      icon: Image.asset('assets/images/testProfile.png', width: 40,), label: ''),
+                      icon: Image.asset('assets/images/testProfile.png', width: 0,), label: ''),
                   BottomNavigationBarItem(
                       icon: Image.asset('assets/images/medal.png'), label: 'Game')
                 ]),
@@ -162,22 +171,55 @@ void initState() {
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FloatingActionButton(
-          child : Container(
-            width:  100,
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-              Color(0xFFFBCA92),
-              Color(0xFFEF7EC2)
-              ]
-            ),
-          ),
-          child: Image.network(profileImg ?? defaultImg, width: 20),
-          ),
+          child : Stack(
+              children: [
+                Container(
+                    width: mediaWidth*0.2,
+                    height: mediaWidth*0.2,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFFFBCA92),
+                              Color(0xFFEF7EC2)
+                            ]
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.7),
+                            blurRadius: 2.0,
+                            spreadRadius: 0.0,
+                            offset: const Offset(0,4),
+                          )
+                        ]
+                    )
+                ),
+                Positioned(
+                    left: mediaWidth * 0.01,
+                    top: mediaWidth * 0.01,
+                    right: mediaWidth * 0.01,
+                    bottom: mediaWidth * 0.01,
+                    child: profileImg != null ? Container(
+                        width: mediaWidth*0.1,
+                        height: mediaWidth*0.1,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: NetworkImage(profileImg),
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                    ) : SizedBox(
+                        width: mediaWidth*0.1,
+                        height: mediaWidth*0.1,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        )
+                    )
+                )
+              ]),
           onPressed: () => setState(() {
             _currentIndex = 1;
           }),

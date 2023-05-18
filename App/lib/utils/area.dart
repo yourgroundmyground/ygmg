@@ -398,8 +398,8 @@ class DrawPolygonState extends State<DrawPolygon> {
       double areaSize,
       List<Map<String, dynamic>> areaCoordinateDtoList)
        async {
+    var dio = Dio();
     try {
-      var dio = Dio();
       print('백에 보낸당!');
       var response = await dio.post('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/coordinate/',
           data: {
@@ -416,23 +416,9 @@ class DrawPolygonState extends State<DrawPolygon> {
           },
           );
       responsedata = response.data;
-      print('성공인가');
-      print(response.data);
-      // if (response.data == '면적이 생성되었습니다.') {
-        print('됨');
-        addNewPolygon();
-        print('뭔데');
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DailyGame(runningPace: runningPace, runningDist: runningDist, runningDuration: runningDuration),
-          ),
-        );
-      // }
     } catch (e) {
-      print('에러임');
-      responsedata = e.toString();
-      // resetPoints();
+      addNewPolygon();
+      moveToResult();
       print(e.toString());
     }
   }
@@ -744,6 +730,15 @@ class DrawPolygonState extends State<DrawPolygon> {
       isCompleted = false;
       print('변수가 변경되었습니다!');
     });
+  }
+
+  void moveToResult () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DailyGame(runningPace: runningPace, runningDist: runningDist, runningDuration: formatDuration(runningDuration)),
+        ),
+      );
   }
 
   // 폴리곤 면적 계산
