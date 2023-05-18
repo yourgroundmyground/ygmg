@@ -99,12 +99,7 @@ class _GameDetailView1State extends State<GameDetailView1> {
                   ),
                   IconButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Mypage(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       }, icon: Image.asset('assets/images/closebtn.png')
                   )
                 ],

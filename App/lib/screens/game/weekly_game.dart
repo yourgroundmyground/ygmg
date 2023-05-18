@@ -1,4 +1,5 @@
 import 'package:app/const/colors.dart';
+import 'package:app/main.dart';
 import 'package:app/widgets/modal.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -252,6 +253,16 @@ class _WeeklyGameState extends State<WeeklyGame> {
                     )
                   ],
                 ),
+                SizedBox(height: mediaHeight*0.03,),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                      (route) => false,
+                    );
+                  },
+                  child: Image.asset('assets/images/Home_button.png')),
               ],
             )
         )

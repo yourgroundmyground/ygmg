@@ -1,3 +1,4 @@
+import 'package:app/main.dart';
 import 'package:app/screens/running/running_start.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -160,9 +161,11 @@ class _RunningInfoState extends State<RunningInfo> {
         runningDist = _distance;
         runningPace = _currentSpeed;
         runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
+        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((locationData.time! ~/ 1).toInt());
+        String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
         // 위치 좌표 리스트에 추가
         _locationList.add({
-          'coordinateTime': locationData.time!,
+          'coordinateTime': formattedTime,
           'lat': locationData.latitude!,
           'lng': locationData.longitude!
         });
@@ -312,7 +315,7 @@ class _RunningInfoState extends State<RunningInfo> {
                             } else {
                               Navigator.pushAndRemoveUntil(
                                 context,
-                                MaterialPageRoute(builder: (context) => RunningStart()),
+                                MaterialPageRoute(builder: (context) => Home()),
                                 (route) => route.settings.name == 'InRunning',
                               );
                             }

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../const/state_provider_token.dart';
+import '../../main.dart';
 
 class DailyGame extends StatefulWidget {
   final double runningPace;
@@ -180,7 +181,17 @@ class _DailyGameState extends State<DailyGame> {
                             ) : SizedBox()
                           )
                         ],
-                      )
+                      ),
+                      SizedBox(height: mediaHeight*0.03,),
+                      InkWell(
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                                  (route) => false,
+                            );
+                          },
+                          child: Image.asset('assets/images/Home_button.png')),
                     ],
                   ),
                 ],
