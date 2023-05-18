@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
         List<AreaCoordinate> list = new ArrayList<>();
 
         Area area = Area.builder()
-                .areaDate(LocalDateTime.now())
+                .areaDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .areaSize(areaUtil.getAreaSize(coordinateInfo.getAreaCoordinateDtoList()))
                 .memberId(coordinateInfo.getMemberId())
                 .game(game)
@@ -84,7 +85,7 @@ public class GameAreaCoordinateServiceImpl implements GameAreaCoordinateService 
             AreaCoordinate areaCoordinate = AreaCoordinate.builder()
                     .areaCoordinateLat(areaCoordinateDto.getAreaCoordinateLat())
                     .areaCoordinateLng(areaCoordinateDto.getAreaCoordinateLng())
-                    .areaCoordinateTime(LocalDateTime.now())
+                    .areaCoordinateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                     .area(area)
                     .build();
 

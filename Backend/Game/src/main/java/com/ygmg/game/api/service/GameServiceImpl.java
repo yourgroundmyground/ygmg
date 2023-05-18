@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Scheduled(cron = "0 0 0 ? * TUE")
     public Game createGame() {
-        LocalDateTime gameStart = LocalDateTime.now();
+        LocalDateTime gameStart = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         LocalDateTime gameEnd = gameStart.plusDays(5).plusHours(23).plusMinutes(50);
 
         Game game = Game.builder()

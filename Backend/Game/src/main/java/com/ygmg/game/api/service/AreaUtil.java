@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +119,7 @@ public class AreaUtil {
                             .areaCoordinateLat(coordinate.x)
                             .areaCoordinateLng(coordinate.y)
                             .area(newArea)
-                            .areaCoordinateTime(LocalDateTime.now())
+                            .areaCoordinateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                             .build());
                 }
                 if(donut){

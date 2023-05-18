@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Coordinate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class Area {
                 .areaCoordinateLat(coordinate.x)
                 .areaCoordinateLng(coordinate.y)
                 .area(area)
-                .areaCoordinateTime(LocalDateTime.now())
+                .areaCoordinateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .build());
     }
 

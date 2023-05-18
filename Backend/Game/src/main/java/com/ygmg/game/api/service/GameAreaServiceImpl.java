@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class GameAreaServiceImpl implements GameAreaService {
         Game game = gameRepository.findById(areaInfo.getGameId()).get();
 
         Area area = Area.builder()
-                .areaDate(LocalDateTime.now())
+                .areaDate(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .areaSize(areaInfo.getAreaSize())
                 .memberId(areaInfo.getMemberId())
                 .game(game)
