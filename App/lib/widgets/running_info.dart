@@ -162,7 +162,7 @@ class _RunningInfoState extends State<RunningInfo> {
         runningPace = _currentSpeed;
         runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
         DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((locationData.time! ~/ 1).toInt());
-        String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+        String formattedTime = DateFormat('HH:mm:ss').format(dateTime);
         // 위치 좌표 리스트에 추가
         _locationList.add({
           'coordinateTime': formattedTime,
