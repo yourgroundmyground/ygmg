@@ -1,4 +1,3 @@
-import 'package:app/const/const_isgameEnd.dart';
 import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:app/const/state_provider_interceptor.dart';
 import 'package:app/const/state_provider_my_ranking.dart';
@@ -51,8 +50,9 @@ void main() async {
   final String? gameStart = gameTimes != null ? gameTimes['gameStart'] : null;
   final String? gameEnd = gameTimes != null ? gameTimes['gameEnd'] : null;
 
-  final todaysDate = DateTime.now();
-  await setFirstTimeInThisWeek();
+  final TodaysDate = DateTime.now();
+
+
 
 
 
@@ -72,7 +72,7 @@ void main() async {
       child: MyApp(
         gameStart:gameStart,
         gameEnd: gameEnd,
-        todaysDate: todaysDate,
+        todaysDate: TodaysDate,
       ),
     )
   );
@@ -91,13 +91,17 @@ class MyApp extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    final isWithinGameTime = gameStart != null &&
+        gameEnd != null &&
+        todaysDate.isAfter(DateTime.parse(gameStart.toString())) &&
+        todaysDate.isBefore(DateTime.parse(gameEnd.toString()));
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      home: LoadingScreen(),
+      home: LoadingScreen() ,
 
     );
   }
