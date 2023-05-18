@@ -1,18 +1,70 @@
 import 'package:app/const/colors.dart';
+import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:slide_countdown/slide_countdown.dart';
 
-class CountDownClock extends StatelessWidget {
+class CountDownClock extends StatefulWidget {
   const CountDownClock({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  State<CountDownClock> createState() => _CountDownClockState();
+}
 
-    // 미디어 사이즈
+class _CountDownClockState extends State<CountDownClock> {
+  var _gameStart;
+  var _gameEnd;
+
+  //게임 시작, 끝 시각 가져오기
+  void getGameTimeInfo() async {
+    try {
+      final gameTimes = await getGameTime();
+      final String? gameStart = gameTimes != null ? gameTimes['gameStart'] : null;
+      final String? gameEnd = gameTimes != null ? gameTimes['gameEnd'] : null;
+
+      setState(() {
+        _gameStart = gameStart;
+        _gameEnd = gameEnd;
+      });
+
+    } catch (e) {
+      print('게임 타임 가져오기 $e');
+    }
+  }
+
+
+
+
+  @override
+  void initState() {
+    getGameTimeInfo();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
     // final mediaHeight = MediaQuery.of(context).size.height;
+
+
+
+    final todaysDate = DateTime.now();
+    final gameStartDate = _gameStart != null ? DateTime.parse(_gameStart!) : null;
+    final gameEndTime = _gameEnd != null ? DateTime.parse(_gameEnd!) : null;
+
+
+    //남은 시간
+    final remainingTime = gameEndTime?.difference(todaysDate) ?? Duration.zero;
+
+    final remainingDuration = Duration(
+      days: remainingTime.inDays,
+      hours: remainingTime.inHours.remainder(24),
+      minutes: remainingTime.inMinutes.remainder(60),
+      seconds: remainingTime.inSeconds.remainder(60),
+    );
+
     // *타이머시간설정
-    const defaultDuration = Duration(days: 2, hours: 2, minutes: 30);
+    // final defaultDuration = Duration(days: 5, hours: 23, minutes: 60);
+
     return Container(
       width: mediaWidth,
       alignment: Alignment.center,
@@ -20,7 +72,6 @@ class CountDownClock extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 20, bottom: 10),
-            // child: Text('Custom BoxDecoration & SeparatorType.title'),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -30,7 +81,7 @@ class CountDownClock extends StatelessWidget {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: remainingDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -57,7 +108,7 @@ class CountDownClock extends StatelessWidget {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: remainingDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -70,6 +121,7 @@ class CountDownClock extends StatelessWidget {
                   shouldShowHours: (p0) => true,
                   shouldShowMinutes: (p0) => false,
                   shouldShowSeconds: (p0) => false,
+
                 ),
               ),
               SizedBox(
@@ -84,7 +136,7 @@ class CountDownClock extends StatelessWidget {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: remainingDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -111,7 +163,7 @@ class CountDownClock extends StatelessWidget {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: remainingDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),

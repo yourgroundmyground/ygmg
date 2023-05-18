@@ -11,7 +11,7 @@ void fetchData(BuildContext context) async {
   if(await isKakaoTalkInstalled()){
     try{
       OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
-      print('카카오톡으로 로그인 성공 ${token.accessToken}');
+      // print('카카오톡으로 로그인 성공 ${token.accessToken}');
       sendCode(context, token.accessToken);
     }catch(error){
       print('카카오톡으로 로그인 실패 $error');
@@ -24,7 +24,7 @@ void fetchData(BuildContext context) async {
       // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
       try {
         OAuthToken token = await UserApi.instance.loginWithKakaoAccount(prompts: [Prompt.login]);
-        print('카카오계정으로 로그인 성공1 ${token.accessToken}');
+        // print('카카오계정으로 로그인 성공1 ${token.accessToken}');
         sendCode(context, token.accessToken);
       } catch (error) {
         print('카카오계정으로 로그인 실패 $error');
@@ -33,7 +33,7 @@ void fetchData(BuildContext context) async {
   } else {
     try {
       OAuthToken token = await UserApi.instance.loginWithKakaoAccount(prompts: [Prompt.login]);
-      print('카카오계정으로 로그인 성공2 ${token.accessToken}');
+      // print('카카오계정으로 로그인 성공2 ${token.accessToken}');
       sendCode(context, token.accessToken);
     } catch (error) {
       print('카카오계정으로 로그인 실패 $error');
@@ -42,14 +42,14 @@ void fetchData(BuildContext context) async {
 }
 
 void sendCode(BuildContext context, var accessToken) async {
-  print('sndcode 호출됌');
+  // print('sndcode 호출됌');
   Dio dio = Dio();
 
   Map<String, dynamic> code = {"accessToken" : accessToken};
   // var body = json.encode(code);
 
     final response = await dio.post(
-      "http://k8c107.p.ssafy.io:8080/api/member/kakao",
+      "https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/kakao",
       options: Options(
           headers: {"Content-Type": "application/json"}),
       data: jsonEncode(code),
@@ -89,7 +89,7 @@ void sendCode(BuildContext context, var accessToken) async {
         );
 
         await saveTokenSecureStorage(tokenInfo);
-        print('로그인성공 && 토큰 정보 저장');
+        // print('로그인성공 && 토큰 정보 저장');
         // print('로그인시 accessToken: ${tokenInfo.accessToken}');
 
 
@@ -102,14 +102,6 @@ void sendCode(BuildContext context, var accessToken) async {
         );
       }
       print('Response body: ${response.data}');
-
-      // final tokenInfo = await loadTokenFromSecureStorage();
-      // print('로깅 accessToken: ${tokenInfo.accessToken}');
-      // print('로깅 refreshToken: ${tokenInfo.refreshToken}');
-      // print('로깅 memberId: ${tokenInfo.memberId}');
-      // print('로깅 memberNickname: ${tokenInfo.memberNickname}');
-      // print('로깅 memberWeight: ${tokenInfo.memberWeight}');
-
 
 
     } else {
@@ -148,33 +140,13 @@ class LoginScreen extends StatelessWidget {
                     margin: EdgeInsets.only(top: mediaHeight*0.02),
                     child: GestureDetector(
                       onTap: () async {
-                        //이미지 클릭시 실행할 코드
                         fetchData(context);
-
-                        print('터치터치');
                       },
                       child: Image.asset('assets/images/kakao_login_medium_narrow.png'),
                     ),
                   ),
                 ],
 
-                // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     GestureDetector(
-                  //       onTap: (){
-                  //         //이미지 클릭시 실행할 코드
-                  //
-                  //       },
-                  //       child: Container(
-                  //         padding: EdgeInsets.only(left: mediaWidth*0.4),
-                  //         margin: EdgeInsets.only(top: mediaHeight*0.01),
-                  //         child: Text('니땅내땅이 처음이세요?',
-                  //             style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
-                  //       )
-                  //
-                  //     ),
-                  //   ]),
               ),
           )
               ),

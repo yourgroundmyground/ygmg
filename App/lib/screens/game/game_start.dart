@@ -1,10 +1,14 @@
 import 'package:app/const/state_provider_countrunners.dart';
 import 'package:app/const/state_provider_my_ranking.dart';
 import 'package:app/const/state_provider_ranking.dart';
+import 'package:app/const/state_provider_token.dart';
+import 'package:app/screens/game/ingame.dart';
 import 'package:app/widgets/countdown_clock.dart';
 import 'package:app/widgets/profile_img.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class GameStart extends ConsumerWidget {
 
@@ -20,6 +24,26 @@ class GameStart extends ConsumerWidget {
     final myRankingInfoAsyncValue = ref.watch(myRankingInfoFutureProvider);
     final runnerCount = ref.watch(runnerCountProvider);
 
+    final todaysDate = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd').format(todaysDate); //2023-05-18
+
+
+    Future<dynamic> amIjoined() async {
+      try {
+        final tokenInfo = await loadTokenFromSecureStorage();
+        var myId = tokenInfo.memberId;
+        var response = await Dio().get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/day/$myId/$formattedDate');
+        final joined = response.data;
+
+        return joined;
+      } catch (error) {
+
+        print('amIjoined errer $error');
+      }
+    }
+
+
+
     return rankingInfoAsyncValue.when(
       data: (rankingInfoList) {
         return myRankingInfoAsyncValue.when(
@@ -31,7 +55,7 @@ class GameStart extends ConsumerWidget {
                 decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: AssetImage('assets/images/gamemap.png'),
+                      image: AssetImage('assets/images/gamemapgj.jpg'),
                     )
                 ),
                 child: Column(
@@ -65,8 +89,7 @@ class GameStart extends ConsumerWidget {
                               ),
                               Text('실시간 순위'),
                               Flexible
-                                (
-                                flex: 5,
+                                (flex: 5,
                                 child: Column(
                                   children: [
                                     Padding(
@@ -96,14 +119,11 @@ class GameStart extends ConsumerWidget {
                                         child: Userprofile(
                                           height: mediaHeight * 0.06,
                                           width: mediaWidth * 0.75,
-                                          // imageProvider: AssetImage('assets/images/profile02.png'),
                                           imageProvider: NetworkImage(
                                             rankingInfoList.length > 1 ? rankingInfoList[1].profileUrl : ''),
                                             text1: rankingInfoList.length > 1 ? '2' : '',
                                             text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname : '',
                                             text3: rankingInfoList.length > 1 ? rankingInfoList[1].areaSize.toString() : '',
-                                          // text2: rankingInfoList.length > 1 ? rankingInfoList[1].memberNickname.toString() : '',
-                                          // text3: rankingList[1]?.areaSize.toString(),
                                         ),
                                       ),
                                     ),
@@ -120,8 +140,6 @@ class GameStart extends ConsumerWidget {
                                           text1: rankingInfoList.length > 2 ? '3' : '',
                                           text2: rankingInfoList.length > 2 ? rankingInfoList[2].memberNickname : '',
                                           text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString() : '',
-                                          // imageProvider: AssetImage('assets/images/profile03.png'),
-                                          // text3: rankingInfoList.length > 2 ? rankingInfoList[2].areaSize.toString() : '',
 
                                         ),
                                       ),
@@ -153,16 +171,37 @@ class GameStart extends ConsumerWidget {
                               Flexible(
                                 fit: FlexFit.tight,
                                 flex: 2,
-                                child: GestureDetector(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                      'assets/images/Startbutton.png'),
+                                child: FutureBuilder<dynamic>(
+                                  future: amIjoined(),
+                                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                      return CircularProgressIndicator();
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      String imagePath = snapshot.data.isNotEmpty
+                                          ? 'assets/images/already_joined.png'
+                                          : 'assets/images/Startbutton.png';
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (snapshot.data.isEmpty) {
+                                            Navigator.of(context).pushAndRemoveUntil(
+                                              MaterialPageRoute(
+                                                  builder: (BuildContext context) => InGame()),
+                                                  (Route<dynamic> route) => false,
+                                            );
+                                          }
+                                          },
+                                        child: Image.asset(imagePath),
+                                      );
+                                    }
+                                    },
                                 ),
-                              )
+                              ),
                             ],
                           ),
-                        )
-                    )
+                        ),
+                    ),
                   ],
                 ),
               ),
@@ -175,6 +214,5 @@ class GameStart extends ConsumerWidget {
       loading: () => CircularProgressIndicator(),
       error: (err, stack) => Text('Error: $err'),
     );
-
   }
 }

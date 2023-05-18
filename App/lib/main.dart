@@ -44,9 +44,7 @@ void main() async {
   }
 
   fetchGameInfo();
-  print('게임아이디 가져오기');
   updateGameId();
-  print('게임인포 업데이트');
 
 
   final gameTimes = await getGameTime();
@@ -54,6 +52,7 @@ void main() async {
   final String? gameEnd = gameTimes != null ? gameTimes['gameEnd'] : null;
 
   final TodaysDate = DateTime.now();
+
 
 
 
