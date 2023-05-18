@@ -102,35 +102,34 @@ public class AreaUtil {
                             break;
                         }
                     }
+
+                    List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
+
+                    Area newArea = Area.builder()
+                            .areaCoordinateList(newAreaCoordinateList)
+                            .areaDate(originLocalDateTime)
+                            .areaSize(polygon.getArea())
+                            .memberId(memberId)
+                            .game(area.getGame())
+                            .build();
+
+                    for (Coordinate coordinate : difference.getCoordinates()) {
+                        newAreaCoordinateList.add(AreaCoordinate.builder()
+                                .areaCoordinateLat(coordinate.x)
+                                .areaCoordinateLng(coordinate.y)
+                                .area(newArea)
+                                .areaCoordinateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                                .build());
+                    }
+                    if(donut){
+                        newArea.makeDonut(coordinates[0],newArea);
+                    }
+
+                    log.info("기존 폴리곤 사이즈는 : " + area.getAreaSize());
+                    log.info("패배한 폴리곤 사이즈는 : " + newArea.getAreaSize());
+
+                    areaRepository.save(newArea);
                 }
-
-                List<AreaCoordinate> newAreaCoordinateList = new ArrayList<>();
-
-                Area newArea = Area.builder()
-                        .areaCoordinateList(newAreaCoordinateList)
-                        .areaDate(originLocalDateTime)
-                        .areaSize(polygon.getArea())
-                        .memberId(memberId)
-                        .game(area.getGame())
-                        .build();
-
-                for (Coordinate coordinate : difference.getCoordinates()) {
-                    newAreaCoordinateList.add(AreaCoordinate.builder()
-                            .areaCoordinateLat(coordinate.x)
-                            .areaCoordinateLng(coordinate.y)
-                            .area(newArea)
-                            .areaCoordinateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-                            .build());
-                }
-                if(donut){
-                    newArea.makeDonut(coordinates[0],newArea);
-                }
-
-                log.info("기존 폴리곤 사이즈는 : " + area.getAreaSize());
-                log.info("패배한 폴리곤 사이즈는 : " + newArea.getAreaSize());
-
-                areaRepository.save(newArea);
-
             }
             return true;
         }
