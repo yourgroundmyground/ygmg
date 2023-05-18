@@ -1,6 +1,7 @@
 import 'package:app/const/colors.dart';
 import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:slide_countdown/slide_countdown.dart';
 
 class CountDownClock extends StatefulWidget {
@@ -33,7 +34,6 @@ class _CountDownClockState extends State<CountDownClock> {
 
 
 
-
   @override
   void initState() {
     getGameTimeInfo();
@@ -45,32 +45,23 @@ class _CountDownClockState extends State<CountDownClock> {
     final mediaWidth = MediaQuery.of(context).size.width;
     final mediaHeight = MediaQuery.of(context).size.height;
 
+    final now = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    DateTime dateTime1 = DateTime.parse(now);
+    DateTime dateTime2 = DateTime.parse(_gameEnd);
+    Duration difference = dateTime2.difference(dateTime1);
 
-    final todaysDate = DateTime.now();
-    final gameStartDate = _gameStart != null ? DateTime.parse(_gameStart!) : null;
-    final gameEndTime = _gameEnd != null ? DateTime.parse(_gameEnd!) : null;
+    int days = difference.inDays;
+    int hours = difference.inHours.remainder(24);
+    int minutes = difference.inMinutes.remainder(60);
+    int seconds = difference.inSeconds.remainder(60);
 
-    //남은 시간
-    final remainingTime = gameEndTime?.difference(todaysDate) ?? Duration.zero;
-
-
-    final remainingDuration = Duration(
-      days: remainingTime.inDays,
-      hours: remainingTime.inHours.remainder(24),
-      minutes: remainingTime.inMinutes.remainder(60),
-      seconds: remainingTime.inSeconds.remainder(60),
-    );
-
-    final defaultDurationDay = remainingTime.inDays;
-    final defaultDurationHour = remainingTime.inHours;
-    final defaultDurationMin= remainingTime.inMinutes;
-    final defaultDurationSecond = remainingTime.inSeconds;
-
-
-    // *타이머시간설정
-    final defaultDuration = Duration(days: defaultDurationDay, hours: defaultDurationHour, minutes: defaultDurationMin, seconds: defaultDurationSecond);
-    print(defaultDuration);
-    final defaultDuration2 = Duration(days: 2, hours: 10, minutes: 20, seconds: 5);
+    String formattedDifference = '$days:${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    List<String> parts = formattedDifference.split(':');
+    int rdays = int.parse(parts[0]);
+    int rhours = int.parse(parts[1]);
+    int rminutes = int.parse(parts[2]);
+    int rseconds = int.parse(parts[3]);
+    Duration defaultDuration = Duration(days: rdays, hours: rhours, minutes: rminutes, seconds: rseconds);
 
     return Container(
       width: mediaWidth,
@@ -88,7 +79,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration2,
+                  duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -115,7 +106,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration2,
+                  duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -143,7 +134,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration2,
+                  duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -170,7 +161,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration2,
+                  duration: defaultDuration,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
