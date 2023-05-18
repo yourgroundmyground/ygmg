@@ -83,7 +83,7 @@ class _GameDetailView1State extends State<GameDetailView1> {
         top: true,
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.05, mediaWidth*0.07, mediaHeight*0.02),
+          padding: EdgeInsets.fromLTRB(mediaWidth*0.07, mediaHeight*0.08, mediaWidth*0.07, mediaHeight*0.02),
           child: Column(
             children: [
               Row(

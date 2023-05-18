@@ -161,7 +161,7 @@ class GameStart extends ConsumerWidget {
                                         width: mediaWidth * 0.75,
                                         text1: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].rank.toString() : '_',
                                         text2: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].memberNickname : '_',
-                                        text3: myRankingInfoList.isNotEmpty ? (myRankingInfoList[0].areaSize != null ? myRankingInfoList[0].areaSize.toString() : 'null') : '_',
+                                        text3: myRankingInfoList.isNotEmpty ? (myRankingInfoList[0].areaSize != null ? (myRankingInfoList[0].areaSize!*10000000000).toStringAsFixed(0) : 'null') : '_',
                                         // text3: myRankingInfoList.isNotEmpty ? myRankingInfoList[0].areaSize.toString() : '_',
                                       ),
                                     ),
@@ -176,7 +176,7 @@ class GameStart extends ConsumerWidget {
                                   future: amIjoined(),
                                   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                                     if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return CircularProgressIndicator();
+                                      return SizedBox();
                                     } else if (snapshot.hasError) {
                                       return Text('Error: ${snapshot.error}');
                                     } else {
@@ -186,10 +186,9 @@ class GameStart extends ConsumerWidget {
                                       return GestureDetector(
                                         onTap: () {
                                           if (snapshot.data.isEmpty) {
-                                            Navigator.of(context).pushAndRemoveUntil(
+                                            Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (BuildContext context) => InGame()),
-                                                  (Route<dynamic> route) => false,
                                             );
                                           }
                                           },
@@ -208,11 +207,11 @@ class GameStart extends ConsumerWidget {
               ),
             );
           },
-          loading: () => CircularProgressIndicator(),
+          loading: () => Center(child: CircularProgressIndicator(),),
           error: (err, stack) => Text('Error: $err'),
         );
       },
-      loading: () => CircularProgressIndicator(),
+      loading: () => Center(child: CircularProgressIndicator(),),
       error: (err, stack) => Text('Error: $err'),
     );
   }

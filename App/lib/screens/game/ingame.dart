@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:slide_countdown/slide_countdown.dart';
 import 'dart:async';
 import '../../main.dart';
+import '../../widgets/countdownTimer.dart';
 
 
 class InGame extends StatefulWidget {
@@ -39,8 +40,7 @@ class InGameState extends State<InGame> {
 
     return Stack(
       children: [
-        Container(
-          child: DrawPolygon(
+          DrawPolygon(
             key: drawPolygonStateKey,
             isWalking: isWalking,
             drawGround: drawGround,
@@ -48,45 +48,42 @@ class InGameState extends State<InGame> {
             toggleWalking: toggleWalking,
             runningStartTime: runningStartTime
           ),
-        ),
         Positioned(
           left: mediaWidth*0.03,
           top: mediaHeight*0.03,
-          child: Container(
-            //왼쪽 위 모달
-            width: 200,
-            decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(15)
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SlideCountdown(
-                  duration: const Duration(hours: 1),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFFDD987),
-                            Color(0xFFF79CC3),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter
-                      ),
-                  ),
-                  onDone: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Home(),
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
+          child: CountdownTimer(
+            duration: 3600,
           ),
+          // child: Container(
+          //   decoration: BoxDecoration(
+          //     color: Colors.transparent, // 노란색 밑줄을 표시하지 않기 위해 투명색으로 설정
+          //   ),
+          //   child: SlideCountdown(
+          //     // SlideCountdown 위젯 설정
+          //     duration: const Duration(hours: 1),
+          //     padding: EdgeInsets.symmetric(horizontal: mediaWidth * 0.02, vertical: mediaHeight * 0.01),
+          //     textStyle: TextStyle(color: Colors.white),
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.all(Radius.circular(10)),
+          //       gradient: LinearGradient(
+          //         colors: [
+          //           Color(0xFFFDD987),
+          //           Color(0xFFF79CC3),
+          //         ],
+          //         begin: Alignment.topCenter,
+          //         end: Alignment.bottomCenter,
+          //       ),
+          //     ),
+          //     onDone: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => Home(),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
         ),
         // Positioned(
         //     right: mediaWidth*0.03,
