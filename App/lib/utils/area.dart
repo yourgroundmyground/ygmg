@@ -25,13 +25,13 @@ class DrawPolygon extends StatefulWidget {
   final runningStartTime;
 
   DrawPolygon(
-    {this.isWalking,
+      {this.isWalking,
       this.drawGround,
       this.currentTime,
       required this.toggleWalking,
       this.runningStartTime,
       Key? key})
-    : super(key: key);
+      : super(key: key);
 
   @override
   State<DrawPolygon> createState() => DrawPolygonState();
@@ -94,6 +94,7 @@ class DrawPolygonState extends State<DrawPolygon> {
   late PermissionStatus _permissionStatus;
   LocationData? _previousLocationData;
   late DateTime runningStart;
+
   // *달린 속도 변경
   double runningPace = 0.0;
   double runningPaceKm = 0.0;
@@ -103,6 +104,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // *달린 시간 변경
   Duration runningDuration = Duration.zero;
+
   // *태운 칼로리 변경
   double runningKcal = 0.0;
   double _distance = 0.0;
@@ -182,13 +184,13 @@ class DrawPolygonState extends State<DrawPolygon> {
   // }
 
   void setCustomMarkerIcon() {
-    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(20, 20)), "assets/images/marker.png")
+    BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(size: Size(20, 20)), "assets/images/marker.png")
         .then(
-          (icon) {
+      (icon) {
         setState(() {
           currentLocationIcon = icon;
-        }
-        );
+        });
       },
     );
   }
@@ -228,11 +230,13 @@ class DrawPolygonState extends State<DrawPolygon> {
     var dio = Dio();
     try {
       // print('gameId 가져오기');
-      var gameid = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/gameId');
+      var gameid = await dio.get(
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/gameId');
       gameIdData = gameid;
       // print('게임앙디');
       // print(gameid);
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/${gameIdData}');
+      var response = await dio.get(
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/${gameIdData}');
       // var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/game/2');
       print(response.data);
       Map<int, List<dynamic>> memberData = {};
@@ -295,8 +299,7 @@ class DrawPolygonState extends State<DrawPolygon> {
             markerId: MarkerId('marker_${i}_$memberId'),
             position: LatLng(centerLat, centerLng),
             icon: BitmapDescriptor.defaultMarkerWithHue(
-                HSLColor.fromColor(randomColor).hue
-            ),
+                HSLColor.fromColor(randomColor).hue),
             onTap: () async {
               var memberInfoList = await getMemberInfo(memberId);
               openProfileModal(memberInfoList);
@@ -331,11 +334,13 @@ class DrawPolygonState extends State<DrawPolygon> {
       print(e.toString());
     }
   }
+
   Future<List<dynamic>> getMemberInfo(int memberId) async {
     var dio = Dio();
     try {
       print('백에서 사용자들 닉네임, 프로필 가져오기!');
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=$memberId');
+      var response = await dio.get(
+          'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=$memberId');
       print(response.data);
       return response.data ?? [];
     } catch (e) {
@@ -343,6 +348,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       return [];
     }
   }
+
   void openProfileModal(List<dynamic> memberInfoList) {
     // 미디어 사이즈
     final mediaWidth = MediaQuery.of(context).size.width;
@@ -384,9 +390,12 @@ class DrawPolygonState extends State<DrawPolygon> {
       },
     );
   }
+
   var responsedata;
+  bool isSent = false;
+
   // post 요청
-  void sendGameData(
+  Future<void> sendGameData(
       int memberId,
       double runningDist,
       String runningEnd,
@@ -396,44 +405,49 @@ class DrawPolygonState extends State<DrawPolygon> {
       String runningDuration,
       String areaDate,
       double areaSize,
-      List<Map<String, dynamic>> areaCoordinateDtoList)
-       async {
+      List<Map<String, dynamic>> areaCoordinateDtoList) async {
     var dio = Dio();
     try {
       print('백에 보낸당!');
-      var response = await dio.post('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/coordinate/',
-          data: {
-            "memberId": memberId,   // *회원 아이디 넣기
-            "runningDistance": runningDist,
-            "runningEnd": runningEnd,
-            "runningKcal": runningKcal,
-            "runningPace": runningPace,
-            "runningStart": runningStart,
-            "runningTime": runningDuration,
-            "areaDate" : areaDate,
-            "areaSize" : areaSize,
-            "areaCoordinateDtoList" : areaCoordinateDtoList
-          },
-          );
+      var response = await dio.post(
+        'https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/coordinate/',
+        data: {
+          "memberId": memberId, // *회원 아이디 넣기
+          "runningDistance": runningDist,
+          "runningEnd": runningEnd,
+          "runningKcal": runningKcal,
+          "runningPace": runningPace,
+          "runningStart": runningStart,
+          "runningTime": runningDuration,
+          "areaDate": areaDate,
+          "areaSize": areaSize,
+          "areaCoordinateDtoList": areaCoordinateDtoList
+        },
+      );
       responsedata = response.data;
       addNewPolygon();
-      moveToResult();
+      setState(() {
+        isSent = true;
+      });
     } catch (e) {
       print(e.toString());
+      print('이거..에러야...');
+    }
+  }
+
+  void toResult() {
+    if (isSent) {
+      Timer.periodic(Duration(seconds: 3), (timer) {
+        moveToResult();
+      });
     }
   }
 
   // 받아온 폴리곤 추가
 
   void addPolygon(polygonData, memberData) {
-    final mediaWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final mediaHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
     for (var data in polygonData) {
       List<LatLng> points = [];
 
@@ -454,63 +468,65 @@ class DrawPolygonState extends State<DrawPolygon> {
       _polygonSets.add(polygon);
 
       String getProfileUrl(int memberId) {
-        final member = data.firstWhere((member) => member['memberId'] == memberId, orElse: () => null);
+        final member = data.firstWhere(
+            (member) => member['memberId'] == memberId,
+            orElse: () => null);
         if (member != null) {
           return member['profileUrl'];
         }
         return ''; // memberId에 해당하는 객체를 찾을 수 없는 경우 null을 반환
       }
+
       String getNickname(int memberId) {
-        final member = data.firstWhere((member) => member['memberId'] == memberId, orElse: () => null);
+        final member = data.firstWhere(
+            (member) => member['memberId'] == memberId,
+            orElse: () => null);
         if (member != null) {
           return member['memberNickname'];
         }
         return ''; // memberId에 해당하는 객체를 찾을 수 없는 경우 null을 반환
       }
-      _markers.add(
-          Marker(
-            markerId: MarkerId(data['areaId'].toString()),
-            position: findPolygonCenter(points),
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return SizedBox(
-                    height: mediaHeight * 0.2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(width: mediaWidth * 0.1),
-                        Container(
-                            width: mediaWidth * 0.2,
-                            height: mediaWidth * 0.2,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            child: ClipOval(
-                              child: Image.network(
-                                "${getProfileUrl(data['memberId'])}",
-                                // *사용자 프로필 이미지
-                                height: mediaWidth * 0.2,
-                                width: mediaWidth * 0.2,
-                                fit: BoxFit.cover,
-                              ),
-                            )
+
+      _markers.add(Marker(
+        markerId: MarkerId(data['areaId'].toString()),
+        position: findPolygonCenter(points),
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return SizedBox(
+                height: mediaHeight * 0.2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(width: mediaWidth * 0.1),
+                    Container(
+                        width: mediaWidth * 0.2,
+                        height: mediaWidth * 0.2,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
                         ),
-                        Text(getNickname(data['memberId']), style: TextStyle(
-                            fontSize: mediaWidth * 0.04)),
-                        SizedBox(width: mediaWidth * 0.1),
-                        Text("${data['areaDate']}", style: TextStyle(
-                            fontSize: mediaWidth * 0.04)),
-                      ],
-                    ),
-                  );
-                },
+                        child: ClipOval(
+                          child: Image.network(
+                            "${getProfileUrl(data['memberId'])}",
+                            // *사용자 프로필 이미지
+                            height: mediaWidth * 0.2,
+                            width: mediaWidth * 0.2,
+                            fit: BoxFit.cover,
+                          ),
+                        )),
+                    Text(getNickname(data['memberId']),
+                        style: TextStyle(fontSize: mediaWidth * 0.04)),
+                    SizedBox(width: mediaWidth * 0.1),
+                    Text("${data['areaDate']}",
+                        style: TextStyle(fontSize: mediaWidth * 0.04)),
+                  ],
+                ),
               );
             },
-
-        )
-      );
+          );
+        },
+      ));
     }
     return polygonData;
   }
@@ -554,10 +570,14 @@ class DrawPolygonState extends State<DrawPolygon> {
           currentLocation = location;
         });
         setState(() {
-          _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
-          _points.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
-          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((currentLocation!.time! ~/ 1).toInt());
-          String formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+          _currentPoints.add(
+              LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
+          _points.add(
+              LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
+          DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+              (currentLocation!.time! ~/ 1).toInt());
+          String formattedTime =
+              DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
           _polygonList.add({
             "areaCoordinateLat": currentLocation!.latitude!,
             "areaCoordinateLng": currentLocation!.longitude!,
@@ -589,7 +609,8 @@ class DrawPolygonState extends State<DrawPolygon> {
 
   // 폴리곤이 만들어지고 다시 게임을 시작했을 때 나의 실시간 경로를 표시하는 함수
   void _updateCurrentPolylines() {
-    _currentPoints.add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
+    _currentPoints
+        .add(LatLng(currentLocation!.latitude!, currentLocation!.longitude!));
     Polyline route = Polyline(
       polylineId: PolylineId('route1'),
       points: _currentPoints,
@@ -632,6 +653,7 @@ class DrawPolygonState extends State<DrawPolygon> {
 
     return LatLng(latitude, longitude);
   }
+
   _onCustomAnimationAlertPressed(context) {
     Alert(
       context: context,
@@ -642,11 +664,11 @@ class DrawPolygonState extends State<DrawPolygon> {
   }
 
   Widget fadeAlertAnimation(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return Align(
       child: FadeTransition(
         opacity: animation,
@@ -655,14 +677,13 @@ class DrawPolygonState extends State<DrawPolygon> {
     );
   }
 
-
   // 폴리곤의 자기교차 여부 판단
-  bool isNotSimplePolygon(List<LatLng> polygon){
-    if(polygon.length <= 3) {
+  bool isNotSimplePolygon(List<LatLng> polygon) {
+    if (polygon.length <= 3) {
       return false;
     }
 
-    for(int i = 0; i < polygon.length - 2; i++){
+    for (int i = 0; i < polygon.length - 2; i++) {
       double x1 = polygon[i].latitude;
       double y1 = polygon[i].longitude;
       double x2 = polygon[i + 1].latitude;
@@ -680,33 +701,37 @@ class DrawPolygonState extends State<DrawPolygon> {
         double maxx2 = max(x21, x22), maxy2 = max(y21, y22);
         double minx2 = min(x21, x22), miny2 = min(y21, y22);
 
-        if ((x1 == x21 && y1 == y21) || (x2 == x22 && y2 == y22) || (x1 == x22 && y1 == y22) || (x2 == x21 && y2 == y21)) {
+        if ((x1 == x21 && y1 == y21) ||
+            (x2 == x22 && y2 == y22) ||
+            (x1 == x22 && y1 == y22) ||
+            (x2 == x21 && y2 == y21)) {
           continue;
         }
 
         if (minx1 > maxx2 || maxx1 < minx2 || miny1 > maxy2 || maxy1 < miny2) {
-          continue;  // The moment when the lines have one common vertex...
+          continue; // The moment when the lines have one common vertex...
         }
 
-
-        double dx1 = x2-x1, dy1 = y2-y1; // The length of the projections of the first line on the x and y axes
-        double dx2 = x22-x21, dy2 = y22-y21; // The length of the projections of the second line on the x and y axes
-        double dxx = x1-x21, dyy = y1-y21;
+        double dx1 = x2 - x1,
+            dy1 = y2 -
+                y1; // The length of the projections of the first line on the x and y axes
+        double dx2 = x22 - x21,
+            dy2 = y22 -
+                y21; // The length of the projections of the second line on the x and y axes
+        double dxx = x1 - x21, dyy = y1 - y21;
 
         double div = dy2 * dx1 - dx2 * dy1;
         double mul1 = dx1 * dyy - dy1 * dxx;
         double mul2 = dx2 * dyy - dy2 * dxx;
 
-        if (div == 0)
-          continue; // Lines are parallel...
+        if (div == 0) continue; // Lines are parallel...
 
         if (div > 0) {
           if (mul1 < 0 || mul1 > div)
             continue; // The first segment intersects beyond its boundaries...
           if (mul2 < 0 || mul2 > div)
             continue; // // The second segment intersects beyond its borders...
-        }
-        else{
+        } else {
           if (-mul1 < 0 || -mul1 > -div)
             continue; // The first segment intersects beyond its boundaries...
           if (-mul2 < 0 || -mul2 > -div)
@@ -717,6 +742,7 @@ class DrawPolygonState extends State<DrawPolygon> {
     }
     return false;
   }
+
   // 매일 달리기 한 번 제한
   void setupTimer() {
     // 현재 시간과 자정 사이의 지연 시간 계산
@@ -732,21 +758,25 @@ class DrawPolygonState extends State<DrawPolygon> {
     });
   }
 
-  void moveToResult () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DailyGame(runningPace: runningPace, runningDist: runningDist, runningDuration: formatDuration(runningDuration)),
-        ),
-      );
+  void moveToResult() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DailyGame(
+            runningPace: runningPace,
+            runningDist: runningDist,
+            runningDuration: formatDuration(runningDuration)),
+      ),
+    );
   }
 
   // 폴리곤 면적 계산
   void calculate() {
     print(_currentPoints);
     print('면적만들기 실행');
-    final points = _points.map((latLng) =>
-        Point(latLng.latitude, latLng.longitude)).toList();
+    final points = _points
+        .map((latLng) => Point(latLng.latitude, latLng.longitude))
+        .toList();
     if (points.isNotEmpty) {
       final distance = _distanceBetweenFirstAndLastPoint();
       if (distance <= 50) {
@@ -778,34 +808,33 @@ class DrawPolygonState extends State<DrawPolygon> {
           _onCustomAnimationAlertPressed(context);
         } else {
           sendGameData(
-            _tokenInfo.memberId,
-            runningDist,
-            DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-            runningKcal,
-            runningPace,
-            widget.runningStartTime,
-            formatDuration(runningDuration),
-            widget.currentTime,
-            area,
-            [..._polygonList, _polygonList.first]
-          );
+              _tokenInfo.memberId,
+              runningDist,
+              DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+              runningKcal,
+              runningPace,
+              widget.runningStartTime,
+              formatDuration(runningDuration),
+              widget.currentTime,
+              area, [
+            ..._polygonList,
+            _polygonList.first
+          ]).then((value) => {
+                Timer.periodic(Duration(seconds: 3), (timer) {
+                  moveToResult();
+                })
+              });
         }
-
       }
     } else {
       print('조금밖에안걸었음');
     }
   }
+
   void addNewPolygon() {
     LatLng center = findPolygonCenter(_points);
-    final mediaWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final mediaHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
     final polygonId = PolygonId('polygon${_polygonSets.length + 1}');
     _polygon = Polygon(
       polygonId: polygonId,
@@ -815,51 +844,48 @@ class DrawPolygonState extends State<DrawPolygon> {
       strokeColor: Colors.red,
     );
     _polygonSets.add(_polygon!);
-    _markers.add(
-        Marker(
-          markerId: MarkerId('marker${_markers.length + 1}'),
-          position: center,
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return SizedBox(
-                  height: mediaHeight * 0.2,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(width: mediaWidth * 0.1),
-                      Container(
-                          width: mediaWidth * 0.2,
-                          height: mediaWidth * 0.2,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              "assets/images/runningbgi.png",
-                              // *사용자 프로필 이미지
-                              height: mediaWidth * 0.2,
-                              width: mediaWidth * 0.2,
-                              fit: BoxFit.cover,
-                            ),
-                          )
+    _markers.add(Marker(
+      markerId: MarkerId('marker${_markers.length + 1}'),
+      position: center,
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return SizedBox(
+              height: mediaHeight * 0.2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: mediaWidth * 0.1),
+                  Container(
+                      width: mediaWidth * 0.2,
+                      height: mediaWidth * 0.2,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
                       ),
-                      Text("닉네임", style: TextStyle(
-                          fontSize: mediaWidth * 0.04)),
-                      SizedBox(width: mediaWidth * 0.1),
-                    ],
-                  ),
-                );
-              },
+                      child: ClipOval(
+                        child: Image.asset(
+                          "assets/images/runningbgi.png",
+                          // *사용자 프로필 이미지
+                          height: mediaWidth * 0.2,
+                          width: mediaWidth * 0.2,
+                          fit: BoxFit.cover,
+                        ),
+                      )),
+                  Text("닉네임", style: TextStyle(fontSize: mediaWidth * 0.04)),
+                  SizedBox(width: mediaWidth * 0.1),
+                ],
+              ),
             );
           },
-        )
-    );
+        );
+      },
+    ));
     _points = []; // points 변수 초기화
     _currentPoints = [];
     _currentPolylines = {};
   }
+
   void resetPoints() {
     setState(() {
       _points = []; // points 변수 초기화
@@ -867,8 +893,8 @@ class DrawPolygonState extends State<DrawPolygon> {
       _currentPolylines = {};
       _onCustomAnimationAlertPressed(context);
     });
-
   }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     setState(() {
@@ -879,8 +905,10 @@ class DrawPolygonState extends State<DrawPolygon> {
             currentLocation!.latitude!,
             currentLocation!.longitude!,
           ),
-          rotation: _gyroscopeValues[2], // 기울기 각도
-          anchor: Offset(0.5, 0.5), // 마커 중심점 설정
+          rotation: _gyroscopeValues[2],
+          // 기울기 각도
+          anchor: Offset(0.5, 0.5),
+          // 마커 중심점 설정
           icon: currentLocationIcon,
         ),
       };
@@ -894,6 +922,7 @@ class DrawPolygonState extends State<DrawPolygon> {
       };
     });
   }
+
   double _distanceBetweenFirstAndLastPoint() {
     if (_points.length < 2) {
       return double.infinity;
@@ -915,8 +944,9 @@ class DrawPolygonState extends State<DrawPolygon> {
       if (p1.longitude > point.longitude == p2.longitude > point.longitude) {
         continue;
       }
-      double x = (point.longitude - p1.longitude) * (p2.latitude - p1.latitude) /
-          (p2.longitude - p1.longitude) +
+      double x = (point.longitude - p1.longitude) *
+              (p2.latitude - p1.latitude) /
+              (p2.longitude - p1.longitude) +
           p1.latitude;
       if (x > point.latitude) {
         intersections++;
@@ -945,11 +975,10 @@ class DrawPolygonState extends State<DrawPolygon> {
       }
     }
 
-
     _locationSubscription =
         location.onLocationChanged.listen((LocationData locationData) {
-          _updateRunningInfo(locationData);
-        });
+      _updateRunningInfo(locationData);
+    });
   }
 
   void _updateRunningInfo(LocationData locationData) {
@@ -991,16 +1020,16 @@ class DrawPolygonState extends State<DrawPolygon> {
       print(runningKcal);
       return runningKcal;
     }
+
     setState(() {
       if (_currentSpeed >= 2.0) {
         runningDist = _distance;
         runningPace = _currentSpeed;
-        runningKcal = calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
-
+        runningKcal =
+            calculateRunningKcal(_tokenInfo.memberWeight, runningDuration);
       } else {
         runningPace = 0.0;
       }
-
     });
     // print(_locationList);
     _previousLocationData = locationData;
@@ -1013,37 +1042,40 @@ class DrawPolygonState extends State<DrawPolygon> {
       });
     }
   }
+
   @override
-
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: currentLocation == null
           ? Center(
-        child: CircularProgressIndicator(),
-      )
+              child: CircularProgressIndicator(),
+            )
           : GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(
-            currentLocation!.latitude!,
-            currentLocation!.longitude!,
-          ),
-          zoom: 17.0,
-        ),
-        // myLocationEnabled: true,
-        markers: widget.isWalking == true? {Marker(
-          markerId: MarkerId('current'),
-          icon: currentLocationIcon,
-          position: LatLng(
-            currentLocation!.latitude!,
-            currentLocation!.longitude!,
-          ),
-        )} : _markers,
-        polylines: _currentPolylines,
-        polygons: _polygonSets,
-        tiltGesturesEnabled: false,
-      ),
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                  currentLocation!.latitude!,
+                  currentLocation!.longitude!,
+                ),
+                zoom: 17.0,
+              ),
+              // myLocationEnabled: true,
+              markers: widget.isWalking == true
+                  ? {
+                      Marker(
+                        markerId: MarkerId('current'),
+                        icon: currentLocationIcon,
+                        position: LatLng(
+                          currentLocation!.latitude!,
+                          currentLocation!.longitude!,
+                        ),
+                      )
+                    }
+                  : _markers,
+              polylines: _currentPolylines,
+              polygons: _polygonSets,
+              tiltGesturesEnabled: false,
+            ),
     );
   }
 }
