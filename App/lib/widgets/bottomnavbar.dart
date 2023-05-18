@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:app/screens/mypage/mypage.dart';
 import 'package:app/screens/game/game_start.dart';
 import 'package:app/screens/running/running_start.dart';
+import 'package:dio/dio.dart';
+import 'package:app/const/state_provider_interceptor.dart';
 
 class Navbar extends StatefulWidget {
   @override
@@ -10,6 +12,27 @@ class Navbar extends StatefulWidget {
 class _NavbarState extends State<Navbar> {
   int _currentIndex = 2;
   List<Widget> _pages = [];
+  var profileImg;
+  var _tokenInfo;
+  final defaultImg = 'assets/images/testProfile.png'; // 기본 이미지 경로
+
+
+  // 마이페이지 회원정보 조회 요청
+  void getMyPageMember() async {
+    var dio = Dio();
+    dio.interceptors.add(
+        TokenInterceptor(_tokenInfo)
+    );
+
+    try {
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/me/${_tokenInfo.memberId}');
+      setState(() {
+        profileImg = response.data['profileUrl'];
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
   @override
   void initState() {
     _pages.add(RunningStart());
@@ -42,8 +65,8 @@ class _NavbarState extends State<Navbar> {
                 iconSize: 8,
                 selectedFontSize: 4,
                 currentIndex: _currentIndex,
-                backgroundColor: Colors.blue,
-                selectedItemColor: Colors.white.withOpacity(0),
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.black.withOpacity(0),
                 onTap: (index) {
                   setState(() {
                     _currentIndex = index;
@@ -79,7 +102,7 @@ class _NavbarState extends State<Navbar> {
               ]
             ),
           ),
-          child: Image.asset('assets/images/testProfile.png', width: 40,),
+          child: Image.network(profileImg ?? defaultImg, width: 20),
           ),
           onPressed: () => setState(() {
             _currentIndex = 1;
