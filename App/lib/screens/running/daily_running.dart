@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../const/state_provider_token.dart';
+import '../../main.dart';
 
 class DailyRunning extends StatefulWidget {
   final String runningStart;
@@ -52,7 +53,7 @@ class _DailyRunningState extends State<DailyRunning> {
     if (locationListJson != null) {
       final locationList = jsonDecode(locationListJson);
       setState(() {
-        runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}));
+        runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['lat'], 'lng': coord['lng']}));
       });
     }
   }
@@ -60,42 +61,31 @@ class _DailyRunningState extends State<DailyRunning> {
   @override
   void initState() {
     _loadTokenInfo().then((_) => {
-      _loadRunningData(widget.runningDist),
-      sendRunningData(
-        runninglocationList,
-        widget.runningStart,
-        widget.runningEnd,
-        widget.runningPace,
-        widget.runningDist,
-        widget.runningDuration,
-        widget.runningKcal,
-      )}
-    );
+      _loadRunningData(widget.runningDist).then((value) => sendRunningData())
+    });
     super.initState();
   }
 
-  void sendRunningData(
-      List<Map<String, dynamic>> runninglocationList,
-      String runningStart,
-      String runningEnd,
-      double runningPace,
-      double runningDist,
-      String runningDuration,
-      double runningKcal) async {
+  void sendRunningData() async {
+    var dio = Dio();
+    var data = {
+      "coordinateList": runninglocationList,
+      "memberId": _tokenInfo.memberId,
+      'runningDistance': widget.runningDist,
+      "runningEnd": widget.runningEnd,
+      'runningKcal': widget.runningKcal,
+      'runningPace': widget.runningPace,
+      'runningStart': widget.runningStart,
+      'runningTime': widget.runningDuration,
+    };
+
+    print('만듦');
+    print(data);
     try {
-      var dio = Dio();
-      await dio.post('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running',
-          data: {
-            "coordinateList": runninglocationList,
-            "memberId": _tokenInfo.memberId,
-            'runningDistance': runningDist,
-            "runningEnd": runningEnd,
-            'runningKcal': runningKcal,
-            'runningPace': runningPace,
-            'runningStart': runningStart,
-            'runningTime': runningDuration,
-          },
+      var response = await dio.post('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running',
+          data: data,
         );
+      print(response.data);
       SharedPreferences runningResult = await SharedPreferences.getInstance();
       await runningResult.clear();
     } catch (e) {
@@ -140,7 +130,7 @@ class _DailyRunningState extends State<DailyRunning> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RunningStart()),
+                                builder: (context) => Home()),
                           );
                         },
                         icon: Image.asset('assets/images/closebtn.png'))
