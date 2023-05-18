@@ -6,8 +6,9 @@ Future<void> setFirstTimeInThisWeek() async {
 }
 
 //이번주에 처음인지 여부 확인
-Future<void> isitFisrtTimeInthisWeek() async {
-  await storage.read(key: 'isitFisrtTimeInthisWeek');
+Future<String?> isitFisrtTimeInthisWeek() async {
+  final intro = await storage.read(key: 'isitFisrtTimeInthisWeek');
+  return intro;
 }
 
 //주기별로 처음인지 여부 갱신
