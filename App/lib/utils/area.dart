@@ -416,9 +416,9 @@ class DrawPolygonState extends State<DrawPolygon> {
           },
           );
       responsedata = response.data;
-    } catch (e) {
       addNewPolygon();
       moveToResult();
+    } catch (e) {
       print(e.toString());
     }
   }
@@ -769,7 +769,6 @@ class DrawPolygonState extends State<DrawPolygon> {
         );
         final polygonArea = SphericalUtils.computeArea(points);
         area += polygonArea;
-        LatLng lastLatLng = _polygonSets.last.points.first;
         if ((isNotSimplePolygon(_currentPoints)) || _polygonList.length < 3) {
           _points = [];
           _currentPoints = [];
