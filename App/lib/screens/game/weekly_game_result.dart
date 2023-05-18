@@ -165,7 +165,7 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
                                       imageProvider: NetworkImage(resultRankingInfoMem != null ? resultRankingInfoMem[0]['profileUrl']: ''),
                                       text1: resultRankingInfoMem != null ? resultRanking[0]['resultRanking'].toString() : '',
                                       text2: resultRankingInfoMem != null ? resultRankingInfoMem[0]['memberNickname']: '',
-                                      text3: resultRankingInfoMem != null ? (resultRanking[0]['resultArea']*10000000000).toStringAsFixed(0) : '',
+                                      text3: resultRankingInfoMem != null ? (resultRanking[0]['resultArea']*1000000000000).toStringAsFixed(0) : '',
                                     ),
                                 ),
                                 Padding(
@@ -177,7 +177,7 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
                                     imageProvider: NetworkImage(resultRankingInfoMem != null ? resultRankingInfoMem[1]['profileUrl']: ''),
                                     text1: resultRankingInfoMem != null ? resultRanking[1]['resultRanking'].toString() : '',
                                     text2: resultRankingInfoMem != null ? resultRankingInfoMem[1]['memberNickname']: '',
-                                    text3: resultRankingInfoMem != null ? (resultRanking[1]['resultArea']*10000000000).toStringAsFixed(0) : '',
+                                    text3: resultRankingInfoMem != null ? (resultRanking[1]['resultArea']*1000000000000).toStringAsFixed(0) : '',
                                   ),
                                 ),
                                 Padding(
@@ -189,7 +189,7 @@ class _WeeklyGameResultState extends State<WeeklyGameResult> {
                                     imageProvider: NetworkImage(resultRankingInfoMem != null ? resultRankingInfoMem[2]['profileUrl']: ''),
                                     text1: resultRankingInfoMem != null ? resultRanking[2]['resultRanking'].toString() : '',
                                     text2: resultRankingInfoMem != null ? resultRankingInfoMem[2]['memberNickname']: '',
-                                    text3: resultRankingInfoMem != null ? (resultRanking[2]['resultArea']*10000000000).toStringAsFixed(0) : '',
+                                    text3: resultRankingInfoMem != null ? (resultRanking[2]['resultArea']*1000000000000).toStringAsFixed(0) : '',
                                   ),
                                 ),
                                 const SizedBox(height: 30),

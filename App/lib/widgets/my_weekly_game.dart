@@ -247,7 +247,7 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
                                       SizedBox(height: mediaHeight*0.005),
                                       Row(
                                         children: [
-                                          Text(notNowIndex != -1 ? '${(notNowArea * 10000000000).toStringAsFixed(0)} m²' : '${(nowArea * 10000000000).toStringAsFixed(0)} m²',    // *단위 수정
+                                          Text(notNowIndex != -1 ? '${(notNowArea * 1000000000000).toStringAsFixed(0)} m²' : '${(nowArea * 1000000000000).toStringAsFixed(0)} m²',    // *단위 수정
                                             style: TextStyle(
                                               fontSize: mediaWidth*0.07,
                                               fontWeight: FontWeight.w700,
@@ -484,7 +484,7 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(height: mediaHeight*0.007,),
-                          Text(notNowIndex != -1 ? '${(notNowArea * 10000).toStringAsFixed(2)} km²' : '${(nowArea * 10000).toStringAsFixed(2)} km²',
+                          Text(notNowIndex != -1 ? '${(notNowArea * 1000000).toStringAsFixed(2)} km²' : '${(nowArea * 1000000).toStringAsFixed(2)} km²',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: mediaHeight*0.015,

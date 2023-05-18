@@ -310,7 +310,7 @@ class _DailyGameResultState extends State<DailyGameResult> {
                       color: TEXT_GREY,
                     )),
                     SizedBox(height: mediaHeight*0.0025),
-                    Text('${(widget.areaSize*10000000000).toStringAsFixed(0)}m²', style: TextStyle(
+                    Text('${(widget.areaSize*1000000000000).toStringAsFixed(0)}m²', style: TextStyle(
                       fontSize: mediaWidth*0.045,
                       fontWeight: FontWeight.w900
                     ),)
