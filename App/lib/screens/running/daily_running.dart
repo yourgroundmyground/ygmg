@@ -47,12 +47,11 @@ class _DailyRunningState extends State<DailyRunning> {
     double? changeDist = myTodayGoal.getDouble('now');
     changeDist ??= 0;
     changeDist += runningDist;
-    await myTodayGoal.setDouble('now', changeDist);  // 달린 거리 로컬에 저장
+    await myTodayGoal.setDouble('now', changeDist);
     final locationListJson = runningResult.getString('locationList');
     if (locationListJson != null) {
       final locationList = jsonDecode(locationListJson);
       setState(() {
-        // runninglocationList = List<Map<String, double>>.from(locationList.map((coord) => {'lat': coord['latitude'], 'lng': coord['longitude']}));
         runninglocationList = List<Map<String, dynamic>>.from(locationList.map((coord) => {'coordinateTime': coord['coordinateTime'], 'lat': coord['latitude'], 'lng': coord['longitude']}));
       });
     }
@@ -85,8 +84,7 @@ class _DailyRunningState extends State<DailyRunning> {
       double runningKcal) async {
     try {
       var dio = Dio();
-      print('백에 보낸당!');
-      var response = await dio.post('http://k8c107.p.ssafy.io:8081/api/running',
+      await dio.post('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running',
           data: {
             "coordinateList": runninglocationList,
             "memberId": _tokenInfo.memberId,
@@ -98,8 +96,6 @@ class _DailyRunningState extends State<DailyRunning> {
             'runningTime': runningDuration,
           },
         );
-      print(response.data);
-      // dio 통신이 성공하면 SharedPreferences에서 데이터 제거
       SharedPreferences runningResult = await SharedPreferences.getInstance();
       await runningResult.clear();
     } catch (e) {
@@ -127,7 +123,6 @@ class _DailyRunningState extends State<DailyRunning> {
           child: Padding(
             padding: EdgeInsets.fromLTRB(mediaWidth * 0.07, mediaHeight * 0.05,
                 mediaWidth * 0.07, mediaHeight * 0.02),
-            // padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               children: [
                 Row(

@@ -26,17 +26,10 @@ class _RunningInfoState extends State<RunningInfo> {
   double gyrorunningPace = 0.0;
   late DateTime runningStart;
 
-  // *달린 속도 변경
   double runningPace = 0.0;
   double runningPaceKm = 0.0;
-
-  // *달린 거리 변경
   double runningDist = 0.0;
-
-  // *달린 시간 변경
   Duration runningDuration = Duration.zero;
-
-  // *태운 칼로리 변경
   double runningKcal = 0.0;
 
   late Timer _timer;
@@ -47,10 +40,8 @@ class _RunningInfoState extends State<RunningInfo> {
   bool _isLocationServiceEnabled = false;
   late PermissionStatus _permissionStatus;
 
-  // List<Map<String, double>> _locationList = [];
   final List<Map<String, dynamic>> _locationList = [];
 
-  // LocationData? _currentLocationData;
   LocationData? _previousLocationData;
   double _currentSpeed = 0.0;
   double _distance = 0.0;
@@ -72,16 +63,9 @@ class _RunningInfoState extends State<RunningInfo> {
       return 0;
     }
 
-    runningKcal = (weight * 3.5 * runningMinutes * 4 / 1000) * 5;    // *사용자 몸무게로 칼로리 측정
+    runningKcal = (weight * 3.5 * runningMinutes * 4 / 1000) * 5;
     print(runningKcal);
     return runningKcal;
-    // if (gender == 'M') {
-    //   runningKcal = ((age * 0.2017) + ((weight * 0.09036) + ((220 - age) * 0.8 * 0.6309) - 55.0969) * runningMinutes / 4.184);
-    //   return runningKcal;
-    // } else {
-    //   runningKcal = ((age * 0.074) + ((weight * 0.05741) + ((220 - age) * 0.8 * 0.4472) - 20.4022) * runningMinutes / 4.184);
-    //   return runningKcal;
-    // }
   }
 
   @override
@@ -108,7 +92,7 @@ class _RunningInfoState extends State<RunningInfo> {
 
     _timer = Timer.periodic(Duration(seconds: 1), _updateRunningTime);
 
-    // gps 측정으로 변경
+    // gps 측정
     _location = Location();
     _checkLocationService();
   }
@@ -121,7 +105,7 @@ class _RunningInfoState extends State<RunningInfo> {
     super.dispose();
   }
 
-  // gps 측정으로 변경
+  // gps 측정
   Future<void> _checkLocationService() async {
     _isLocationServiceEnabled = await _location.serviceEnabled();
     if (!_isLocationServiceEnabled) {
@@ -190,66 +174,6 @@ class _RunningInfoState extends State<RunningInfo> {
     print(_locationList);
     _previousLocationData = locationData;
     saveRunningData();
-    // if (_previousLocationData != null) {
-    //   Point<num> previousPoint = Point(
-    //     _previousLocationData!.latitude!,
-    //     _previousLocationData!.longitude!,
-    //   );
-    //   Point<num> currentPoint = Point(
-    //     locationData.latitude!,
-    //     locationData.longitude!,
-    //   );
-    //   double distanceInMeters = SphericalUtils.computeDistanceBetween(
-    //     previousPoint,
-    //     currentPoint,
-    //   );
-    //
-    //   // 위치 보정 전
-    //   _distance += distanceInMeters / 1000; // 단위: km
-    //
-    //   double timeInSeconds =
-    //       (locationData.time! - _previousLocationData!.time!) / 1000.0;
-    //   _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
-    //
-    //   setState(() {
-    //     runningDist = _distance;
-    //     runningPace = _currentSpeed;
-    //     runningKcal = calculateRunningKcal(47.6, runningDuration);
-    //
-    //     // 위치 좌표 리스트에 추가
-    //     _locationList.add({
-    //       'coordinateTime': locationData.time!,
-    //       'lat': locationData.latitude!,
-    //       'lng': locationData.longitude!
-    //     });
-    //   });
-    //   _previousLocationData = locationData;
-    //   saveRunningData();
-
-      // 위치 보정 후
-      // if (distanceInMeters > 30) {
-      //   _distance += distanceInMeters / 1000; // 단위: km
-      //
-      //   double timeInSeconds =
-      //       (locationData.time! - _previousLocationData!.time!) / 1000.0;
-      //   _currentSpeed = distanceInMeters / timeInSeconds * 3.6; // 단위: km/hr
-      //
-      //   setState(() {
-      //     runningDist = _distance;
-      //     runningPace = _currentSpeed;
-      //     runningKcal = calculateRunningKcal(47.6, runningDuration);
-      //
-      //     // 위치 좌표 리스트에 추가
-      //     _locationList.add({
-      //       'coordinateTime': locationData.time!,
-      //       'lat': locationData.latitude!,
-      //       'lng': locationData.longitude!
-      //     });
-      //   });
-      //   _previousLocationData = locationData;
-      //   saveRunningData();
-      // }
-    // }
   }
 
   void _updateRunningTime(Timer timer) {
@@ -302,7 +226,6 @@ class _RunningInfoState extends State<RunningInfo> {
       ),
       child: Column(
         children: [
-          Text('$_currentSpeed'),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -463,7 +386,6 @@ class _RunningInfoState extends State<RunningInfo> {
                             transform: Matrix4.rotationY(pi),
                             child:
                                 Image.asset('assets/images/runningimg.png'))),
-                    // SizedBox(height: mediaHeight*0.0025),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -525,7 +447,6 @@ class _RunningInfoState extends State<RunningInfo> {
                             transform: Matrix4.rotationY(pi),
                             child: Image.asset(
                                 'assets/images/lighteningimg.png'))),
-                    // SizedBox(height: mediaHeight*0.0025),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
