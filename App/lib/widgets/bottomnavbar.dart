@@ -1,3 +1,4 @@
+import 'package:app/const/colors.dart';
 import 'package:app/const/const_isgameEnd.dart';
 import 'package:app/const/state_provider_gameInfo.dart';
 import 'package:app/screens/game/weekly_game_result.dart';
@@ -148,7 +149,7 @@ void initState() {
                 iconSize: 8,
                 selectedFontSize: 4,
                 currentIndex: _currentIndex,
-                backgroundColor: Colors.white,
+                backgroundColor: YGMG_YELLOW,
                 selectedItemColor: Colors.black.withOpacity(0),
                 onTap: (index) {
                   setState(() {
@@ -212,11 +213,6 @@ void initState() {
                           ),
                         )
                     ) : SizedBox(
-                        width: mediaWidth*0.1,
-                        height: mediaWidth*0.1,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        )
                     )
                 )
               ]),

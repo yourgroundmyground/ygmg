@@ -165,343 +165,346 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
 
     return rankArealoaded && runningDataloaded && nowRankArealoaded ? FadeTransition(
       opacity: _controller,
-      child: TapToExpand(
-        scrollPhysics: NeverScrollableScrollPhysics(),
-        onTapPadding: 10,
-        closedHeight: mediaHeight*0.1,
-        scrollable: true,
-        borderRadius: 40,
-        openedHeight: mediaHeight*0.55,
-        trailing: Icon(Icons.expand_circle_down, color: YGMG_ORANGE),
-        content: Stack(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: mediaHeight*0.03, horizontal: mediaWidth*0.03),
-              width: mediaWidth*0.85,
-              height: mediaHeight*0.5,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(mediaWidth*0.05),
-                color: Colors.white,
-              ),
-              child: ListView(
-                controller: ScrollController(),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return TapToExpand(
+            scrollPhysics: NeverScrollableScrollPhysics(),
+            onTapPadding: mediaWidth*0.028,
+            closedHeight: mediaHeight*0.1,
+            scrollable: true,
+            borderRadius: 40,
+            openedHeight: mediaHeight*0.55,
+            trailing: Icon(Icons.expand_circle_down, color: YGMG_ORANGE, size: mediaWidth*0.05),
+            content: Stack(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: mediaHeight*0.03, horizontal: mediaWidth*0.03),
+                  width: mediaWidth*0.85,
+                  height: mediaHeight*0.5,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(mediaWidth*0.05),
+                    color: Colors.white,
+                  ),
+                  child: ListView(
+                    controller: ScrollController(),
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(notNowIndex == -1 ? '${_tokenInfo?.memberNickname ?? ''}님의 현재 순위' : '${_tokenInfo.memberNickname}님의 최종 순위',
-                                style: TextStyle(
-                                    fontSize: mediaWidth*0.04,
-                                    color: Colors.black45
-                                ),
+                              Row(
+                                children: [
+                                  Text(notNowIndex == -1 ? '${_tokenInfo?.memberNickname ?? ''}님의 현재 순위' : '${_tokenInfo.memberNickname}님의 최종 순위',
+                                    style: TextStyle(
+                                        fontSize: mediaWidth*0.04,
+                                        color: Colors.black45
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          SizedBox(height: mediaHeight*0.005),
-                          Row(
-                            children: [
-                              Text(notNowIndex != -1 ? '$notNowRank 위' : '$nowRank 위',
-                                style: TextStyle(
-                                  fontSize: mediaWidth*0.07,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                              SizedBox(height: mediaHeight*0.005),
+                              Row(
+                                children: [
+                                  Text(notNowIndex != -1 ? '$notNowRank 위' : '$nowRank 위',
+                                    style: TextStyle(
+                                      fontSize: mediaWidth*0.07,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  SizedBox(height: mediaHeight*0.02),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: mediaHeight*0.015, horizontal: mediaWidth*0.05),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(mediaWidth*0.02),
-                      color: Color(0xFFF3F7FF),
-                    ),
-                    child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      SizedBox(height: mediaHeight*0.02),
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: mediaHeight*0.015, horizontal: mediaWidth*0.05),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(mediaWidth*0.02),
+                          color: Color(0xFFF3F7FF),
+                        ),
+                        child: Column(
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('내 땅 크기',
-                                        style: TextStyle(
-                                            fontSize: mediaWidth*0.04,
-                                            color: Colors.black45
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text('내 땅 크기',
+                                            style: TextStyle(
+                                                fontSize: mediaWidth*0.04,
+                                                color: Colors.black45
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: mediaHeight*0.005),
+                                      Row(
+                                        children: [
+                                          Text(notNowIndex != -1 ? '${(notNowArea * 10000000000).toStringAsFixed(0)} m²' : '${(nowArea * 10000000000).toStringAsFixed(0)} m²',    // *단위 수정
+                                            style: TextStyle(
+                                              fontSize: mediaWidth*0.07,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: mediaHeight*0.005),
-                                  Row(
+                                  Column(
                                     children: [
-                                      Text(notNowIndex != -1 ? '${(notNowArea * 10000000000).toStringAsFixed(0)} m²' : '${(nowArea * 10000000000).toStringAsFixed(0)} m²',    // *단위 수정
-                                        style: TextStyle(
-                                          fontSize: mediaWidth*0.07,
-                                          fontWeight: FontWeight.w700,
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) =>
+                                              GameDetail(
+                                                gameId: -notNowIndex+2,
+                                                memberId: widget.memberId,
+                                                start: widget.tuesday,
+                                                end: widget.sunday,
+                                            )),
+                                          );
+                                        },
+                                        child: SizedBox(
+                                          width: mediaWidth*0.08,
+                                          child: Image.asset('assets/images/right-arrow.png'),
                                         ),
-                                      ),
+                                      )
                                     ],
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) =>
-                                          GameDetail(
-                                            gameId: -notNowIndex+2,
-                                            memberId: widget.memberId,
-                                            start: widget.tuesday,
-                                            end: widget.sunday,
-                                        )),
-                                      );
-                                    },
-                                    child: SizedBox(
-                                      width: mediaWidth*0.08,
-                                      child: Image.asset('assets/images/right-arrow.png'),
-                                    ),
                                   )
                                 ],
-                              )
-                            ],
-                          ),
-                        ]
-                    ),
-                  ),
-                  SizedBox(height: mediaHeight*0.008),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: mediaHeight*0.015, horizontal: mediaWidth*0.05),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(mediaWidth*0.02),
-                      color: Color(0xFFF3F7FF),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text('누적 달리기 시간',
-                                  style: TextStyle(
-                                      fontSize: mediaWidth*0.04,
-                                      color: Colors.black45
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: mediaHeight*0.005),
-                            Row(
-                              children: [
-                                Text(runningTime,
-                                  style: TextStyle(
-                                    fontSize: mediaWidth*0.07,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: mediaHeight*0.01),
-                        Row(
-                          children: [
-                            Text('평균 달리기 기록',
-                              style: TextStyle(
-                                fontSize: mediaWidth*0.04,
-                                color: Colors.black45
                               ),
-                            ),
-                          ],
+                            ]
                         ),
-                        SizedBox(height: mediaHeight*0.01),
-                        Row(
+                      ),
+                      SizedBox(height: mediaHeight*0.008),
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: mediaHeight*0.015, horizontal: mediaWidth*0.05),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(mediaWidth*0.02),
+                          color: Color(0xFFF3F7FF),
+                        ),
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                                children: [
-                                  Container(
-                                      width: mediaWidth*0.05,
-                                      alignment: Alignment.topCenter,
-                                      child:
-                                      Transform(
-                                          alignment: Alignment.center,
-                                          transform: Matrix4.rotationY(math.pi),
-                                          child: Image.asset('assets/images/runningimg.png')
-                                      )
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(runningDistance.toStringAsFixed(1),
-                                        style: TextStyle(
-                                          fontSize: mediaWidth*0.045,
-                                          fontWeight: FontWeight.w700
-                                      ),),
-                                      Text('km',
-                                        textAlign: TextAlign.right,
-                                        style: TextStyle(
-                                            fontSize: mediaWidth*0.03,
-                                            color: TEXT_GREY
-                                        ),),
-                                    ],
-                                  )
-                                ]
-                            ),
-                            VerticalDivider(
-                              thickness: 1,
-                              color: TEXT_GREY
-                            ),
-                            Row(
-                                children: [
-                                  Container(
-                                      width: mediaWidth*0.05,
-                                      alignment: Alignment.topCenter,
-                                      child:
-                                      Transform(
-                                          alignment: Alignment.center,
-                                          transform: Matrix4.rotationY(math.pi),
-                                          child: Image.asset('assets/images/fireimg.png')
-                                      )
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(runningKcal.toStringAsFixed(0),
-                                       style: TextStyle(
-                                          fontSize: mediaWidth*0.045,
-                                          fontWeight: FontWeight.w700
-                                      ),),
-                                      Text('kcal',
-                                        textAlign: TextAlign.right,
-                                        style: TextStyle(
-                                          fontSize: mediaWidth*0.03,
-                                          color: TEXT_GREY
-                                        )
+                            Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text('누적 달리기 시간',
+                                      style: TextStyle(
+                                          fontSize: mediaWidth*0.04,
+                                          color: Colors.black45
                                       ),
-                                    ],
-                                  )
-                                ]
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: mediaHeight*0.005),
+                                Row(
+                                  children: [
+                                    Text(runningTime,
+                                      style: TextStyle(
+                                        fontSize: mediaWidth*0.07,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            VerticalDivider(
-                              thickness: 1,
-                              color: TEXT_GREY,
-                            ),
+                            SizedBox(height: mediaHeight*0.01),
                             Row(
-                                children: [
-                                  Container(
-                                      width: mediaWidth*0.05,
-                                      alignment: Alignment.topCenter,
-                                      child:
-                                      Transform(
-                                          alignment: Alignment.center,
-                                          transform: Matrix4.rotationY(math.pi),
-                                          child: Image.asset('assets/images/lighteningimg.png')
-                                      )
+                              children: [
+                                Text('평균 달리기 기록',
+                                  style: TextStyle(
+                                    fontSize: mediaWidth*0.04,
+                                    color: Colors.black45
                                   ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: mediaHeight*0.01),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
                                     children: [
-                                      Text(runningSpeed.toStringAsFixed(1),
-                                        style: TextStyle(
-                                          fontSize: mediaWidth*0.045,
-                                          fontWeight: FontWeight.w700
-                                        )
+                                      Container(
+                                          width: mediaWidth*0.05,
+                                          alignment: Alignment.topCenter,
+                                          child:
+                                          Transform(
+                                              alignment: Alignment.center,
+                                              transform: Matrix4.rotationY(math.pi),
+                                              child: Image.asset('assets/images/runningimg.png')
+                                          )
                                       ),
-                                      Text('km/hr',
-                                        textAlign: TextAlign.right,
-                                        style: TextStyle(
-                                          fontSize: mediaWidth*0.03,
-                                          color: TEXT_GREY
-                                        )
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(runningDistance.toStringAsFixed(1),
+                                            style: TextStyle(
+                                              fontSize: mediaHeight*0.02,
+                                              fontWeight: FontWeight.w700
+                                          ),),
+                                          Text('km',
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                fontSize: mediaHeight*0.013,
+                                                color: TEXT_GREY
+                                            ),),
+                                        ],
+                                      )
+                                    ]
+                                ),
+                                VerticalDivider(
+                                  thickness: 1,
+                                  color: TEXT_GREY
+                                ),
+                                Row(
+                                    children: [
+                                      Container(
+                                          width: mediaWidth*0.05,
+                                          alignment: Alignment.topCenter,
+                                          child:
+                                          Transform(
+                                              alignment: Alignment.center,
+                                              transform: Matrix4.rotationY(math.pi),
+                                              child: Image.asset('assets/images/fireimg.png')
+                                          )
                                       ),
-                                    ],
-                                  )
-                                ]
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(runningKcal.toStringAsFixed(0),
+                                           style: TextStyle(
+                                              fontSize: mediaHeight*0.02,
+                                              fontWeight: FontWeight.w700
+                                          ),),
+                                          Text('kcal',
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                              fontSize: mediaHeight*0.013,
+                                              color: TEXT_GREY
+                                            )
+                                          ),
+                                        ],
+                                      )
+                                    ]
+                                ),
+                                VerticalDivider(
+                                  thickness: 1,
+                                  color: TEXT_GREY,
+                                ),
+                                Row(
+                                    children: [
+                                      Container(
+                                          width: mediaWidth*0.05,
+                                          alignment: Alignment.topCenter,
+                                          child:
+                                          Transform(
+                                              alignment: Alignment.center,
+                                              transform: Matrix4.rotationY(math.pi),
+                                              child: Image.asset('assets/images/lighteningimg.png')
+                                          )
+                                      ),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(runningSpeed.toStringAsFixed(1),
+                                            style: TextStyle(
+                                              fontSize: mediaHeight*0.02,
+                                              fontWeight: FontWeight.w700
+                                            )
+                                          ),
+                                          Text('km/hr',
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                              fontSize: mediaHeight*0.013,
+                                              color: TEXT_GREY
+                                            )
+                                          ),
+                                        ],
+                                      )
+                                    ]
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            title: SizedBox(
+              width: mediaWidth*0.7,
+              height: mediaHeight*0.05,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children:[
+                  CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/runningimg.png'),
+                    radius: 20,
+                  ),
+                  Row(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('$weeksAgo 땅따먹기', style: TextStyle(
+                                fontSize: mediaHeight*0.02,
+                                fontWeight: FontWeight.w700
+                            ),),
+                            Text('$startdate - $enddate',
+                              style: TextStyle(
+                                  fontSize: mediaHeight*0.0145,
+                                  color: TEXT_GREY
+                              ),
+                            ),
+                          ],
+                        )
+                      ]
+                  ),
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: mediaHeight*0.007,),
+                          Text(notNowIndex != -1 ? '${(notNowArea * 10000).toStringAsFixed(2)} km²' : '${(nowArea * 10000).toStringAsFixed(2)} km²',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: mediaHeight*0.015,
+                                  fontWeight: FontWeight.w700
+                              )
+                          ),
+                          Text('${runningKcal.toStringAsFixed(0)} kcal ',
+                            style: TextStyle(
+                                fontSize: mediaHeight*0.015,
+                                color: TEXT_GREY
+                            ),
+                          ),
+                        ],
+                      )
+                    ]
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-        title: SizedBox(
-          width: mediaWidth*0.7,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children:[
-              CircleAvatar(
-                backgroundImage: AssetImage('assets/images/runningimg.png'),
-                radius: 20,
-              ),
-              Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('$weeksAgo 땅따먹기', style: TextStyle(
-                            fontSize: mediaWidth*0.045,
-                            fontWeight: FontWeight.w700
-                        ),),
-                        Text('$startdate - $enddate',
-                          style: TextStyle(
-                              fontSize: mediaWidth*0.032,
-                              color: TEXT_GREY
-                          ),
-                        ),
-                      ],
-                    )
-                  ]
-              ),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: mediaHeight*0.007,),
-                      Text(notNowIndex != -1 ? '${(notNowArea * 10000).toStringAsFixed(2)} km²' : '${(nowArea * 10000).toStringAsFixed(2)} km²',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: mediaWidth*0.032,
-                              fontWeight: FontWeight.w700
-                          )
-                      ),
-                      Text('${runningKcal.toStringAsFixed(0)} kcal ',
-                        style: TextStyle(
-                            fontSize: mediaWidth*0.032,
-                            color: TEXT_GREY
-                        ),
-                      ),
-                    ],
-                  )
-                ]
-              ),
-            ],
-          ),
-        ),
-      ),
-    ) : SizedBox();
+          );}
+    )) : SizedBox();
   }
 }

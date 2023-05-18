@@ -435,13 +435,16 @@ class DrawPolygonState extends State<DrawPolygon> {
     }
   }
 
-  void toResult() {
-    if (isSent) {
-      Timer.periodic(Duration(seconds: 3), (timer) {
-        moveToResult();
-      });
-    }
-  }
+  // void toResult() {
+  //   if (isSent) {
+  //     Timer.periodic(Duration(seconds: 3), (timer) {
+  //       moveToResult();
+  //       setState(() {
+  //         isSent = false;
+  //       });
+  //     });
+  //   }
+  // }
 
   // 받아온 폴리곤 추가
 
@@ -655,12 +658,23 @@ class DrawPolygonState extends State<DrawPolygon> {
   }
 
   _onCustomAnimationAlertPressed(context) {
-    Alert(
+    showDialog(
       context: context,
-      title: "영역생성 실패!",
-      desc: "경로가 모두 초기화됩니다.",
-      alertAnimation: fadeAlertAnimation,
-    ).show();
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('영역생성 실패!'),
+          content: Text('경로가 모두 초기화됩니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget fadeAlertAnimation(
@@ -820,10 +834,8 @@ class DrawPolygonState extends State<DrawPolygon> {
             ..._polygonList,
             _polygonList.first
           ]).then((value) => {
-                Timer.periodic(Duration(seconds: 3), (timer) {
-                  moveToResult();
-                })
-              });
+            moveToResult()
+            });
         }
       }
     } else {

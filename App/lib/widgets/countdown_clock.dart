@@ -43,7 +43,7 @@ class _CountDownClockState extends State<CountDownClock> {
   @override
   Widget build(BuildContext context) {
     final mediaWidth = MediaQuery.of(context).size.width;
-    // final mediaHeight = MediaQuery.of(context).size.height;
+    final mediaHeight = MediaQuery.of(context).size.height;
 
 
     final todaysDate = DateTime.now();
@@ -85,7 +85,7 @@ class _CountDownClockState extends State<CountDownClock> {
             children: [
               SizedBox(
                 width: mediaWidth*0.2,
-                height: mediaWidth*0.2,
+                height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration2,
@@ -112,7 +112,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 )),
               SizedBox(
                 width: mediaWidth*0.2,
-                height: mediaWidth*0.2,
+                height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration2,
@@ -140,7 +140,7 @@ class _CountDownClockState extends State<CountDownClock> {
                   )),
               SizedBox(
                 width: mediaWidth*0.2,
-                height: mediaWidth*0.2,
+                height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration2,
@@ -167,7 +167,7 @@ class _CountDownClockState extends State<CountDownClock> {
                   )),
               SizedBox(
                 width: mediaWidth*0.2,
-                height: mediaWidth*0.2,
+                height: mediaHeight*0.1,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
                   duration: defaultDuration2,

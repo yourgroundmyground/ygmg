@@ -1,5 +1,6 @@
 import 'package:app/const/state_provider_token.dart';
 import 'package:app/main.dart';
+import 'package:app/screens/game/daily_game.dart';
 import 'package:app/screens/login/login.dart';
 import 'package:flutter/material.dart';
 

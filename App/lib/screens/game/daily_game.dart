@@ -111,7 +111,6 @@ class _DailyGameState extends State<DailyGame> {
                       Container(
                         padding: EdgeInsets.fromLTRB(mediaWidth*0.1, mediaHeight*0.03, mediaWidth*0.1, mediaHeight*0.02),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('현재 랭킹 :',
                               style: TextStyle(
@@ -119,6 +118,7 @@ class _DailyGameState extends State<DailyGame> {
                                 fontWeight: FontWeight.w600
                               ),
                             ),
+                            SizedBox(width: mediaWidth*0.24),
                             Text(nowRanking != null ? '$nowRanking 위' : '',
                               style: TextStyle(
                                 fontSize: mediaWidth*0.05,
