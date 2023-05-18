@@ -70,6 +70,8 @@ class _CountDownClockState extends State<CountDownClock> {
     // *타이머시간설정
     final defaultDuration = Duration(days: defaultDurationDay, hours: defaultDurationHour, minutes: defaultDurationMin, seconds: defaultDurationSecond);
     print(defaultDuration);
+    final defaultDuration2 = Duration(days: 2, hours: 10, minutes: 20, seconds: 5);
+
     return Container(
       width: mediaWidth,
       alignment: Alignment.center,
@@ -86,7 +88,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: defaultDuration2,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -113,7 +115,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: defaultDuration2,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -141,7 +143,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: defaultDuration2,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -168,7 +170,7 @@ class _CountDownClockState extends State<CountDownClock> {
                 height: mediaWidth*0.2,
                 child: SlideCountdown(
                   padding: EdgeInsets.only(left: 20),
-                  duration: defaultDuration,
+                  duration: defaultDuration2,
                   decoration: BoxDecoration(
                     color: CLOCK_BLACK,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
