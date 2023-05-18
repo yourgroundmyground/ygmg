@@ -47,16 +47,7 @@ class _MypageState extends State<Mypage> with SingleTickerProviderStateMixin {
     var dio = Dio();
 
     try {
-      print('백에서 회원 전체러닝정보 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io/api/running/${_tokenInfo.memberId}');
-      print('러닝정보 가져오기 ${response.data}');
-      // 데이터 형식
-      // {
-      //   "runningDate": "2023-05-08",
-      //   "runningDistance": 1.2,
-      //   "runningId": 0,
-      //   "runningType": "RUNNING"
-      // },
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/running/${_tokenInfo.memberId}');
       setState(() {
         runningList = response.data['runningList'];
         runningListLoading = false;
@@ -126,14 +117,6 @@ class _MypageState extends State<Mypage> with SingleTickerProviderStateMixin {
 
     tuesdaysList = tuesdays;
     sundaysList = sundays;
-
-    // // 결과 출력
-    // for (int i = 0; i < tuesdays.length; i++) {
-    //   print('주차: ${i + 1}');
-    //   print('화요일: ${DateFormat('yyyy-MM-dd').format(tuesdays[i])}');
-    //   print('일요일: ${DateFormat('yyyy-MM-dd').format(sundays[i].subtract(Duration(days: 1)))}');
-    //   print('---------------------------');
-    // }
   }
 
   // 로컬에 저장된 토큰정보 가져오기

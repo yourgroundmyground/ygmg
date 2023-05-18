@@ -68,15 +68,11 @@ class _WeeklyGameResultMapState extends State<WeeklyGameResultMap> {
   void getPolygonPoints() async {
     var dio = Dio();
     try {
-      print('백에서 주별폴리곤 좌표리스트 가져오기!');
-      var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/${widget.memberId}/${widget.gameId}');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/member/1/1');     // *요청 API 주소 넣기
-      print(response.data);
+      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/member/${widget.memberId}/${widget.gameId}');
 
       // 받은 좌표 리스트로 폴리곤의 위치 좌표 구하기
       List<dynamic> polygonData = response.data;
       List<List<LatLng>> polygonCoordinates = extractCoordinateLists(polygonData);
-      print('좌표만 얻기 $polygonCoordinates');
 
       // 랜덤한 색상 선택
       Color randomColor = _polygonColors[Random().nextInt(_polygonColors.length)];

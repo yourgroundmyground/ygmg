@@ -62,52 +62,8 @@ class _DailyGameResultMapState extends State<DailyGameResultMap> {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
     try {
-      print('백에서 일별폴리곤 좌표리스트 가져오기!');
       var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/area/day/${widget.memberId}/$formattedDate');
-      // var response = await dio.get('http://k8c107.p.ssafy.io:8082/api/game/area/day/1/2023-05-13');     // *요청 API 주소 넣기
-      print(response.data);
-      // 데이터 형식
-      // List<Map<String, dynamic>> test = [
-      //     {
-      //         "areaId": 1,
-      //         "memberId": 1,
-      //         "areaDate": "2023-05-13 13:05:11",
-      //         "gameId": 1,
-      //         "areaSize": 5.691152769292121E-6,
-      //         "coordinateList": [
-      //             {
-      //                 "areaCoordinateId": 1,
-      //                 "areaCoordinateLat": 33.451690157220135,
-      //                 "areaCoordinateLng": 126.56738664637757,
-      //                 "areaCoordinateTime": "2023-05-12 23:13:05"
-      //             },
-      //             {
-      //                 "areaCoordinateId": 2,
-      //                 "areaCoordinateLat": 33.44949922860903,
-      //                 "areaCoordinateLng": 126.56737601368614,
-      //                 "areaCoordinateTime": "2023-05-12 23:13:05"
-      //             },
-      //             {
-      //                 "areaCoordinateId": 3,
-      //                 "areaCoordinateLat": 33.4502143361292,
-      //                 "areaCoordinateLng": 126.57104991347728,
-      //                 "areaCoordinateTime": "2023-05-12 23:13:05"
-      //             },
-      //             {
-      //                 "areaCoordinateId": 4,
-      //                 "areaCoordinateLat": 33.45126460137033,
-      //                 "areaCoordinateLng": 126.57070654854132,
-      //                 "areaCoordinateTime": "2023-05-12 23:13:05"
-      //             },
-      //             {
-      //                 "areaCoordinateId": 5,
-      //                 "areaCoordinateLat": 33.451690157220135,
-      //                 "areaCoordinateLng": 126.56738664637757,
-      //                 "areaCoordinateTime": "2023-05-12 23:13:05"
-      //             }
-      //         ]
-      //     },
-      // ];
+
       // 받은 좌표 리스트로 폴리곤의 위치 좌표 구하기
       List<dynamic> polygonData = response.data[0]['coordinateList'];
       List<LatLng> polygonCoordinates = extractPolygonCoordinates(polygonData);
