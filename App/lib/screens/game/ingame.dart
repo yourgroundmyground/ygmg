@@ -1,4 +1,3 @@
-import 'package:app/utils/polygonmap.dart';
 import 'package:app/utils/area.dart';
 import 'package:app/widgets/profile_img.dart';
 import 'package:flutter/material.dart';
