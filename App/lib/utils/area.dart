@@ -124,74 +124,74 @@ class DrawPolygonState extends State<DrawPolygon> {
     return '$hours:$minutes:$seconds';
   }
 
-  // 실시간 나의 위치 보여주는 프로필사진 마커
-  void setCustomMarkerIcon() async {
-    var dio = Dio();
-    try {
-      print('백에서 사용자들 닉네임, 프로필 가져오기!');
-      var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=${_tokenInfo.memberId}');
-      print(response.data);
-      List<dynamic> profiles = response.data ?? [];
-      if (profiles.isNotEmpty) {
-        String profileUrl = profiles[0]['profileUrl']; // 첫 번째 프로필의 URL을 가져옴
-
-        // 외부 이미지를 다운로드하여 BitmapDescriptor 생성
-        BitmapDescriptor? markerIcon = await _getMarkerIconFromUrl(profileUrl);
-
-        // markerIcon을 사용하여 마커 이미지 업데이트
-        setState(() {
-          currentLocationIcon = markerIcon!;
-        });
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future<Uint8List?> compressImage(Uint8List imageBytes, int targetWidth, int targetHeight) async {
-    final compressedImage = await FlutterImageCompress.compressWithList(
-      imageBytes,
-      quality: 90,
-      minWidth: targetWidth,
-      minHeight: targetHeight,
-    );
-
-    return compressedImage;
-  }
-
-  Future<BitmapDescriptor?> _getMarkerIconFromUrl(String imageUrl) async {
-    var dio = Dio();
-    try {
-      var response = await dio.get<List<int>>(imageUrl, options: Options(responseType: ResponseType.bytes));
-      if (response.statusCode == 200) {
-        final Uint8List imageBytes = Uint8List.fromList(response.data!);
-
-        // Compress and resize the image
-        final compressedImage = await compressImage(imageBytes, 100, 100);
-        print('나와라');
-        print(compressedImage);
-        return BitmapDescriptor.fromBytes(compressedImage!);
-      } else {
-        print('이미지 다운로드 실패');
-        return null;
-      }
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
-
-  // void setCustomMarkerIcon() {
-  //   BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(100, 100)), "assets/images/testProfile.png")
-  //       .then(
-  //         (icon) {
+  // // 실시간 나의 위치 보여주는 프로필사진 마커
+  // void setCustomMarkerIcon() async {
+  //   var dio = Dio();
+  //   try {
+  //     print('백에서 사용자들 닉네임, 프로필 가져오기!');
+  //     var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/member/profiles?memberList=${_tokenInfo.memberId}');
+  //     print(response.data);
+  //     List<dynamic> profiles = response.data ?? [];
+  //     if (profiles.isNotEmpty) {
+  //       String profileUrl = profiles[0]['profileUrl']; // 첫 번째 프로필의 URL을 가져옴
+  //
+  //       // 외부 이미지를 다운로드하여 BitmapDescriptor 생성
+  //       BitmapDescriptor? markerIcon = await _getMarkerIconFromUrl(profileUrl);
+  //
+  //       // markerIcon을 사용하여 마커 이미지 업데이트
   //       setState(() {
-  //         currentLocationIcon = icon;
-  //       }
-  //       );
-  //     },
-  //   );
+  //         currentLocationIcon = markerIcon!;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
   // }
+  //
+  // Future<Uint8List?> compressImage(Uint8List imageBytes, int targetWidth, int targetHeight) async {
+  //   final compressedImage = await FlutterImageCompress.compressWithList(
+  //     imageBytes,
+  //     quality: 90,
+  //     minWidth: targetWidth,
+  //     minHeight: targetHeight,
+  //   );
+  //
+  //   return compressedImage;
+  // }
+  //
+  // Future<BitmapDescriptor?> _getMarkerIconFromUrl(String imageUrl) async {
+  //   var dio = Dio();
+  //   try {
+  //     var response = await dio.get<List<int>>(imageUrl, options: Options(responseType: ResponseType.bytes));
+  //     if (response.statusCode == 200) {
+  //       final Uint8List imageBytes = Uint8List.fromList(response.data!);
+  //
+  //       // Compress and resize the image
+  //       final compressedImage = await compressImage(imageBytes, 100, 100);
+  //       print('나와라');
+  //       print(compressedImage);
+  //       return BitmapDescriptor.fromBytes(compressedImage!);
+  //     } else {
+  //       print('이미지 다운로드 실패');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //     return null;
+  //   }
+  // }
+
+  void setCustomMarkerIcon() {
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(20, 20)), "assets/images/marker.png")
+        .then(
+          (icon) {
+        setState(() {
+          currentLocationIcon = icon;
+        }
+        );
+      },
+    );
+  }
 
   @override
   void initState() {

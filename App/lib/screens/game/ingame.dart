@@ -59,12 +59,22 @@ class InGameState extends State<InGame> {
                 color: Colors.white.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(15)
             ),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              //   Text('시간모달', style: TextStyle(fontSize: 20,color: Colors.black),),
-              //   Text('0m²', style: TextStyle(fontSize: 25,color: Colors.black, fontWeight: FontWeight.w400),)
                 SlideCountdown(
                   duration: const Duration(hours: 1),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFFDD987),
+                            Color(0xFFF79CC3),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter
+                      ),
+                  ),
                   onDone: () {
                     Navigator.push(
                       context,
@@ -78,71 +88,71 @@ class InGameState extends State<InGame> {
             ),
           ),
         ),
-        Positioned(
-            right: mediaWidth*0.03,
-            top: mediaHeight*0.03,
-            child: Container(
-              //오른쪽 위 모달
-              width: 200,
-              decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(15)
-              ),
-              child: Column(
-                children: [
-                  Column(
-                    children: [
-                      Text('실시간 순위', style: TextStyle(fontSize: 16, color: Colors.black)),
-                      SizedBox(
-                        child: Userprofile(
-                            height: mediaHeight*0.04,
-                            width: mediaWidth*0.8,
-                            imageProvider: AssetImage('assets/images/profile01mini.png'),
-                            text1: '1',
-                            text2: '군침이싹도나',
-                            text3: null,
-                            textStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15
-                            )),
-                      ),
-                      SizedBox(
-                        child: Userprofile(
-                            height: mediaHeight*0.04,
-                            width: mediaWidth*0.8,
-                            imageProvider: AssetImage('assets/images/profile02mini.png'),
-                            text1: '2',
-                            text2: '오늘도군것질',
-                            text3: null,
-                            textStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15
-                            )),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text('내 순위', style: TextStyle(fontSize: 16, color: Colors.black)),
-                      SizedBox(
-                        child: Userprofile(
-                            height: mediaHeight*0.04,
-                            width: mediaWidth*0.8,
-                            imageProvider: AssetImage('assets/images/profilememini.png'),
-                            text1: '_',
-                            text2: '가면말티즈',
-                            text3: null,
-                            textStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15
-                            )),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            )
-        ),
+        // Positioned(
+        //     right: mediaWidth*0.03,
+        //     top: mediaHeight*0.03,
+        //     child: Container(
+        //       //오른쪽 위 모달
+        //       width: 200,
+        //       decoration: BoxDecoration(
+        //           color: Colors.white.withOpacity(0.8),
+        //           borderRadius: BorderRadius.circular(15)
+        //       ),
+        //       child: Column(
+        //         children: [
+        //           Column(
+        //             children: [
+        //               Text('실시간 순위', style: TextStyle(fontSize: 16, color: Colors.black)),
+        //               SizedBox(
+        //                 child: Userprofile(
+        //                     height: mediaHeight*0.04,
+        //                     width: mediaWidth*0.8,
+        //                     imageProvider: AssetImage('assets/images/profile01mini.png'),
+        //                     text1: '1',
+        //                     text2: '군침이싹도나',
+        //                     text3: null,
+        //                     textStyle: TextStyle(
+        //                         color: Colors.black,
+        //                         fontSize: 15
+        //                     )),
+        //               ),
+        //               SizedBox(
+        //                 child: Userprofile(
+        //                     height: mediaHeight*0.04,
+        //                     width: mediaWidth*0.8,
+        //                     imageProvider: AssetImage('assets/images/profile02mini.png'),
+        //                     text1: '2',
+        //                     text2: '오늘도군것질',
+        //                     text3: null,
+        //                     textStyle: TextStyle(
+        //                         color: Colors.black,
+        //                         fontSize: 15
+        //                     )),
+        //               )
+        //             ],
+        //           ),
+        //           Column(
+        //             children: [
+        //               Text('내 순위', style: TextStyle(fontSize: 16, color: Colors.black)),
+        //               SizedBox(
+        //                 child: Userprofile(
+        //                     height: mediaHeight*0.04,
+        //                     width: mediaWidth*0.8,
+        //                     imageProvider: AssetImage('assets/images/profilememini.png'),
+        //                     text1: '_',
+        //                     text2: '가면말티즈',
+        //                     text3: null,
+        //                     textStyle: TextStyle(
+        //                         color: Colors.black,
+        //                         fontSize: 15
+        //                     )),
+        //               )
+        //             ],
+        //           )
+        //         ],
+        //       ),
+        //     )
+        // ),
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
@@ -170,37 +180,32 @@ class InGameState extends State<InGame> {
                     child: FloatingActionButton(
                         backgroundColor: Colors.transparent,
                         onPressed: (){
-                          drawPolygonStateKey.currentState?.resetPoints();
-                        }, child: Icon(Icons.stop_rounded, size: 45)),
-                  ),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFFDD987),
-                              Color(0xFFF79CC3),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter
-                        ),
-                        border: Border.all(
-                            color: Colors.white,
-                            width: 3
-                        )
-                    ),
-                    child: FloatingActionButton(
-                        backgroundColor: Colors.transparent,
-                        onPressed: (){
                           if (!isWalking) {
                             runningStartTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
                           }
                           setState(() {
                             isWalking = !isWalking;
                           });
-                        }, child: Icon(isWalking ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 45)),
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFFFDD987),
+                                    Color(0xFFF79CC3),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter
+                              ),
+                              border: Border.all(
+                                  color: Colors.white,
+                                  width: 3
+                              )
+                          ),
+                          child : Icon(isWalking ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 45))),
                   ),
                   Container(
                     width: 80,
@@ -230,7 +235,26 @@ class InGameState extends State<InGame> {
                           drawGround = !drawGround;
                           currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
-                        }, child: Icon(Icons.star_border_rounded, size: 45)),
+                        }, child:
+                            Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFFFDD987),
+                                          Color(0xFFF79CC3),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter
+                                    ),
+                                    border: Border.all(
+                                        color: Colors.white,
+                                        width: 3
+                                    )
+                                ),
+                                child : Icon(Icons.star_border_rounded, size: 45))),
                   ),
                 ],
               )
