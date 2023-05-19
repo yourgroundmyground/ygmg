@@ -1,4 +1,3 @@
-
 # 🏃 니땅내땅
 ![시작페이지.png](./image/시작페이지.png)
 
@@ -283,7 +282,7 @@ C:.
 
 #### 1️⃣ 회원 가입 및 로그인
 A. 회원 가입
-<img src="./image/회원가입1.png" width="200" height="400"/>
+<img src="/image/회원가입1.png" width="200" height="400"/>
 <img src="회원가입2.png" width="200" height="400"/>
 ![회원가입1](/image/회원가입1.png) {: width="200" height="400"}
 ![회원가입2](./image/회원가입2.png)
