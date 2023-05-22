@@ -24,7 +24,6 @@ class _GameDetailState extends State<GameDetail> {
   List<Widget> _pages = [];
   var pagesLength;
   final _pageController = PageController();
-  var test;
 
   // 마이페이지 게임상세조회 요청
   void getGameDetail() async {
@@ -51,7 +50,6 @@ class _GameDetailState extends State<GameDetail> {
         groupedAreaLists = tempMap.values.toList();
 
         setState(() {
-          test = response.data;
           _pages = List.generate(
             groupedAreaLists.length,
                 (index) => GameDetailView1(
