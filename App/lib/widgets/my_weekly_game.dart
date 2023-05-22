@@ -265,7 +265,7 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
                                             context,
                                             MaterialPageRoute(builder: (context) =>
                                               GameDetail(
-                                                gameId: -notNowIndex+2,
+                                                gameId: -notNowIndex+widget.nowgameId,
                                                 memberId: widget.memberId,
                                                 start: widget.tuesday,
                                                 end: widget.sunday,
