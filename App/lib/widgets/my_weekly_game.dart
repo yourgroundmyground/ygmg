@@ -102,8 +102,11 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
 
     try {
       int memberId = widget.memberId;
-      if (-notNowIndex+2 != widget.nowgameId) {
-        var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/${-notNowIndex+2}/$memberId');
+      print('여기');
+      print(notNowIndex);
+      print(widget.nowgameId);
+      if (-notNowIndex+widget.nowgameId - 1 != widget.nowgameId) {
+        var response = await dio.get('https://xofp5xphrk.execute-api.ap-northeast-2.amazonaws.com/ygmg/api/game/result/${-notNowIndex+widget.nowgameId - 1}/$memberId');
         setState(() {
           notNowRank = response.data['resultRanking'];
           notNowArea = response.data['resultArea'];
@@ -265,7 +268,7 @@ class _MyWeeklyGameState extends State<MyWeeklyGame> with SingleTickerProviderSt
                                             context,
                                             MaterialPageRoute(builder: (context) =>
                                               GameDetail(
-                                                gameId: -notNowIndex+widget.nowgameId,
+                                                gameId: -notNowIndex + widget.nowgameId - 1,
                                                 memberId: widget.memberId,
                                                 start: widget.tuesday,
                                                 end: widget.sunday,
